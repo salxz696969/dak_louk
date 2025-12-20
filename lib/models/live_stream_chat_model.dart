@@ -5,6 +5,8 @@ class LiveStreamChat{
   final String text;
   final int userId;
   final int liveStreamId;
+final DateTime createdAt;
+  final DateTime updatedAt;
 
   final User? user;
 
@@ -13,6 +15,8 @@ class LiveStreamChat{
     required this.text,
     required this.userId,
     required this.liveStreamId,
+    required this.createdAt,
+    required this.updatedAt,
     this.user,
   });
 
@@ -22,6 +26,8 @@ class LiveStreamChat{
       text: liveStreamChat['text'],
       userId: liveStreamChat['user_id'],
       liveStreamId: liveStreamChat['live_stream_id'],
+      createdAt: DateTime.parse(liveStreamChat['created_at']),
+      updatedAt: DateTime.parse(liveStreamChat['updated_at']),
       user: user,
     );
   }
@@ -32,6 +38,8 @@ class LiveStreamChat{
       'text': text,
       'user_id': userId,
       'live_stream_id': liveStreamId,
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
     };
   }
 }

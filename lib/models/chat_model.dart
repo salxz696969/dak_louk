@@ -5,6 +5,8 @@ class Chat {
   final int userId;
   final String text;
   final int chatRoomId;
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
   final User? user;
 
@@ -13,6 +15,8 @@ class Chat {
     required this.userId,
     required this.text,
     required this.chatRoomId,
+    required this.createdAt,
+    required this.updatedAt,
     this.user,
   });
 
@@ -21,6 +25,8 @@ class Chat {
       id: chat['id'],
       userId: chat['user_id'],
       text: chat['text'],
+      createdAt: DateTime.parse(chat['created_at']),
+      updatedAt: DateTime.parse(chat['updated_at']),
       user: user,
       chatRoomId: chat['chat_room_id'],
     );
@@ -32,6 +38,8 @@ class Chat {
       'user_id': userId,
       'text': text,
       'chat_room_id': chatRoomId,
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
     };
   }
 }

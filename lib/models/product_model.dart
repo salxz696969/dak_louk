@@ -8,7 +8,10 @@ class Product {
   final ProductCategory category;
   final double price;
   final int quantity;
-  final int liveStreamId;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
+  final int? liveStreamId;
 
   Product({
     required this.id,
@@ -18,7 +21,9 @@ class Product {
     required this.category,
     required this.price,
     required this.quantity,
-    required this.liveStreamId,
+    required this.createdAt,
+    required this.updatedAt,
+    this.liveStreamId,
   });
 
   factory Product.fromMap(Map<String, dynamic> product) {
@@ -33,6 +38,8 @@ class Product {
       price: product['price'],
       quantity: product['quantity'],
       liveStreamId: product['live_stream_id'],
+      createdAt: DateTime.parse(product['created_at']),
+      updatedAt: DateTime.parse(product['updated_at']),
     );
   }
 
@@ -46,6 +53,8 @@ class Product {
       'price': price,
       'quantity': quantity,
       'live_stream_id': liveStreamId,
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
     };
   }
 }

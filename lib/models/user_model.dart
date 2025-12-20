@@ -5,6 +5,8 @@ class User {
   final String profileImageUrl;
   final double rating;
   final String role;
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
   User({
     required this.id,
@@ -13,6 +15,8 @@ class User {
     required this.profileImageUrl,
     required this.rating,
     required this.role,
+    required this.createdAt,
+    required this.updatedAt,
   });
 
   factory User.fromMap(Map<String, dynamic> user) {
@@ -23,6 +27,8 @@ class User {
       profileImageUrl: user['profile_image_url'],
       rating: user['rating'],
       role: user['role'],
+      createdAt: DateTime.parse(user['created_at']),
+      updatedAt: DateTime.parse(user['updated_at']),
     );
   }
 
@@ -34,6 +40,8 @@ class User {
       'profile_image_url': profileImageUrl,
       'rating': rating,
       'role': role,
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
     };
   }
 }

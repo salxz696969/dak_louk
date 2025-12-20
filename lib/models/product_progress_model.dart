@@ -7,6 +7,8 @@ class ProductProgress {
   final int userId;
   final int productId;
   final ProgressStatus status;
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
   final User? user;
   final Product? product;
@@ -16,6 +18,8 @@ class ProductProgress {
     required this.userId,
     required this.productId,
     required this.status,
+    required this.createdAt,
+    required this.updatedAt,
     this.user,
     this.product,
   });
@@ -32,6 +36,8 @@ class ProductProgress {
       status: ProgressStatus.values.firstWhere(
         (e) => e.toString() == 'ProgressStatus.${productProgress['status']}',
       ),
+      createdAt: DateTime.parse(productProgress['created_at']),
+      updatedAt: DateTime.parse(productProgress['updated_at']),
       user: user,
       product: product,
     );
@@ -43,6 +49,8 @@ class ProductProgress {
       'user_id': userId,
       'product_id': productId,
       'status': status.toString().split('.').last,
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
     };
   }
 }

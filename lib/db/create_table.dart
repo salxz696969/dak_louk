@@ -65,10 +65,10 @@ Future<void> createTables(Database db) async {
       CREATE TABLE medias (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         url TEXT,
-        product_id INTEGER,
+        post_id INTEGER,
         created_at TEXT,
         updated_at TEXT,
-        FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+        FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
       )
     ''');
 
@@ -103,21 +103,19 @@ Future<void> createTables(Database db) async {
   await db.execute('''
       CREATE TABLE chats (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        chat_id INTEGER,
         user_id INTEGER,
         chat_room_id INTEGER,
         text TEXT,
         created_at TEXT,
         updated_at TEXT,
         FOREIGN KEY (chat_room_id) REFERENCES chat_rooms(id) ON DELETE CASCADE,
-        FOREIGN KEY (chat_id) REFERENCES chats(id) ON DELETE CASCADE,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
       )
     ''');
 
-  // live_stream_chat
+  // live_stream_chats
   await db.execute('''
-      CREATE TABLE live_stream_chat (
+      CREATE TABLE live_stream_chats (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         text TEXT,
         user_id INTEGER,

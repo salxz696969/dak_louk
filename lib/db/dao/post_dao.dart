@@ -26,7 +26,18 @@ class PostDao {
         final Product product = await productDao.getProductById(
           map['product_id'] as int,
         );
-        return Post.fromMap(map, product, user);
+        final postId = map['id'] as int;
+        final mediaResults = await db.query(
+          'medias',
+          where: 'post_id = ?',
+          whereArgs: [postId],
+        );
+        return Post.fromMap(
+          map,
+          product,
+          user,
+          mediaResults.map((media) => media['url'] as String).toList(),
+        );
       }),
     );
 

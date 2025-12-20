@@ -1,42 +1,22 @@
+import 'package:dak_louk/models/post_model.dart';
 import 'package:dak_louk/screens/product_info_screen.dart';
 import 'package:dak_louk/widgets/add_and_remove_button.dart';
 import 'package:dak_louk/widgets/photo_slider.dart';
 import 'package:dak_louk/widgets/usernameContainer.dart';
 import 'package:flutter/material.dart';
 
-class ProductBlock extends StatefulWidget {
-  final String title;
-  final List<ImageProvider> images;
-  final ImageProvider profile;
-  final String username;
-  final String description;
-  final String price;
-  final String rating;
-  final String date;
-  final String quantity;
+class PostBlock extends StatefulWidget {
+  final Post post;
 
-  const ProductBlock({
-    super.key,
-    required this.quantity,
-    required this.date,
-    required this.title,
-    required this.rating,
-    required this.images,
-    required this.profile,
-    required this.username,
-    required this.description,
-    required this.price,
-  });
+  const PostBlock({super.key, required this.post});
 
   @override
-  State<ProductBlock> createState() => _ProductBlockState();
+  State<PostBlock> createState() => _PostBlockState();
 }
 
-class _ProductBlockState extends State<ProductBlock> {
+class _PostBlockState extends State<PostBlock> {
   late final PageController _pageController;
   int _page = 0;
-
-  List<ImageProvider> get _images => widget.images;
 
   @override
   void initState() {
@@ -54,44 +34,57 @@ class _ProductBlockState extends State<ProductBlock> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          UsernameContainer(
-            profile: widget.profile,
-            username: widget.username,
-            rating: widget.rating,
+    final user = widget.post.user;
+    final product = widget.post.product;
+    final images = widget.post.images ?? [];
+
+    final profileImage = (user?.profileImageUrl != null)
+        ? AssetImage(user!.profileImageUrl)
+        : const AssetImage('assets/profiles/profile1.png');
+
+    final username = user?.username ?? 'Unknown';
+    final rating = user?.rating.toStringAsFixed(2) ?? '0.00';
+
+    final quantity = product?.quantity.toString() ?? '1';
+    final price = product?.price.toStringAsFixed(2) ?? '0.0';
+    final description = product?.description ?? '';
+    final title = widget.post.title;
+
+    final date = timeAgo(widget.post.createdAt);
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        UsernameContainer(
+          profile: profileImage,
+          username: username,
+          rating: rating,
+        ),
+        if (images.isNotEmpty)
+          PhotoSlider(
+            quantity: images.length.toString(),
+            images: images.map((url) => AssetImage(url)).toList(),
+            page: _page,
+            controller: _pageController,
+            onChanged: _onPageChanged,
           ),
-          if (_images.isNotEmpty)
-            PhotoSlider(
-              quantity: widget.quantity,
-              images: _images,
-              page: _page,
-              controller: _pageController,
-              onChanged: _onPageChanged,
-            ),
-          if (_images.isNotEmpty) const SizedBox(height: 8.0),
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 12.0,
-              vertical: 4.0,
-            ),
-          ),
-          _ActionsAndMeta(
-            quantity: widget.quantity,
-            images: widget.images,
-            profile: widget.profile,
-            username: widget.username,
-            rating: widget.rating,
-            title: widget.title,
-            date: widget.date,
-            price: widget.price,
-            description: widget.description,
-          ),
-        ],
-      ),
+        if (images.isNotEmpty) const SizedBox(height: 8.0),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
+        ),
+        _ActionsAndMeta(
+          quantity: quantity,
+          images: images.map((url) => AssetImage(url)).toList(),
+          profile: profileImage,
+          username: username,
+          rating: rating,
+          title: title,
+          date: date,
+          price: price,
+          description: description,
+        ),
+      ],
     );
   }
 }
@@ -230,5 +223,29 @@ class _AddToCartButtonState extends State<_AddToCartButton> {
     }
 
     return AddAndRemoveButton();
+  }
+}
+
+String timeAgo(DateTime date) {
+  final now = DateTime.now();
+  final difference = now.difference(date);
+
+  if (difference.inSeconds < 60) {
+    return '${difference.inSeconds}s ago';
+  } else if (difference.inMinutes < 60) {
+    return '${difference.inMinutes}m ago';
+  } else if (difference.inHours < 24) {
+    return '${difference.inHours}h ago';
+  } else if (difference.inDays < 7) {
+    return '${difference.inDays}d ago';
+  } else if (difference.inDays < 30) {
+    final weeks = (difference.inDays / 7).floor();
+    return '${weeks}w ago';
+  } else if (difference.inDays < 365) {
+    final months = (difference.inDays / 30).floor();
+    return '${months}mo ago';
+  } else {
+    final years = (difference.inDays / 365).floor();
+    return '${years}y ago';
   }
 }

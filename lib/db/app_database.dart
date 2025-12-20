@@ -1,5 +1,6 @@
 // ignore: depend_on_referenced_packages
 import 'package:dak_louk/db/create_table.dart';
+import 'package:dak_louk/db/init_db.dart';
 // ignore: depend_on_referenced_packages
 import 'package:sqflite/sqflite.dart';
 // ignore: depend_on_referenced_packages
@@ -31,6 +32,7 @@ class AppDatabase {
         },
         onCreate: (db, version) async {
           await createTables(db);
+          await insertMockData(db);
         },
       );
     } catch (e) {
