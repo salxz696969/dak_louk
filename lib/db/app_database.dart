@@ -15,8 +15,15 @@ class AppDatabase {
 
   Future<Database> get database async {
     if (_db != null && _db!.isOpen) return _db!;
+    // await _deleteDatabaseOnStart(); // Delete DB on every app run
     _db = await _init();
     return _db!;
+  }
+
+  Future<void> _deleteDatabaseOnStart() async {
+    final dbPath = await getDatabasesPath();
+    final path = '$dbPath/marketplace.db';
+    await deleteDatabase(path);
   }
 
   Future<Database> _init() async {
