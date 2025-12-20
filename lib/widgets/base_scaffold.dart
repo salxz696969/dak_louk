@@ -1,52 +1,53 @@
 import 'package:dak_louk/screens/cart_screen.dart';
+import 'package:dak_louk/screens/chat_screen.dart';
+import 'package:dak_louk/screens/home_screen.dart';
+import 'package:dak_louk/screens/live_stream_screen.dart';
+import 'package:dak_louk/screens/setting_screen.dart';
+import 'package:dak_louk/widgets/appbar.dart';
 import 'package:dak_louk/widgets/navbar.dart';
 import 'package:flutter/material.dart';
 
-class BaseScaffold extends StatelessWidget {
-  final Widget body;
+/// Simple tab scaffold for Home / Chat / Live / Settings.
+class BaseScaffold extends StatefulWidget {
+  final int initialIndex;
 
-  const BaseScaffold({super.key, required this.body});
+  const BaseScaffold({super.key, this.initialIndex = 0});
+
+  @override
+  State<BaseScaffold> createState() => _BaseScaffoldState();
+}
+
+class _BaseScaffoldState extends State<BaseScaffold> {
+  static const List<Widget> _tabs = [
+    HomeScreen(),
+    ChatScreen(),
+    LiveStreamScreen(),
+    SettingScreen(),
+  ];
+
+  late int _currentIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = widget.initialIndex.clamp(0, _tabs.length - 1);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Colors.white,
-        iconTheme: const IconThemeData(color: Colors.white),
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text(
-              'Dak Louk',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-                fontSize: 28,
-              ),
-            ),
-            IconButton(
-              icon: const Icon(
-                Icons.shopping_cart,
-                color: Colors.white,
-                size: 28,
-              ),
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => const BaseScaffold(body: CartScreen()),
-                ),
-              ),
-            ),
-          ],
+      appBar: const PreferredSize(
+        preferredSize: Size.fromHeight(kToolbarHeight),
+        child: Appbar(
+          title: 'Dak Louk',
+          icon: Icons.receipt_rounded,
+          navigateTo: CartScreen(),
         ),
       ),
-      body: body,
+      body: _tabs[_currentIndex],
       bottomNavigationBar: Navbar(
-        onNavigate: (screen) => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => BaseScaffold(body: screen)),
-        ),
+        currentIndex: _currentIndex,
+        onNavigate: (index) => setState(() => _currentIndex = index),
       ),
     );
   }

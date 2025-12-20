@@ -1,4 +1,3 @@
-import 'package:dak_louk/screens/home_screen.dart';
 import 'package:dak_louk/widgets/base_scaffold.dart';
 import 'package:flutter/material.dart';
 
@@ -17,7 +16,7 @@ class MyApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: const BaseScaffold(body: HomeScreen()),
+      home: const BaseScaffold(),
     );
   }
 }

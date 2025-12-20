@@ -5,13 +5,13 @@ class PhotoSlider extends StatelessWidget {
   final int page;
   final PageController controller;
   final ValueChanged<int> onChanged;
-  final String rating;
+  final String quantity;
 
   const PhotoSlider({
     super.key,
+    required this.quantity,
     required this.images,
     required this.page,
-    required this.rating,
     required this.controller,
     required this.onChanged,
   });
@@ -107,36 +107,38 @@ class PhotoSlider extends StatelessWidget {
                   ),
                 ),
               ),
-              Positioned(
-                right: 5.0,
-                bottom: 5.0,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(4.0),
-                    color: const Color.fromARGB(213, 0, 0, 0),
+            ],
+            Positioned(
+              bottom: 8,
+              right: 8,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: const Color.fromARGB(190, 0, 0, 0),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8.0,
+                    vertical: 4.0,
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 5.0,
-                      vertical: 1.0,
-                    ),
-                    child: Row(
-                      children: [
-                        Text(
-                          rating,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
+                  child: Text(
+                    '$quantity left',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      shadows: [
+                        Shadow(
+                          offset: Offset(0, 0),
+                          blurRadius: 4.0,
+                          color: Colors.black54,
                         ),
-                        const Icon(Icons.star, color: Colors.yellow, size: 16),
                       ],
                     ),
                   ),
                 ),
               ),
-            ],
+            ),
           ],
         ),
       ),
