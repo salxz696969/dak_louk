@@ -1,20 +1,31 @@
 import 'package:flutter/material.dart';
 
-class PhotoSlider extends StatelessWidget {
+class PhotoSlider extends StatefulWidget {
   final List<ImageProvider> images;
-  final int page;
-  final PageController controller;
-  final ValueChanged<int> onChanged;
   final String quantity;
 
-  const PhotoSlider({
-    super.key,
-    required this.quantity,
-    required this.images,
-    required this.page,
-    required this.controller,
-    required this.onChanged,
-  });
+  const PhotoSlider({super.key, required this.quantity, required this.images});
+
+  @override
+  State<PhotoSlider> createState() => _PhotoSliderState();
+}
+
+class _PhotoSliderState extends State<PhotoSlider> {
+  late final PageController controller;
+  int _page = 0;
+  void _onPageChanged(int i) => setState(() => _page = i);
+
+  @override
+  void initState() {
+    super.initState();
+    controller = PageController();
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,15 +37,15 @@ class PhotoSlider extends StatelessWidget {
           children: [
             PageView.builder(
               controller: controller,
-              itemCount: images.length,
-              onPageChanged: onChanged,
+              itemCount: widget.images.length,
+              onPageChanged: _onPageChanged,
               itemBuilder: (_, i) => Image(
-                image: images[i],
+                image: widget.images[i],
                 fit: BoxFit.cover,
                 width: double.infinity,
               ),
             ),
-            if (images.length > 1) ...[
+            if (widget.images.length > 1) ...[
               Positioned.fill(
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -43,7 +54,7 @@ class PhotoSlider extends StatelessWidget {
                     children: [
                       InkWell(
                         onTap: () {
-                          if (page > 0) {
+                          if (_page > 0) {
                             controller.previousPage(
                               duration: const Duration(milliseconds: 300),
                               curve: Curves.easeInOut,
@@ -64,7 +75,7 @@ class PhotoSlider extends StatelessWidget {
                       ),
                       InkWell(
                         onTap: () {
-                          if (page < images.length - 1) {
+                          if (_page < widget.images.length - 1) {
                             controller.nextPage(
                               duration: const Duration(milliseconds: 300),
                               curve: Curves.easeInOut,
@@ -92,14 +103,14 @@ class PhotoSlider extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: List.generate(
-                    images.length,
+                    widget.images.length,
                     (i) => Container(
                       margin: const EdgeInsets.symmetric(horizontal: 3),
                       width: 8,
                       height: 8,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: page == i
+                        color: _page == i
                             ? Colors.white
                             : Colors.white.withOpacity(0.4),
                       ),
@@ -122,18 +133,11 @@ class PhotoSlider extends StatelessWidget {
                     vertical: 4.0,
                   ),
                   child: Text(
-                    '$quantity left',
+                    '${widget.quantity} left',
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
-                      shadows: [
-                        Shadow(
-                          offset: Offset(0, 0),
-                          blurRadius: 4.0,
-                          color: Colors.black54,
-                        ),
-                      ],
                     ),
                   ),
                 ),

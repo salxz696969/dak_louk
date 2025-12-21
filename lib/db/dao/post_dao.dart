@@ -13,9 +13,22 @@ class PostDao {
     return await db.insert('posts', post.toMap());
   }
 
-  Future<List<Post>> getAllPosts() async {
+  Future<List<Post>> getAllPosts(String category, int limit) async {
     final db = await _appDatabase.database;
-    final result = await db.query('posts', limit: 20);
+    List<Map<String, dynamic>> result = <Map<String, dynamic>>[];
+    if (limit <= 0) {
+      limit = 100;
+    }
+    if (category == 'all') {
+      result = await db.query('posts', limit: limit);
+    } else {
+      result = await db.query(
+        'posts',
+        limit: limit,
+        where: 'category = ?',
+        whereArgs: [category],
+      );
+    }
 
     final UserDao userDao = UserDao();
     final ProductDao productDao = ProductDao();

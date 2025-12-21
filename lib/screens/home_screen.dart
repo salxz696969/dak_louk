@@ -4,24 +4,37 @@ import 'package:dak_louk/db/dao/post_dao.dart';
 import 'package:dak_louk/models/post_model.dart';
 import 'package:flutter/material.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  String selectedCategory = 'all';
+
+  void onCategorySelected(String category) {
+    setState(() {
+      selectedCategory = category.toLowerCase();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         const SizedBox(height: 16.0),
-        CategoryBar(),
+        CategoryBar(onCategorySelected: onCategorySelected),
         const SizedBox(height: 16.0),
         Expanded(
           child: FutureBuilder<List<Post>>(
-            future: PostDao().getAllPosts(),
+            future: PostDao().getAllPosts(selectedCategory, 100),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
               } else if (snapshot.hasError) {
-                return Center(child: Text('Error: ${snapshot.error}'));
+                return Center(child: Text('Error: \\${snapshot.error}'));
               } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                 return const Center(child: Text('No posts found.'));
               }

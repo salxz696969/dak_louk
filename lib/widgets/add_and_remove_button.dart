@@ -2,66 +2,62 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class AddAndRemoveButton extends StatefulWidget {
-  final bool reverseColor;
-  const AddAndRemoveButton({super.key, this.reverseColor = false});
+  final double size;
+  final int quantity;
+
+  const AddAndRemoveButton({
+    super.key,
+    this.size = 30.0,
+    required this.quantity,
+  });
 
   @override
   State<AddAndRemoveButton> createState() => _AddAndRemoveButtonState();
 }
 
 class _AddAndRemoveButtonState extends State<AddAndRemoveButton> {
-  int quantity = 0;
-  bool isAdded = false;
-
-  void onAdd() {
-    setState(() {
-      isAdded = true;
-      quantity = quantity + 1;
-    });
-  }
-
-  void onRemove() {
-    setState(() {
-      if (quantity > 0) quantity--;
-    });
-  }
-
+  int currentQuantity = 0;
   @override
   Widget build(BuildContext context) {
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
         InkWell(
-          onTap: onRemove,
+          onTap: () {
+            if (currentQuantity > 0) {
+              setState(() {
+                currentQuantity = currentQuantity - 1;
+              });
+            }
+          },
           child: Icon(
-            widget.reverseColor
-                ? CupertinoIcons.minus_circle_fill
-                : Icons.remove_circle_rounded,
-            size: 30,
-            color: widget.reverseColor
-                ? Colors.white
-                : Theme.of(context).colorScheme.secondary,
+            CupertinoIcons.minus_circle_fill,
+            size: widget.size,
+            color: Theme.of(context).colorScheme.secondary,
           ),
         ),
         const SizedBox(width: 5),
         Text(
-          quantity.toString(),
-          style: TextStyle(
+          currentQuantity.toString(),
+          style: const TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: widget.reverseColor ? Colors.white : Colors.black,
+            color: Colors.black,
           ),
         ),
         const SizedBox(width: 5),
         InkWell(
-          onTap: onAdd,
+          onTap: () {
+            setState(() {
+              if (currentQuantity < widget.quantity) {
+                currentQuantity = currentQuantity + 1;
+              }
+            });
+          },
           child: Icon(
-            widget.reverseColor
-                ? CupertinoIcons.add_circled_solid
-                : Icons.add_circle_rounded,
-            size: 28,
-            color: widget.reverseColor
-                ? Colors.white
-                : Theme.of(context).colorScheme.secondary,
+            CupertinoIcons.add_circled_solid,
+            size: widget.size,
+            color: Theme.of(context).colorScheme.secondary,
           ),
         ),
       ],

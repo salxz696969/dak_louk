@@ -23,6 +23,7 @@ Future<void> createTables(Database db) async {
         user_id INTEGER,
         title TEXT,
         product_id INTEGER,
+        category TEXT CHECK(category IN ('vehicles','property','electronics','home','fashion','jobs','services','entertainment','kids','pets','business','others')),
         created_at TEXT,
         updated_at TEXT,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE

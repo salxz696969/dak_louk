@@ -29,15 +29,21 @@ class UsernameContainer extends StatelessWidget {
                   Text(
                     username,
                     style: const TextStyle(
-                      fontSize: 16,
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   Row(
                     children: [
-                      Text(rating, style: const TextStyle(fontSize: 14)),
+                      Text(
+                        rating,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
                       const SizedBox(width: 2),
-                      Icon(Icons.star, color: Colors.amber, size: 16),
+                      Icon(Icons.star, color: Colors.amber, size: 14),
                     ],
                   ),
                 ],

@@ -2,7 +2,7 @@ import 'package:dak_louk/models/post_model.dart';
 import 'package:dak_louk/screens/product_info_screen.dart';
 import 'package:dak_louk/widgets/add_and_remove_button.dart';
 import 'package:dak_louk/widgets/photo_slider.dart';
-import 'package:dak_louk/widgets/usernameContainer.dart';
+import 'package:dak_louk/widgets/username_container.dart';
 import 'package:flutter/material.dart';
 
 class PostBlock extends StatefulWidget {
@@ -16,7 +16,6 @@ class PostBlock extends StatefulWidget {
 
 class _PostBlockState extends State<PostBlock> {
   late final PageController _pageController;
-  int _page = 0;
 
   @override
   void initState() {
@@ -30,59 +29,36 @@ class _PostBlockState extends State<PostBlock> {
     super.dispose();
   }
 
-  void _onPageChanged(int i) => setState(() => _page = i);
-
   @override
   Widget build(BuildContext context) {
-    final user = widget.post.user;
-    final product = widget.post.product;
-    final images = widget.post.images ?? [];
-
-    final profileImage = (user?.profileImageUrl != null)
-        ? AssetImage(user!.profileImageUrl)
-        : const AssetImage('assets/profiles/profile1.png');
-
-    final username = user?.username ?? 'Unknown';
-    final rating = user?.rating.toStringAsFixed(2) ?? '0.00';
-
-    final quantity = product?.quantity.toString() ?? '1';
-    final price = product?.price.toStringAsFixed(2) ?? '0.0';
-    final description = product?.description ?? '';
-    final title = widget.post.title;
-
-    final date = timeAgo(widget.post.createdAt);
-
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         UsernameContainer(
-          profile: profileImage,
-          username: username,
-          rating: rating,
+          profile: widget.post.ui()['profileImage'],
+          username: widget.post.ui()['username'],
+          rating: widget.post.ui()['rating'],
         ),
-        if (images.isNotEmpty)
+        if (widget.post.ui().isNotEmpty)
           PhotoSlider(
-            quantity: images.length.toString(),
-            images: images.map((url) => AssetImage(url)).toList(),
-            page: _page,
-            controller: _pageController,
-            onChanged: _onPageChanged,
+            quantity: widget.post.ui()['quantity'],
+            images: widget.post.ui()['images'],
           ),
-        if (images.isNotEmpty) const SizedBox(height: 8.0),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
-        ),
+        if ((widget.post.ui()['images'] as List).isNotEmpty)
+          const SizedBox(height: 8.0),
+        Padding(padding: const EdgeInsets.symmetric(horizontal: 12.0)),
         _ActionsAndMeta(
-          quantity: quantity,
-          images: images.map((url) => AssetImage(url)).toList(),
-          profile: profileImage,
-          username: username,
-          rating: rating,
-          title: title,
-          date: date,
-          price: price,
-          description: description,
+          quantity: widget.post.ui()['quantity'],
+          images: widget.post.ui()['images'],
+          profile: widget.post.ui()['profileImage'],
+          username: widget.post.ui()['username'],
+          rating: widget.post.ui()['rating'],
+          title: widget.post.ui()['title'],
+          date: widget.post.ui()['date'],
+          price: widget.post.ui()['price'],
+          description: widget.post.ui()['description'],
+          category: widget.post.ui()['category'],
         ),
       ],
     );
@@ -99,6 +75,7 @@ class _ActionsAndMeta extends StatelessWidget {
   final String username;
   final String description;
   final String quantity;
+  final String category;
 
   const _ActionsAndMeta({
     required this.images,
@@ -110,6 +87,7 @@ class _ActionsAndMeta extends StatelessWidget {
     required this.title,
     required this.date,
     required this.price,
+    required this.category,
   });
 
   @override
@@ -130,7 +108,7 @@ class _ActionsAndMeta extends StatelessWidget {
                   color: Theme.of(context).colorScheme.primary,
                 ),
               ),
-              _AddToCartButton(),
+              _AddToCartButton(quantity: int.parse(quantity)),
             ],
           ),
           const SizedBox(height: 10.0),
@@ -138,7 +116,7 @@ class _ActionsAndMeta extends StatelessWidget {
             title,
             style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
           ),
-          const SizedBox(height: 8.0),
+          const SizedBox(height: 5.0),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -157,6 +135,7 @@ class _ActionsAndMeta extends StatelessWidget {
                         title: title,
                         date: date,
                         rating: rating,
+                        category: category,
                       ),
                     ),
                   );
@@ -164,7 +143,7 @@ class _ActionsAndMeta extends StatelessWidget {
                 child: const Text(
                   "View more",
                   style: TextStyle(
-                    fontSize: 15,
+                    fontSize: 13,
                     color: Color.fromARGB(255, 96, 96, 96),
                   ),
                 ),
@@ -172,7 +151,7 @@ class _ActionsAndMeta extends StatelessWidget {
               const SizedBox(height: 4.0),
               Text(
                 date,
-                style: const TextStyle(fontSize: 14, color: Color(0xFF777777)),
+                style: const TextStyle(fontSize: 12, color: Color(0xFF777777)),
               ),
             ],
           ),
@@ -183,7 +162,8 @@ class _ActionsAndMeta extends StatelessWidget {
 }
 
 class _AddToCartButton extends StatefulWidget {
-  const _AddToCartButton();
+  final int quantity;
+  const _AddToCartButton({required this.quantity});
 
   @override
   State<_AddToCartButton> createState() => _AddToCartButtonState();
@@ -222,30 +202,6 @@ class _AddToCartButtonState extends State<_AddToCartButton> {
       );
     }
 
-    return AddAndRemoveButton();
-  }
-}
-
-String timeAgo(DateTime date) {
-  final now = DateTime.now();
-  final difference = now.difference(date);
-
-  if (difference.inSeconds < 60) {
-    return '${difference.inSeconds}s ago';
-  } else if (difference.inMinutes < 60) {
-    return '${difference.inMinutes}m ago';
-  } else if (difference.inHours < 24) {
-    return '${difference.inHours}h ago';
-  } else if (difference.inDays < 7) {
-    return '${difference.inDays}d ago';
-  } else if (difference.inDays < 30) {
-    final weeks = (difference.inDays / 7).floor();
-    return '${weeks}w ago';
-  } else if (difference.inDays < 365) {
-    final months = (difference.inDays / 30).floor();
-    return '${months}mo ago';
-  } else {
-    final years = (difference.inDays / 365).floor();
-    return '${years}y ago';
+    return AddAndRemoveButton(quantity: widget.quantity);
   }
 }
