@@ -25,7 +25,7 @@ class Navbar extends StatelessWidget {
           const Spacer(),
           _item(icon: Icons.video_collection_rounded, index: 2),
           const Spacer(),
-          _item(icon: Icons.person_rounded, index: 3),
+          _item(icon: Icons.receipt_rounded, index: 3),
         ],
       ),
     );

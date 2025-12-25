@@ -1,5 +1,5 @@
-import 'package:dak_louk/widgets/category_bar.dart';
-import 'package:dak_louk/widgets/post_block.dart';
+import 'package:dak_louk/ui/widgets/category_bar.dart';
+import 'package:dak_louk/ui/widgets/post_block.dart';
 import 'package:dak_louk/db/dao/post_dao.dart';
 import 'package:dak_louk/models/post_model.dart';
 import 'package:flutter/material.dart';
@@ -26,9 +26,9 @@ class _HomeScreenState extends State<HomeScreen> {
       children: [
         const SizedBox(height: 16.0),
         CategoryBar(onCategorySelected: onCategorySelected),
-        const SizedBox(height: 16.0),
+        const SizedBox(height: 20.0),
         Expanded(
-          child: FutureBuilder<List<Post>>(
+          child: FutureBuilder<List<PostModel>>(
             future: PostDao().getAllPosts(selectedCategory, 100),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {

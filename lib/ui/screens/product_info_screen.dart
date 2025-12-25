@@ -1,43 +1,22 @@
 import 'package:dak_louk/db/dao/post_dao.dart';
+import 'package:dak_louk/models/cart_model.dart';
 import 'package:dak_louk/models/post_model.dart';
-import 'package:dak_louk/widgets/add_and_remove_button.dart';
-import 'package:dak_louk/widgets/appbar.dart';
-import 'package:dak_louk/widgets/photo_slider.dart';
-import 'package:dak_louk/widgets/username_container.dart';
+import 'package:dak_louk/ui/widgets/add_and_remove_button.dart';
+import 'package:dak_louk/ui/widgets/appbar.dart';
+import 'package:dak_louk/ui/widgets/photo_slider.dart';
+import 'package:dak_louk/ui/widgets/username_container.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class ProductInfoScreen extends StatefulWidget {
-  final String description;
-  final List<ImageProvider> images;
-  final ImageProvider profile;
-  final String username;
-  final String price;
-  final String title;
-  final String date;
-  final String rating;
-  final String quantity;
-  final String category;
-  const ProductInfoScreen({
-    super.key,
-    required this.description,
-    required this.quantity,
-    required this.images,
-    required this.profile,
-    required this.username,
-    required this.price,
-    required this.title,
-    required this.date,
-    required this.rating,
-    required this.category,
-  });
+  final PostModel post;
+  const ProductInfoScreen({super.key, required this.post});
 
   @override
   State<ProductInfoScreen> createState() => _ProductInfoScreenState();
 }
 
 class _ProductInfoScreenState extends State<ProductInfoScreen> {
-  
   int quantity = 1;
   void onAdd() {
     setState(() {
@@ -45,9 +24,9 @@ class _ProductInfoScreenState extends State<ProductInfoScreen> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
+    final ui = widget.post.ui();
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight),
@@ -65,20 +44,19 @@ class _ProductInfoScreenState extends State<ProductInfoScreen> {
                 bottom: 2.0,
               ),
               child: UsernameContainer(
-                rating: widget.rating,
-                profile: widget.profile,
-                username: widget.username,
+                userId: ui.userId,
+                rating: ui.rating,
+                bio: ui.bio,
+                profile: ui.profileImage,
+                username: ui.username,
               ),
             ),
-            PhotoSlider(
-              quantity: widget.quantity,
-              images: widget.images,
-            ),
+            PhotoSlider(quantity: ui.quantity, images: ui.images),
             const SizedBox(height: 10),
             Padding(
               padding: const EdgeInsets.all(12.0),
               child: Text(
-                widget.title,
+                ui.title,
                 style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.w600,
@@ -88,7 +66,7 @@ class _ProductInfoScreenState extends State<ProductInfoScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12.0),
               child: Text(
-                "\$${widget.price}",
+                "\$${ui.price}",
                 style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.w600,
@@ -99,7 +77,7 @@ class _ProductInfoScreenState extends State<ProductInfoScreen> {
             Padding(
               padding: const EdgeInsets.only(left: 12.0),
               child: Text(
-                widget.date,
+                ui.date,
                 style: const TextStyle(fontSize: 13, color: Color(0xFF777777)),
               ),
             ),
@@ -115,7 +93,7 @@ class _ProductInfoScreenState extends State<ProductInfoScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12.0),
               child: Text(
-                widget.description,
+                ui.description,
                 style: const TextStyle(
                   fontSize: 13,
                   height: 1.4,
@@ -126,7 +104,18 @@ class _ProductInfoScreenState extends State<ProductInfoScreen> {
             const SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12.0),
-              child: AddAndRemoveButton(quantity: quantity, size: 30.0),
+              child: AddAndRemoveButton(
+                baseQuantity: 1,
+                size: 30.0,
+                cart: CartModel(
+                  id: 0,
+                  userId: 1,
+                  productId: ui.productId,
+                  quantity: quantity,
+                  createdAt: DateTime.now().toIso8601String(),
+                  updatedAt: DateTime.now().toIso8601String(),
+                ),
+              ),
             ),
             const SizedBox(height: 20),
             Padding(
@@ -136,7 +125,7 @@ class _ProductInfoScreenState extends State<ProductInfoScreen> {
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
               ),
             ),
-            _SimilarItems(category: widget.category),
+            _SimilarItems(category: ui.category ?? 'unknown'),
           ],
         ),
       ),
@@ -169,11 +158,10 @@ class _SimilarItemsState extends State<_SimilarItems> {
   }
 
   @override
-  @override
   Widget build(BuildContext context) {
     return SizedBox(
       height: 400,
-      child: FutureBuilder<List<Post>>(
+      child: FutureBuilder<List<PostModel>>(
         future: PostDao().getAllPosts(widget.category, 10),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -196,22 +184,9 @@ class _SimilarItemsState extends State<_SimilarItems> {
               itemCount: posts.length,
               itemBuilder: (context, index) {
                 final post = posts[index];
-                final ui = post.ui();
-
                 return Padding(
                   padding: const EdgeInsets.all(5.0),
-                  child: _SimilarItemCard(
-                    image: ui['images'],
-                    title: ui['title'],
-                    price: ui['price'],
-                    rating: ui['rating'],
-                    profile: ui['profileImage'],
-                    username: ui['username'],
-                    quantity: ui['quantity'],
-                    date: ui['date'],
-                    description: ui['description'],
-                    category: ui['category'],
-                  ),
+                  child: _SimilarItemCard(post: post),
                 );
               },
             ),
@@ -223,29 +198,9 @@ class _SimilarItemsState extends State<_SimilarItems> {
 }
 
 class _SimilarItemCard extends StatefulWidget {
-  final List<ImageProvider> image;
-  final String title;
-  final String price;
-  final String rating;
-  final ImageProvider profile;
-  final String username;
-  final String quantity;
-  final String date;
-  final String description;
-  final String category;
+  final PostModel post;
 
-  const _SimilarItemCard({
-    required this.image,
-    required this.title,
-    required this.price,
-    required this.rating,
-    required this.profile,
-    required this.username,
-    required this.quantity,
-    required this.date,
-    required this.description,
-    required this.category,
-  });
+  const _SimilarItemCard({required this.post});
 
   @override
   State<_SimilarItemCard> createState() => _SimilarItemCardState();
@@ -255,23 +210,13 @@ class _SimilarItemCardState extends State<_SimilarItemCard> {
   bool isAdded = false;
   @override
   Widget build(BuildContext context) {
+    final ui = widget.post.ui();
     return InkWell(
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ProductInfoScreen(
-              description: widget.description,
-              quantity: widget.quantity,
-              images: widget.image,
-              profile: widget.profile,
-              username: widget.username,
-              price: widget.price,
-              title: widget.title,
-              date: widget.date,
-              rating: widget.rating,
-              category: widget.category,
-            ),
+            builder: (context) => ProductInfoScreen(post: widget.post),
           ),
         );
       },
@@ -289,7 +234,7 @@ class _SimilarItemCardState extends State<_SimilarItemCard> {
                 children: [
                   AspectRatio(
                     aspectRatio: 4 / 3,
-                    child: Image(image: widget.image[0], fit: BoxFit.cover),
+                    child: Image(image: ui.images[0], fit: BoxFit.cover),
                   ),
                   Positioned(
                     top: 8,
@@ -305,7 +250,7 @@ class _SimilarItemCardState extends State<_SimilarItemCard> {
                           vertical: 4.0,
                         ),
                         child: Text(
-                          '${widget.quantity} left',
+                          '${ui.quantity} left',
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
@@ -332,12 +277,15 @@ class _SimilarItemCardState extends State<_SimilarItemCard> {
                 children: [
                   Row(
                     children: [
-                      CircleAvatar(radius: 18, backgroundImage: widget.profile),
+                      CircleAvatar(
+                        radius: 18,
+                        backgroundImage: ui.profileImage,
+                      ),
                       const SizedBox(width: 6),
                       Column(
                         children: [
                           Text(
-                            widget.username,
+                            ui.username,
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
@@ -348,7 +296,7 @@ class _SimilarItemCardState extends State<_SimilarItemCard> {
                           Row(
                             children: [
                               Text(
-                                widget.rating,
+                                ui.rating,
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: Colors.grey[200],
@@ -369,7 +317,7 @@ class _SimilarItemCardState extends State<_SimilarItemCard> {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            "\$${widget.price}",
+                            "\$${ui.price}",
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
@@ -386,7 +334,7 @@ class _SimilarItemCardState extends State<_SimilarItemCard> {
                     children: [
                       Expanded(
                         child: Text(
-                          widget.title,
+                          ui.title,
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
@@ -410,8 +358,16 @@ class _SimilarItemCardState extends State<_SimilarItemCard> {
                                   ),
                                 ),
                                 child: AddAndRemoveButton(
-                                  quantity: int.parse(widget.quantity),
+                                  baseQuantity: 1,
                                   size: 25.0,
+                                  cart: CartModel(
+                                    id: 0,
+                                    userId: 1,
+                                    productId: ui.productId,
+                                    quantity: int.parse(ui.quantity),
+                                    createdAt: DateTime.now().toIso8601String(),
+                                    updatedAt: DateTime.now().toIso8601String(),
+                                  ),
                                 ),
                               )
                             : DecoratedBox(

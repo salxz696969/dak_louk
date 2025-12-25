@@ -1,16 +1,16 @@
 import 'package:dak_louk/models/user_model.dart';
 
-class LiveStreamChat{
+class LiveStreamChatModel {
   final int id;
   final String text;
   final int userId;
   final int liveStreamId;
-final DateTime createdAt;
+  final DateTime createdAt;
   final DateTime updatedAt;
 
-  final User? user;
+  final UserModel? user;
 
-  LiveStreamChat({
+  LiveStreamChatModel({
     required this.id,
     required this.text,
     required this.userId,
@@ -20,8 +20,11 @@ final DateTime createdAt;
     this.user,
   });
 
-  factory LiveStreamChat.fromMap(Map<String, dynamic> liveStreamChat, User? user) {
-    return LiveStreamChat(
+  factory LiveStreamChatModel.fromMap(
+    Map<String, dynamic> liveStreamChat,
+    UserModel? user,
+  ) {
+    return LiveStreamChatModel(
       id: liveStreamChat['id'],
       text: liveStreamChat['text'],
       userId: liveStreamChat['user_id'],

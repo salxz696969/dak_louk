@@ -1,11 +1,11 @@
-import 'package:dak_louk/screens/cart_screen.dart';
-import 'package:dak_louk/screens/chat_screen.dart';
-import 'package:dak_louk/screens/home_screen.dart';
-import 'package:dak_louk/screens/live_stream_screen.dart';
-import 'package:dak_louk/screens/setting_screen.dart';
-import 'package:dak_louk/widgets/appbar.dart';
-import 'package:dak_louk/widgets/navbar.dart';
 import 'package:flutter/material.dart';
+import 'package:dak_louk/ui/screens/home_screen.dart';
+import 'package:dak_louk/ui/screens/chat_screen.dart';
+import 'package:dak_louk/ui/screens/live_stream_screen.dart';
+import 'package:dak_louk/ui/screens/setting_screen.dart';
+import 'package:dak_louk/ui/screens/cart_screen.dart';
+import 'package:dak_louk/ui/widgets/appbar.dart';
+import 'package:dak_louk/ui/widgets/navbar.dart';
 
 /// Simple tab scaffold for Home / Chat / Live / Settings.
 class BaseScaffold extends StatefulWidget {
@@ -40,7 +40,7 @@ class _BaseScaffoldState extends State<BaseScaffold> {
         preferredSize: Size.fromHeight(kToolbarHeight),
         child: Appbar(
           title: 'Dak Louk',
-          icon: Icons.receipt_rounded,
+          icon: Icons.shopping_cart_rounded,
           navigateTo: CartScreen(),
         ),
       ),

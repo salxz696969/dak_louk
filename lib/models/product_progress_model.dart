@@ -2,7 +2,7 @@ import 'package:dak_louk/models/product_model.dart';
 import 'package:dak_louk/models/progress_status_enum.dart';
 import 'package:dak_louk/models/user_model.dart';
 
-class ProductProgress {
+class ProductProgressModel {
   final int id;
   final int userId;
   final int productId;
@@ -10,10 +10,10 @@ class ProductProgress {
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  final User? user;
-  final Product? product;
+  final UserModel? user;
+  final ProductModel? product;
 
-  ProductProgress({
+  ProductProgressModel({
     required this.id,
     required this.userId,
     required this.productId,
@@ -24,12 +24,12 @@ class ProductProgress {
     this.product,
   });
 
-  factory ProductProgress.fromMap(
+  factory ProductProgressModel.fromMap(
     Map<String, dynamic> productProgress,
-    User? user,
-    Product? product,
+    UserModel? user,
+    ProductModel? product,
   ) {
-    return ProductProgress(
+    return ProductProgressModel(
       id: productProgress['id'],
       userId: productProgress['user_id'],
       productId: productProgress['product_id'],

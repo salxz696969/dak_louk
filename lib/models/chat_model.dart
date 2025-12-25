@@ -1,6 +1,6 @@
 import 'package:dak_louk/models/user_model.dart';
 
-class Chat {
+class ChatModel {
   final int id;
   final int userId;
   final String text;
@@ -8,9 +8,9 @@ class Chat {
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  final User? user;
+  final UserModel? user;
 
-  Chat({
+  ChatModel({
     required this.id,
     required this.userId,
     required this.text,
@@ -20,8 +20,8 @@ class Chat {
     this.user,
   });
 
-  factory Chat.fromMap(Map<String, dynamic> chat, User? user) {
-    return Chat(
+  factory ChatModel.fromMap(Map<String, dynamic> chat, UserModel? user) {
+    return ChatModel(
       id: chat['id'],
       userId: chat['user_id'],
       text: chat['text'],

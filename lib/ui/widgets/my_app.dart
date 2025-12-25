@@ -1,5 +1,5 @@
-import 'package:dak_louk/widgets/base_scaffold.dart';
 import 'package:flutter/material.dart';
+import 'package:dak_louk/ui/widgets/base_scaffold.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -13,6 +13,7 @@ class MyApp extends StatelessWidget {
           seedColor: const Color.fromARGB(255, 99, 175, 76),
           primary: const Color.fromARGB(255, 34, 99, 51),
           secondary: const Color.fromARGB(255, 56, 141, 32),
+          
         ),
         useMaterial3: true,
       ),

@@ -10,6 +10,7 @@ Future<void> createTables(Database db) async {
         password_hash TEXT,
         profile_image_url TEXT,
         rating REAL,
+        bio TEXT,
         role TEXT CHECK(role IN ('user', 'merchant')),
         created_at TEXT,
         updated_at TEXT
@@ -30,9 +31,9 @@ Future<void> createTables(Database db) async {
       )
     ''');
 
-  // live_stream
+  // live_streams
   await db.execute('''
-      CREATE TABLE live_stream (
+      CREATE TABLE live_streams (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         url TEXT,
         user_id INTEGER,
@@ -40,6 +41,18 @@ Future<void> createTables(Database db) async {
         created_at TEXT,
         updated_at TEXT,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      )
+    ''');
+
+  // medias
+  await db.execute('''
+      CREATE TABLE medias (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        url TEXT,
+        post_id INTEGER,
+        created_at TEXT,
+        updated_at TEXT,
+        FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
       )
     ''');
 
@@ -54,22 +67,11 @@ Future<void> createTables(Database db) async {
         price REAL,
         quantity INTEGER DEFAULT 1,
         live_stream_id INTEGER,
+        image_url TEXT,
         created_at TEXT,
         updated_at TEXT,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-        FOREIGN KEY (live_stream_id) REFERENCES live_stream(id) ON DELETE SET NULL
-      )
-    ''');
-
-  // medias
-  await db.execute('''
-      CREATE TABLE medias (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        url TEXT,
-        post_id INTEGER,
-        created_at TEXT,
-        updated_at TEXT,
-        FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
+        FOREIGN KEY (live_stream_id) REFERENCES live_streams(id) ON DELETE SET NULL
       )
     ''');
 
@@ -124,7 +126,7 @@ Future<void> createTables(Database db) async {
         created_at TEXT,
         updated_at TEXT,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-        FOREIGN KEY (live_stream_id) REFERENCES live_stream(id) ON DELETE CASCADE
+        FOREIGN KEY (live_stream_id) REFERENCES live_streams(id) ON DELETE CASCADE
       )
     ''');
 
@@ -140,6 +142,20 @@ Future<void> createTables(Database db) async {
         updated_at TEXT,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
         FOREIGN KEY (target_user_id) REFERENCES users(id) ON DELETE CASCADE
+      )
+    ''');
+
+  // carts
+  await db.execute('''
+      CREATE TABLE carts (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        product_id INTEGER,
+        quantity INTEGER,
+        created_at TEXT,
+        updated_at TEXT,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
       )
     ''');
 }

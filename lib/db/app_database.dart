@@ -15,9 +15,10 @@ class AppDatabase {
 
   Future<Database> get database async {
     if (_db != null && _db!.isOpen) return _db!;
-    // final dbPath = await getDatabasesPath();
-    // final path = '$dbPath/marketplace.db';
-    // await deleteDatabase(path);
+    // delete on restart
+    final dbPath = await getDatabasesPath();
+    final path = '$dbPath/marketplace.db';
+    await deleteDatabase(path);
     _db = await _init();
     return _db!;
   }

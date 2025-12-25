@@ -1,16 +1,16 @@
 import 'package:dak_louk/models/user_model.dart';
 
-class ChatRoom {
+class ChatRoomModel {
   final int id;
   final int userId;
   final int targetUserId;
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  final User? user;
-  final User? targetUser;
+  final UserModel? user;
+  final UserModel? targetUser;
 
-  ChatRoom({
+  ChatRoomModel({
     required this.id,
     required this.userId,
     required this.targetUserId,
@@ -20,12 +20,12 @@ class ChatRoom {
     required this.updatedAt,
   });
 
-  factory ChatRoom.fromMap(
+  factory ChatRoomModel.fromMap(
     Map<String, dynamic> chatRoom,
-    User? user,
-    User? targetUser,
+    UserModel? user,
+    UserModel? targetUser,
   ) {
-    return ChatRoom(
+    return ChatRoomModel(
       id: chatRoom['id'],
       userId: chatRoom['user_id'],
       targetUserId: chatRoom['target_user_id'],

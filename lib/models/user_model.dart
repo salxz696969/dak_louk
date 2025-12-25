@@ -1,32 +1,35 @@
-class User {
+class UserModel {
   final int id;
   final String username;
   final String passwordHash;
   final String profileImageUrl;
   final double rating;
   final String role;
+  final String bio;
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  User({
+  UserModel({
     required this.id,
     required this.username,
     required this.passwordHash,
     required this.profileImageUrl,
     required this.rating,
     required this.role,
+    required this.bio,
     required this.createdAt,
     required this.updatedAt,
   });
 
-  factory User.fromMap(Map<String, dynamic> user) {
-    return User(
+  factory UserModel.fromMap(Map<String, dynamic> user) {
+    return UserModel(
       id: user['id'],
       username: user['username'],
       passwordHash: user['password_hash'],
       profileImageUrl: user['profile_image_url'],
       rating: user['rating'],
       role: user['role'],
+      bio: user['bio'],
       createdAt: DateTime.parse(user['created_at']),
       updatedAt: DateTime.parse(user['updated_at']),
     );
@@ -40,6 +43,7 @@ class User {
       'profile_image_url': profileImageUrl,
       'rating': rating,
       'role': role,
+      'bio': bio,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
     };

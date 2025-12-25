@@ -2,19 +2,19 @@ import 'package:dak_louk/models/live_stream_chat_model.dart';
 import 'package:dak_louk/models/product_model.dart';
 import 'package:dak_louk/models/user_model.dart';
 
-class LiveStream {
+class LiveStreamModel {
   final int id;
   final String url;
   final int userId;
   final String title;
-final DateTime createdAt;
+  final DateTime createdAt;
   final DateTime updatedAt;
 
-  final User? user;
-  final List<Product>? products;
-  final List<LiveStreamChat>? liveStreamChats;
+  final UserModel? user;
+  final List<ProductModel>? products;
+  final List<LiveStreamChatModel>? liveStreamChats;
 
-  LiveStream({
+  LiveStreamModel({
     required this.id,
     required this.url,
     required this.userId,
@@ -26,13 +26,13 @@ final DateTime createdAt;
     this.liveStreamChats,
   });
 
-  factory LiveStream.fromMap(
+  factory LiveStreamModel.fromMap(
     Map<String, dynamic> liveStream,
-    User? user,
-    List<Product>? products,
-    List<LiveStreamChat>? liveStreamChats,
+    UserModel? user,
+    List<ProductModel>? products,
+    List<LiveStreamChatModel>? liveStreamChats,
   ) {
-    return LiveStream(
+    return LiveStreamModel(
       id: liveStream['id'],
       url: liveStream['url'],
       userId: liveStream['user_id'],

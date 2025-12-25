@@ -18,7 +18,6 @@ const productVideos = [
   'assets/live_videos/sample2.mp4',
 ];
 
-// 🔹 Natural text pools
 final postTitles = [
   "Fresh stock just arrived! ☕ Don't miss out",
   "Back in stock - grab yours while available",
@@ -37,22 +36,21 @@ final postTitles = [
   "Honestly one of my favorites to sell",
 ];
 
+final bio = [
+  'Passionate entrepreneur, coffee enthusiast, and lifelong learner. With over a decade of experience in the local marketplace scene, I’ve built a reputation for delivering quality products and exceptional customer service. My journey began with a small online shop, and through dedication and hard work, I’ve grown into a trusted seller known for honesty, reliability, and a personal touch.',
+  'As a merchant, I believe in the power of community and the importance of supporting local businesses. I take pride in curating a selection of products that not only meet but exceed customer expectations. Whether it’s sourcing unique items or providing everyday essentials, my goal is to create a shopping experience that feels personal and rewarding. When I’m not busy managing my store, you can find me exploring new coffee blends, hiking local trails, or volunteering in community initiatives.',
+  'With a background in business management and a passion for e-commerce, I bring a strategic approach to my role as a merchant. I’m committed to continuous improvement, always seeking feedback from my customers to enhance their shopping experience. My store is more than just a business; it’s a reflection of my values and dedication to quality. I’m excited to connect with fellow entrepreneurs and customers alike, sharing my love for great products and exceptional service.',
+];
+
 final productDescriptions = [
-  "This is one of those items that just works. I've been selling it for a while now and the feedback has been really positive. It's well-made, durable, and does exactly what it's supposed to do. Perfect for everyday use and the price is very reasonable compared to similar products out there. If you're looking for something reliable without breaking the bank, this is a solid choice.",
-
-  "I personally tested this before adding it to my shop and I'm impressed with the quality. The materials feel premium and it's built to last. Several of my regular customers have already bought this and they keep coming back for more. It's one of those products that sells itself once people try it. Great value for money and I stand behind it 100%.",
-
-  "Honestly, I was surprised by how good this is for the price. It's been flying off the shelves lately and I can see why. The quality is consistent, it works exactly as described, and I haven't had a single complaint about it. Whether you're buying for yourself or as a gift, this is a safe bet. Plus, it ships quickly and arrives in perfect condition.",
-
-  "This has become one of my bestsellers for good reason. The build quality is solid, it's easy to use right out of the box, and it just does what it promises. I've sold dozens of these and the customer satisfaction rate is nearly 100%. If you're on the fence about it, don't be - it's worth every cent and then some.",
-
-  "I've been in this business long enough to know quality when I see it, and this product delivers. It's practical, well-designed, and priced fairly. My repeat customers always ask if I have this in stock because they trust it. The manufacturer really got it right with this one. Simple, effective, and reliable.",
-
-  "Let me tell you, this item punches way above its weight class. For the price you're paying, you're getting something that could easily cost twice as much elsewhere. I use one myself and several of my family members have bought it after seeing mine. It's durable, functional, and honestly just a smart purchase if you need something dependable.",
-
-  "This is what I call a no-brainer purchase. Good materials, solid construction, and it actually lasts. I've had customers message me months after buying to say it's still going strong. That's the kind of product I like to sell - something I can be proud of. If you need something that won't let you down, this is it.",
-
-  "I stock this item specifically because my customers keep requesting it. It's become a staple in my shop and for good reason. The quality-to-price ratio is excellent, it's versatile enough for different uses, and it just works reliably every single time. Easy to recommend without hesitation.",
+  "This is one of those items that just works. I've been selling it for a while now and the feedback has been really positive.",
+  "I personally tested this before adding it to my shop and I'm impressed with the quality.",
+  "Honestly, I was surprised by how good this is for the price.",
+  "This has become one of my bestsellers for good reason.",
+  "I've been in this business long enough to know quality when I see it.",
+  "Let me tell you, this item punches way above its weight class.",
+  "This is what I call a no-brainer purchase.",
+  "I stock this item specifically because my customers keep requesting it.",
 ];
 
 final chatMessages = [
@@ -92,28 +90,23 @@ final liveChatMessages = [
 ];
 
 final reviewMessages = [
-  "Really smooth transaction! The seller was super helpful and answered all my questions quickly. Would definitely buy from them again.",
-
-  "Item arrived exactly as described in the post. No surprises, no issues. The seller communicated well throughout the process.",
-
-  "Fast replies and very easy to deal with. The seller was professional and the whole process was hassle-free. Recommended!",
-
-  "Had a great experience overall. The item is exactly what I needed and the seller made sure everything went smoothly. Happy customer here!",
-
-  "Would absolutely buy from this seller again. Honest, responsive, and the product quality was spot on. Thanks!",
-
-  "Seller was patient with all my questions and very accommodating. The item is great quality and arrived on time. Very satisfied!",
-
-  "No complaints at all. Quick transaction, item as described, and good communication. What more could you ask for?",
-
-  "Trustworthy seller with quality items. Everything went exactly as promised. Will definitely check their shop again.",
+  "Really smooth transaction! The seller was super helpful.",
+  "Item arrived exactly as described in the post.",
+  "Fast replies and very easy to deal with.",
+  "Had a great experience overall.",
+  "Would absolutely buy from this seller again.",
+  "Seller was patient with all my questions.",
+  "No complaints at all.",
+  "Trustworthy seller with quality items.",
 ];
 
 Future<void> insertMockData(Database db) async {
+  await db.execute('PRAGMA foreign_keys = ON');
+
   final now = DateTime.now().toIso8601String();
   final rand = Random();
 
-  // 1️⃣ USERS
+  // USERS
   for (int i = 1; i <= 100; i++) {
     await db.insert('users', {
       'id': i,
@@ -121,47 +114,18 @@ Future<void> insertMockData(Database db) async {
       'password_hash': 'hash_user$i',
       'profile_image_url': profileImage,
       'rating': (rand.nextDouble() * 2) + 3.0,
+      'bio': bio[rand.nextInt(bio.length)],
       'role': i % 2 == 0 ? 'merchant' : 'user',
       'created_at': now,
       'updated_at': now,
     });
   }
 
-  // 2️⃣ LIVE STREAMS
-  for (int i = 1; i <= 50; i++) {
-    await db.insert('live_stream', {
-      'id': i,
-      'url': productVideos[i % productVideos.length],
-      'user_id': i,
-      'title': 'Live selling now - join us!',
-      'created_at': now,
-      'updated_at': now,
-    });
-  }
-
-  // 3️⃣ PRODUCTS
-  for (int i = 1; i <= 50; i++) {
-    await db.insert('products', {
-      'id': i,
-      'user_id': (i % 100) + 1,
-      'title': postTitles[rand.nextInt(postTitles.length)],
-      'description':
-          productDescriptions[rand.nextInt(productDescriptions.length)],
-      'category':
-          ProductCategory.values[i % ProductCategory.values.length].name,
-      'price': (rand.nextDouble() * 100).toStringAsFixed(2),
-      'quantity': rand.nextInt(20) + 1,
-      'live_stream_id': (i % 50) + 1,
-      'created_at': now,
-      'updated_at': now,
-    });
-  }
-
-  // 4️⃣ POSTS
-  for (int i = 1; i <= 50; i++) {
+  // USER 1 POSTS (20)
+  for (int i = 1; i <= 20; i++) {
     await db.insert('posts', {
-      'id': i,
-      'user_id': (i % 100) + 1,
+      'id': 100 + i,
+      'user_id': 1,
       'title': postTitles[rand.nextInt(postTitles.length)],
       'product_id': i,
       'category':
@@ -171,7 +135,64 @@ Future<void> insertMockData(Database db) async {
     });
   }
 
-  // 5️⃣ MEDIAS
+  // MEDIAS FOR USER 1 POSTS
+  for (int i = 1; i <= 20; i++) {
+    for (int j = 0; j < 2; j++) {
+      await db.insert('medias', {
+        'url': productImages[rand.nextInt(productImages.length)],
+        'post_id': 100 + i,
+        'created_at': now,
+        'updated_at': now,
+      });
+    }
+  }
+
+  // USER 1 LIVE STREAMS (20 VIDEOS)
+  for (int i = 1; i <= 20; i++) {
+    await db.insert('live_streams', {
+      'id': i,
+      'url': productVideos[i % productVideos.length],
+      'user_id': 1,
+      'title': 'Live selling now - join us!',
+      'created_at': now,
+      'updated_at': now,
+    });
+  }
+
+  // PRODUCTS
+  for (int i = 1; i <= 50; i++) {
+    await db.insert('products', {
+      'id': i,
+      'user_id': 1,
+      'title': postTitles[rand.nextInt(postTitles.length)],
+      'description':
+          productDescriptions[rand.nextInt(productDescriptions.length)],
+      'category':
+          ProductCategory.values[i % ProductCategory.values.length].name,
+      'price': rand.nextDouble() * 100,
+      'quantity': rand.nextInt(20) + 1,
+      'live_stream_id': i <= 20 ? i : null,
+      'image_url': productImages[rand.nextInt(productImages.length)],
+      'created_at': now,
+      'updated_at': now,
+    });
+  }
+
+  // POSTS (OTHER USERS)
+  for (int i = 1; i <= 50; i++) {
+    await db.insert('posts', {
+      'id': i,
+      'user_id': ((i * 2) % 100) + 2,
+      'title': postTitles[rand.nextInt(postTitles.length)],
+      'product_id': i,
+      'category':
+          ProductCategory.values[i % ProductCategory.values.length].name,
+      'created_at': now,
+      'updated_at': now,
+    });
+  }
+
+  // MEDIAS
   for (int postId = 1; postId <= 50; postId++) {
     for (int j = 0; j < 2; j++) {
       await db.insert('medias', {
@@ -183,7 +204,20 @@ Future<void> insertMockData(Database db) async {
     }
   }
 
-  // 6️⃣ CHAT ROOMS
+  // PRODUCT PROGRESS
+  int progressId = 1;
+  for (int i = 1; i <= 50; i++) {
+    await db.insert('product_progress', {
+      'id': progressId++,
+      'user_id': ((i * 2) % 100) + 2,
+      'product_id': i,
+      'status': ProgressStatus.values[i % ProgressStatus.values.length].name,
+      'created_at': now,
+      'updated_at': now,
+    });
+  }
+
+  // CHAT ROOMS
   for (int i = 1; i <= 10; i++) {
     await db.insert('chat_rooms', {
       'id': i,
@@ -194,7 +228,7 @@ Future<void> insertMockData(Database db) async {
     });
   }
 
-  // 7️⃣ CHATS
+  // CHATS
   int chatId = 1;
   for (int roomId = 1; roomId <= 10; roomId++) {
     for (int j = 0; j < 5; j++) {
@@ -209,14 +243,14 @@ Future<void> insertMockData(Database db) async {
     }
   }
 
-  // 8️⃣ LIVE STREAM CHATS
+  // LIVE STREAM CHATS
   int liveChatId = 1;
-  for (int lsId = 1; lsId <= 50; lsId++) {
-    for (int j = 0; j < 2; j++) {
+  for (int lsId = 1; lsId <= 20; lsId++) {
+    for (int j = 0; j < 3; j++) {
       await db.insert('live_stream_chats', {
         'id': liveChatId++,
         'text': liveChatMessages[rand.nextInt(liveChatMessages.length)],
-        'user_id': lsId,
+        'user_id': rand.nextInt(100) + 1,
         'live_stream_id': lsId,
         'created_at': now,
         'updated_at': now,
@@ -224,7 +258,7 @@ Future<void> insertMockData(Database db) async {
     }
   }
 
-  // 9️⃣ REVIEWS
+  // REVIEWS
   int reviewId = 1;
   for (int target = 1; target <= 10; target++) {
     for (int reviewer = 1; reviewer <= 10; reviewer++) {
@@ -241,16 +275,18 @@ Future<void> insertMockData(Database db) async {
     }
   }
 
-  // 🔟 PRODUCT PROGRESS
-  int progressId = 1;
-  for (int i = 1; i <= 50; i++) {
-    await db.insert('product_progress', {
-      'id': progressId++,
-      'user_id': (i % 100) + 1,
-      'product_id': i,
-      'status': ProgressStatus.values[i % ProgressStatus.values.length].name,
-      'created_at': now,
-      'updated_at': now,
-    });
+  // CARTS
+  int cartId = 1;
+  for (int userId = 1; userId <= 20; userId++) {
+    for (int j = 0; j < 3; j++) {
+      await db.insert('carts', {
+        'id': cartId++,
+        'user_id': userId,
+        'product_id': rand.nextInt(50) + 1,
+        'quantity': rand.nextInt(3) + 1,
+        'created_at': now,
+        'updated_at': now,
+      });
+    }
   }
 }

@@ -1,4 +1,4 @@
-import 'package:dak_louk/widgets/my_app.dart';
+import 'package:dak_louk/ui/widgets/my_app.dart';
 import 'package:flutter/material.dart';
 
 void main() {

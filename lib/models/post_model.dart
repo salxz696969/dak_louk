@@ -2,7 +2,7 @@ import 'package:dak_louk/models/product_model.dart';
 import 'package:dak_louk/models/user_model.dart';
 import 'package:flutter/material.dart';
 
-class Post {
+class PostModel {
   final int id;
   final int userId;
   final String title;
@@ -11,10 +11,10 @@ class Post {
   final DateTime updatedAt;
 
   final List<String>? images;
-  final Product? product;
-  final User? user;
+  final ProductModel? product;
+  final UserModel? user;
 
-  Post({
+  PostModel({
     required this.id,
     required this.userId,
     required this.title,
@@ -26,13 +26,13 @@ class Post {
     this.user,
   });
 
-  factory Post.fromMap(
+  factory PostModel.fromMap(
     Map<String, dynamic> post,
-    Product? product,
-    User? user,
+    ProductModel? product,
+    UserModel? user,
     List<String>? images,
   ) {
-    return Post(
+    return PostModel(
       id: post['id'],
       userId: post['user_id'],
       title: post['title'],
@@ -80,7 +80,7 @@ class Post {
     }
   }
 
-  Map<String, dynamic> ui() {
+  PostUI ui() {
     final user = this.user;
     final product = this.product;
     final images = (this.images?.map((img) => AssetImage(img)).toList()) ?? [];
@@ -97,20 +97,55 @@ class Post {
     final description = product?.description ?? '';
     final title = this.title;
     final category = this.product?.category.name;
-
+    final productId = this.product?.id;
     final date = timeAgo(createdAt);
 
-    return {
-      'profileImage': profileImage,
-      'username': username,
-      'rating': rating,
-      'quantity': quantity,
-      'price': price,
-      'description': description,
-      'title': title,
-      'category': category,
-      'date': date,
-      'images': images,
-    };
+    return PostUI(
+      bio: user?.bio ?? '',
+      userId: userId,
+      profileImage: profileImage,
+      username: username,
+      rating: rating,
+      quantity: quantity,
+      price: price,
+      description: description,
+      title: title,
+      category: category,
+      date: date,
+      images: images,
+      productId: productId ?? 0,
+    );
   }
+}
+
+class PostUI {
+  final AssetImage profileImage;
+  final int userId;
+  final String username;
+  final String rating;
+  final String quantity;
+  final String price;
+  final String description;
+  final String title;
+  final String? category;
+  final String date;
+  final List<AssetImage> images;
+  final int productId;
+  final String bio;
+
+  PostUI({
+    required this.bio,
+    required this.profileImage,
+    required this.username,
+    required this.rating,
+    required this.quantity,
+    required this.price,
+    required this.description,
+    required this.title,
+    required this.category,
+    required this.date,
+    required this.images,
+    required this.userId,
+    required this.productId,
+  });
 }

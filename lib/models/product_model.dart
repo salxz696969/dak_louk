@@ -1,6 +1,8 @@
+import 'package:dak_louk/models/user_model.dart';
+
 import 'product_category_enum.dart';
 
-class Product {
+class ProductModel {
   final int id;
   final int userId;
   final String title;
@@ -10,10 +12,12 @@ class Product {
   final int quantity;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final String image;
 
   final int? liveStreamId;
+  final UserModel? user;
 
-  Product({
+  ProductModel({
     required this.id,
     required this.userId,
     required this.title,
@@ -23,11 +27,13 @@ class Product {
     required this.quantity,
     required this.createdAt,
     required this.updatedAt,
+    required this.image,
     this.liveStreamId,
+    this.user,
   });
 
-  factory Product.fromMap(Map<String, dynamic> product) {
-    return Product(
+  factory ProductModel.fromMap(Map<String, dynamic> product, String image) {
+    return ProductModel(
       id: product['id'],
       userId: product['user_id'],
       title: product['title'],
@@ -38,6 +44,7 @@ class Product {
       price: product['price'],
       quantity: product['quantity'],
       liveStreamId: product['live_stream_id'],
+      image: image,
       createdAt: DateTime.parse(product['created_at']),
       updatedAt: DateTime.parse(product['updated_at']),
     );
@@ -53,6 +60,7 @@ class Product {
       'price': price,
       'quantity': quantity,
       'live_stream_id': liveStreamId,
+      'image': image,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
     };

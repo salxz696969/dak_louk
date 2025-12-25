@@ -1,12 +1,14 @@
+import 'package:dak_louk/db/dao/cart_dao.dart';
+import 'package:dak_louk/models/cart_model.dart';
 import 'package:dak_louk/models/post_model.dart';
-import 'package:dak_louk/screens/product_info_screen.dart';
-import 'package:dak_louk/widgets/add_and_remove_button.dart';
-import 'package:dak_louk/widgets/photo_slider.dart';
-import 'package:dak_louk/widgets/username_container.dart';
+import 'package:dak_louk/ui/widgets/add_and_remove_button.dart';
+import 'package:dak_louk/ui/screens/product_info_screen.dart';
+import 'package:dak_louk/ui/widgets/photo_slider.dart';
+import 'package:dak_louk/ui/widgets/username_container.dart';
 import 'package:flutter/material.dart';
 
 class PostBlock extends StatefulWidget {
-  final Post post;
+  final PostModel post;
 
   const PostBlock({super.key, required this.post});
 
@@ -36,62 +38,31 @@ class _PostBlockState extends State<PostBlock> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         UsernameContainer(
-          profile: widget.post.ui()['profileImage'],
-          username: widget.post.ui()['username'],
-          rating: widget.post.ui()['rating'],
+          bio: widget.post.ui().bio,
+          userId: widget.post.ui().userId,
+          profile: widget.post.ui().profileImage,
+          username: widget.post.ui().username,
+          rating: widget.post.ui().rating,
         ),
-        if (widget.post.ui().isNotEmpty)
-          PhotoSlider(
-            quantity: widget.post.ui()['quantity'],
-            images: widget.post.ui()['images'],
-          ),
-        if ((widget.post.ui()['images'] as List).isNotEmpty)
-          const SizedBox(height: 8.0),
+        PhotoSlider(
+          quantity: widget.post.ui().quantity,
+          images: widget.post.ui().images,
+        ),
+        if (widget.post.ui().images.isNotEmpty) const SizedBox(height: 8.0),
         Padding(padding: const EdgeInsets.symmetric(horizontal: 12.0)),
-        _ActionsAndMeta(
-          quantity: widget.post.ui()['quantity'],
-          images: widget.post.ui()['images'],
-          profile: widget.post.ui()['profileImage'],
-          username: widget.post.ui()['username'],
-          rating: widget.post.ui()['rating'],
-          title: widget.post.ui()['title'],
-          date: widget.post.ui()['date'],
-          price: widget.post.ui()['price'],
-          description: widget.post.ui()['description'],
-          category: widget.post.ui()['category'],
-        ),
+        _ActionsAndMeta(post: widget.post),
       ],
     );
   }
 }
 
 class _ActionsAndMeta extends StatelessWidget {
-  final String title;
-  final String date;
-  final String price;
-  final String rating;
-  final List<ImageProvider> images;
-  final ImageProvider profile;
-  final String username;
-  final String description;
-  final String quantity;
-  final String category;
-
-  const _ActionsAndMeta({
-    required this.images,
-    required this.quantity,
-    required this.description,
-    required this.profile,
-    required this.username,
-    required this.rating,
-    required this.title,
-    required this.date,
-    required this.price,
-    required this.category,
-  });
+  final PostModel post;
+  const _ActionsAndMeta({required this.post});
 
   @override
   Widget build(BuildContext context) {
+    final ui = post.ui();
     return Padding(
       padding: const EdgeInsets.all(12.0),
       child: Column(
@@ -101,19 +72,28 @@ class _ActionsAndMeta extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "\$$price",
+                "\$${ui.price}",
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w700,
                   color: Theme.of(context).colorScheme.primary,
                 ),
               ),
-              _AddToCartButton(quantity: int.parse(quantity)),
+              _AddToCartButton(
+                cart: CartModel(
+                  id: 0,
+                  userId: 1,
+                  productId: ui.productId,
+                  quantity: int.parse(ui.quantity),
+                  createdAt: DateTime.now().toIso8601String(),
+                  updatedAt: DateTime.now().toIso8601String(),
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 10.0),
           Text(
-            title,
+            ui.title,
             style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 5.0),
@@ -125,18 +105,7 @@ class _ActionsAndMeta extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => ProductInfoScreen(
-                        quantity: quantity,
-                        description: description,
-                        images: images,
-                        profile: profile,
-                        username: username,
-                        price: price,
-                        title: title,
-                        date: date,
-                        rating: rating,
-                        category: category,
-                      ),
+                      builder: (_) => ProductInfoScreen(post: post),
                     ),
                   );
                 },
@@ -150,7 +119,7 @@ class _ActionsAndMeta extends StatelessWidget {
               ),
               const SizedBox(height: 4.0),
               Text(
-                date,
+                ui.date,
                 style: const TextStyle(fontSize: 12, color: Color(0xFF777777)),
               ),
             ],
@@ -162,19 +131,39 @@ class _ActionsAndMeta extends StatelessWidget {
 }
 
 class _AddToCartButton extends StatefulWidget {
-  final int quantity;
-  const _AddToCartButton({required this.quantity});
+  final CartModel cart;
+  const _AddToCartButton({required this.cart});
 
   @override
   State<_AddToCartButton> createState() => _AddToCartButtonState();
 }
 
 class _AddToCartButtonState extends State<_AddToCartButton> {
-  bool isAdded = false;
-  void onAdd() {
+  late int cartId;
+  late bool isAdded;
+  CartDao cartDao = CartDao();
+
+  @override
+  void initState() {
+    super.initState();
+    isAdded = false;
+    cartId = 0;
+  }
+
+  void onAdd() async {
     setState(() {
       isAdded = true;
     });
+    cartId = await cartDao.insertCart(
+      CartModel(
+        id: 0,
+        userId: widget.cart.userId,
+        productId: widget.cart.productId,
+        quantity: 1,
+        createdAt: DateTime.now().toIso8601String(),
+        updatedAt: DateTime.now().toIso8601String(),
+      ),
+    );
   }
 
   @override
@@ -202,6 +191,16 @@ class _AddToCartButtonState extends State<_AddToCartButton> {
       );
     }
 
-    return AddAndRemoveButton(quantity: widget.quantity);
+    return AddAndRemoveButton(
+      baseQuantity: 1,
+      cart: CartModel(
+        id: cartId,
+        userId: widget.cart.userId,
+        productId: widget.cart.productId,
+        quantity: widget.cart.quantity,
+        createdAt: widget.cart.createdAt,
+        updatedAt: widget.cart.updatedAt,
+      ),
+    );
   }
 }

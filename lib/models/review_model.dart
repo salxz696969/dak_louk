@@ -1,6 +1,6 @@
 import 'package:dak_louk/models/user_model.dart';
 
-class Review {
+class ReviewModel {
   final int id;
   final int userId;
   final int targetUserId;
@@ -9,10 +9,10 @@ class Review {
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  final User? user;
-  final User? targetUser;
+  final UserModel? user;
+  final UserModel? targetUser;
 
-  Review({
+  ReviewModel({
     required this.id,
     required this.userId,
     required this.targetUserId,
@@ -24,8 +24,12 @@ class Review {
     this.targetUser,
   });
 
-  factory Review.fromMap(Map<String, dynamic> review, User? user, User? targetUser) {
-    return Review(
+  factory ReviewModel.fromMap(
+    Map<String, dynamic> review,
+    UserModel? user,
+    UserModel? targetUser,
+  ) {
+    return ReviewModel(
       id: review['id'],
       userId: review['user_id'],
       targetUserId: review['target_user_id'],
