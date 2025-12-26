@@ -2,6 +2,7 @@ import 'package:dak_louk/db/app_database.dart';
 import 'package:dak_louk/db/dao/product_dao.dart';
 import 'package:dak_louk/db/dao/user_dao.dart';
 import 'package:dak_louk/models/cart_model.dart';
+import 'package:dak_louk/utils/tables.dart';
 
 class CartDao {
   final AppDatabase _appDatabase = AppDatabase();
@@ -11,7 +12,7 @@ class CartDao {
       final db = await _appDatabase.database;
       final map = cart.toMap();
       map.remove('id');
-      return await db.insert('carts', map);
+      return await db.insert(Tables.carts, map);
     } catch (e) {
       rethrow;
     }
@@ -21,8 +22,8 @@ class CartDao {
     try {
       final db = await _appDatabase.database;
       final List<Map<String, dynamic>> maps = await db.query(
-        'carts',
-        where: 'user_id = ?',
+        Tables.carts,
+        where: Where.userId,
         whereArgs: [userId],
       );
 
