@@ -154,6 +154,8 @@ Future<void> insertMockData(Database db) async {
       'url': productVideos[i % productVideos.length],
       'user_id': 1,
       'title': 'Live selling now - join us!',
+      'thumbnail_url': productImages[rand.nextInt(productImages.length)],
+      'view': rand.nextInt(1000),
       'created_at': now,
       'updated_at': now,
     });

@@ -38,6 +38,8 @@ Future<void> createTables(Database db) async {
         url TEXT,
         user_id INTEGER,
         title TEXT,
+        thumbnail_url TEXT,
+        view INTEGER,
         created_at TEXT,
         updated_at TEXT,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
