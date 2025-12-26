@@ -1,4 +1,6 @@
 import 'package:dak_louk/db/app_database.dart';
+import 'package:dak_louk/db/dao/live_stream_chat_dao.dart';
+import 'package:dak_louk/db/dao/product_dao.dart';
 import 'package:dak_louk/db/dao/user_dao.dart';
 import 'package:dak_louk/models/live_stream_model.dart';
 
@@ -23,9 +25,18 @@ class LiveStreamDao {
       if (result.isNotEmpty) {
         final List<LiveStreamModel> liveStreams = [];
         final UserDao userDao = UserDao();
+        final productDao = ProductDao();
+        final LiveStreamChatDao liveStreamChatDao = LiveStreamChatDao();
         for (var map in result) {
           final user = await userDao.getUserById(map['user_id'] as int);
-          liveStreams.add(LiveStreamModel.fromMap(map, user, null, null));
+          final products = await productDao.getAllProductsByLiveStreamId(
+            map['id'] as int,
+          );
+          final liveStreamChats = await liveStreamChatDao
+              .getAllLiveStreamChatByLiveStreamId(map['id'] as int);
+          liveStreams.add(
+            LiveStreamModel.fromMap(map, user, products, liveStreamChats),
+          );
         }
         return liveStreams;
       }

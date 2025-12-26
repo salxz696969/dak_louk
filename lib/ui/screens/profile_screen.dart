@@ -1,13 +1,15 @@
+import 'dart:async';
 import 'package:dak_louk/db/dao/live_stream_dao.dart';
 import 'package:dak_louk/db/dao/post_dao.dart';
+import 'package:dak_louk/models/live_stream_chat_model.dart';
 import 'package:dak_louk/models/live_stream_model.dart';
 import 'package:dak_louk/models/post_model.dart';
 import 'package:dak_louk/ui/screens/chat_screen.dart';
 import 'package:dak_louk/ui/screens/product_info_screen.dart';
-import 'package:dak_louk/utils/thumbnail_generator.dart';
 import 'package:dak_louk/ui/widgets/appbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:video_player/video_player.dart';
 
 class ProfileScreen extends StatefulWidget {
   final int userId;
@@ -294,13 +296,11 @@ class _LiveStreamGrid extends StatelessWidget {
           physics: const NeverScrollableScrollPhysics(),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 3,
+            childAspectRatio: 9 / 16,
           ),
           itemBuilder: (context, index) {
             final liveStream = liveStreams[index];
-            return AspectRatio(
-              aspectRatio: 4 / 3,
-              child: _VideoContainer(videoUrl: liveStream.url),
-            );
+            return _VideoContainer(livestream: liveStream);
           },
           itemCount: liveStreams.length,
         );
@@ -310,28 +310,207 @@ class _LiveStreamGrid extends StatelessWidget {
 }
 
 class _VideoContainer extends StatelessWidget {
-  final String videoUrl;
+  final LiveStreamModel livestream;
 
-  const _VideoContainer({required this.videoUrl});
+  const _VideoContainer({required this.livestream});
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<String?>(
-      future: thumbnailGenerator(videoUrl),
-      builder: (context, asyncSnapshot) {
-        if (asyncSnapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (asyncSnapshot.hasError ||
-            !asyncSnapshot.hasData ||
-            asyncSnapshot.data == null) {
-          return const Center(child: Icon(Icons.error));
-        }
-        final thumbnail = AssetImage(asyncSnapshot.data!);
-        return AspectRatio(
-          aspectRatio: 16 / 9,
-          child: Image(image: thumbnail, fit: BoxFit.cover),
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => FullScreenVideo(livestream: livestream),
+          ),
         );
       },
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: Image(image: livestream.ui().thumbnail, fit: BoxFit.cover),
+          ),
+
+          const Center(
+            child: Icon(Icons.play_circle_fill, color: Colors.white, size: 48),
+          ),
+
+          Positioned(
+            bottom: 8,
+            right: 8,
+            child: Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: Colors.black54,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                '${livestream.view} views',
+                style: const TextStyle(color: Colors.white, fontSize: 12),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class FullScreenVideo extends StatefulWidget {
+  final LiveStreamModel livestream;
+
+  const FullScreenVideo({super.key, required this.livestream});
+
+  @override
+  State<FullScreenVideo> createState() => _FullScreenVideoState();
+}
+
+class _FullScreenVideoState extends State<FullScreenVideo> {
+  late VideoPlayerController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = VideoPlayerController.asset(widget.livestream.url)
+      ..initialize().then((_) {
+        if (!mounted) return;
+        setState(() {});
+        _controller.play();
+      });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
+      body: Center(
+        child: _controller.value.isInitialized
+            ? Stack(
+                children: [
+                  AspectRatio(
+                    aspectRatio: _controller.value.aspectRatio,
+                    child: VideoPlayer(_controller),
+                  ),
+                  _LiveStreamChatBox(
+                    chats: widget.livestream.ui().liveStreamChats,
+                  ),
+                ],
+              )
+            : const CircularProgressIndicator(),
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.white,
+        onPressed: () {
+          setState(() {
+            _controller.value.isPlaying
+                ? _controller.pause()
+                : _controller.play();
+          });
+        },
+        child: Icon(
+          _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
+          color: Colors.black,
+        ),
+      ),
+    );
+  }
+}
+
+class _LiveStreamChatBox extends StatefulWidget {
+  final List<LiveStreamChatModel> chats;
+
+  const _LiveStreamChatBox({required this.chats});
+
+  @override
+  State<_LiveStreamChatBox> createState() => __LiveStreamChatBoxState();
+}
+
+class __LiveStreamChatBoxState extends State<_LiveStreamChatBox> {
+  late List<LiveStreamChatModel> _messages;
+  late Timer _timer;
+  final ScrollController _scrollController = ScrollController();
+
+  int _counter = 1;
+
+  @override
+  void initState() {
+    super.initState();
+    _messages = List.from(widget.chats);
+
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+      setState(() {
+        _messages.add(
+          LiveStreamChatModel(
+            id: DateTime.now().millisecondsSinceEpoch,
+            userId: 0,
+            liveStreamId: 0,
+            text: 'Hello $_counter 👋',
+            createdAt: DateTime.now(),
+            updatedAt: DateTime.now(),
+          ),
+        );
+        _counter++;
+      });
+
+      // auto scroll to bottom
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_scrollController.hasClients) {
+          _scrollController.animateTo(
+            _scrollController.position.maxScrollExtent,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+          );
+        }
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: Colors.black.withOpacity(0.4),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: ListView.builder(
+        controller: _scrollController,
+        itemCount: _messages.length,
+        itemBuilder: (context, index) {
+          final chat = _messages[index];
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 2),
+            child: RichText(
+              text: TextSpan(
+                children: [
+                  TextSpan(
+                    text: chat.text,
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 }
@@ -354,9 +533,8 @@ class _PhotoContainer extends StatelessWidget {
       },
       child: Stack(
         children: [
-          AspectRatio(
-            aspectRatio: 1,
-            child: Image(image: post.ui().images.first, fit: BoxFit.cover),
+          Positioned.fill(
+            child: Image(image: post.ui().images[0], fit: BoxFit.cover),
           ),
           if (post.ui().images.length > 1)
             Positioned(

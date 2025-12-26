@@ -35,6 +35,27 @@ class ProductDao {
     }
   }
 
+  Future<List<ProductModel>> getAllProductsByLiveStreamId(
+    int liveStreamId,
+  ) async {
+    try {
+      final db = await _appDatabase.database;
+      final result = await db.query(
+        'products',
+        where: 'live_stream_id = ?',
+        whereArgs: [liveStreamId],
+      );
+      if (result.isNotEmpty) {
+        return result
+            .map((map) => ProductModel.fromMap(map, map['image_url'] as String))
+            .toList();
+      }
+      throw Exception('No Products found');
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<int> updateProduct(ProductModel product) async {
     try {
       final db = await _appDatabase.database;
