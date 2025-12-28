@@ -10,6 +10,7 @@ class PostModel {
   final DateTime createdAt;
   final DateTime updatedAt;
 
+  final int? liveStreamId;
   final List<String>? images;
   final ProductModel? product;
   final UserModel? user;
@@ -21,6 +22,7 @@ class PostModel {
     required this.productId,
     required this.createdAt,
     required this.updatedAt,
+    this.liveStreamId,
     this.images,
     this.product,
     this.user,

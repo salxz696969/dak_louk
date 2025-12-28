@@ -14,7 +14,6 @@ class ProductModel {
   final DateTime updatedAt;
   final String image;
 
-  final int? liveStreamId;
   final UserModel? user;
 
   ProductModel({
@@ -28,7 +27,6 @@ class ProductModel {
     required this.createdAt,
     required this.updatedAt,
     required this.image,
-    this.liveStreamId,
     this.user,
   });
 }

@@ -152,7 +152,6 @@ class ProductService {
         createdAt: product.createdAt,
         updatedAt: DateTime.now(),
         image: product.image,
-        liveStreamId: product.liveStreamId,
       );
 
       await _productRepository.update(updatedProduct);

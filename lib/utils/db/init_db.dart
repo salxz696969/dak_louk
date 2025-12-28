@@ -26,10 +26,12 @@ Future<void> initDb(Database db) async {
         user_id INTEGER,
         title TEXT,
         product_id INTEGER,
+        live_stream_id INTEGER,
         category TEXT CHECK(category IN ('vehicles','property','electronics','home','fashion','jobs','services','entertainment','kids','pets','business','others')),
         created_at TEXT,
         updated_at TEXT,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        FOREIGN KEY (live_stream_id) REFERENCES live_streams(id) ON DELETE SET NULL
       )
     ''');
 
@@ -70,12 +72,10 @@ Future<void> initDb(Database db) async {
         category TEXT CHECK(category IN ('vehicles','property','electronics','home','fashion','jobs','services','entertainment','kids','pets','business','others')),
         price REAL,
         quantity INTEGER DEFAULT 1,
-        live_stream_id INTEGER,
         image_url TEXT,
         created_at TEXT,
         updated_at TEXT,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-        FOREIGN KEY (live_stream_id) REFERENCES live_streams(id) ON DELETE SET NULL
       )
     ''');
 

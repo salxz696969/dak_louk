@@ -29,6 +29,4 @@ class ChatRepository extends BaseRepository<ChatModel> {
       Tables.chats.cols.updatedAt: model.updatedAt,
     };
   }
-
-  
 }

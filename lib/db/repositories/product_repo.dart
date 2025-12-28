@@ -19,7 +19,6 @@ class ProductRepository extends BaseRepository<ProductModel> {
       createdAt: map[Tables.products.cols.createdAt],
       updatedAt: map[Tables.products.cols.updatedAt],
       image: map[Tables.products.cols.image],
-      liveStreamId: map[Tables.products.cols.liveStreamId],
     );
   }
 
@@ -36,7 +35,6 @@ class ProductRepository extends BaseRepository<ProductModel> {
       Tables.products.cols.createdAt: model.createdAt,
       Tables.products.cols.updatedAt: model.updatedAt,
       Tables.products.cols.image: model.image,
-      Tables.products.cols.liveStreamId: model.liveStreamId,
     };
   }
 }
