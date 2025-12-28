@@ -1,5 +1,5 @@
 import 'package:dak_louk/db/app_database.dart';
-import 'package:dak_louk/db/dao/user_dao.dart';
+import 'package:dak_louk/db/repository/user_dao.dart';
 import 'package:dak_louk/models/live_stream_chat_model.dart';
 
 class LiveStreamChatDao {

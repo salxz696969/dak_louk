@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'package:dak_louk/db/dao/live_stream_dao.dart';
-import 'package:dak_louk/db/dao/post_dao.dart';
+import 'package:dak_louk/db/repository/live_stream_dao.dart';
+import 'package:dak_louk/db/repository/post_dao.dart';
 import 'package:dak_louk/models/live_stream_chat_model.dart';
 import 'package:dak_louk/models/live_stream_model.dart';
 import 'package:dak_louk/models/post_model.dart';
