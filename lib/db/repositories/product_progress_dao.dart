@@ -1,12 +1,9 @@
-import 'package:dak_louk/db/repositories/repository_base.dart';
-import 'package:dak_louk/db/repositories/product_dao.dart';
-import 'package:dak_louk/db/repositories/user_dao.dart';
+import 'package:dak_louk/db/repositories/base_repo.dart';
 import 'package:dak_louk/models/product_progress_model.dart';
 import 'package:dak_louk/models/progress_status_enum.dart';
-import 'package:dak_louk/utils/db/orm.dart';
 import 'package:dak_louk/utils/db/tables/tables.dart';
 
-class ProductProgressDao extends BaseRepository<ProductProgressModel> {
+class ProductProgressRepository extends BaseRepository<ProductProgressModel> {
   @override
   String get tableName => Tables.productProgress.tableName;
 
@@ -43,42 +40,5 @@ class ProductProgressDao extends BaseRepository<ProductProgressModel> {
       Tables.productProgress.cols.createdAt: model.createdAt.toIso8601String(),
       Tables.productProgress.cols.updatedAt: model.updatedAt.toIso8601String(),
     };
-  }
-
-  Future<List<ProductProgressModel>> getProductProgressesByUserId(
-    int userId,
-  ) async {
-    try {
-      final statement = Clauses.where.eq(
-        Tables.productProgress.cols.userId,
-        userId,
-      );
-      final progresses = await queryThisTable(
-        where: statement.clause,
-        args: statement.args,
-      );
-
-      if (progresses.isNotEmpty) {
-        ProductDao productDao = ProductDao();
-        UserDao userDao = UserDao();
-        for (var progress in progresses) {
-          final product = await productDao.getById(progress.productId);
-          final user = await userDao.getById(progress.userId);
-          progresses.add(
-            ProductProgressModel(
-              id: progress.id,
-              userId: progress.userId,
-              productId: progress.productId,
-              status: progress.status,
-              createdAt: progress.createdAt,
-              updatedAt: progress.updatedAt,
-            ),
-          );
-        }
-      }
-      return progresses;
-    } catch (e) {
-      rethrow;
-    }
   }
 }

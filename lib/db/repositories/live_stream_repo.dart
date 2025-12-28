@@ -1,9 +1,8 @@
-import 'package:dak_louk/db/repositories/repository_base.dart';
+import 'package:dak_louk/db/repositories/base_repo.dart';
 import 'package:dak_louk/models/live_stream_model.dart';
-import 'package:dak_louk/utils/db/orm.dart';
 import 'package:dak_louk/utils/db/tables/tables.dart';
 
-class LiveStreamDao extends BaseRepository<LiveStreamModel> {
+class LiveStreamRepository extends BaseRepository<LiveStreamModel> {
   @override
   String get tableName => Tables.liveStreams.tableName;
 
@@ -37,29 +36,5 @@ class LiveStreamDao extends BaseRepository<LiveStreamModel> {
       Tables.liveStreams.cols.createdAt: model.createdAt.toIso8601String(),
       Tables.liveStreams.cols.updatedAt: model.updatedAt.toIso8601String(),
     };
-  }
-
-  Future<List<LiveStreamModel>> getAllLiveStreamsByUserId(
-    int userId,
-    int limit,
-  ) async {
-    try {
-      final statement = Clauses.where.eq(
-        Tables.liveStreams.cols.userId,
-        userId,
-      );
-      final result = await queryThisTable(
-        where: statement.clause,
-        args: statement.args,
-        limit: limit,
-      );
-
-      if (result.isNotEmpty) {
-        return result;
-      }
-      throw Exception('No LiveStreams found');
-    } catch (e) {
-      rethrow;
-    }
   }
 }

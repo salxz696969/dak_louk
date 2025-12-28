@@ -23,4 +23,30 @@ class CartService {
       rethrow;
     }
   }
+
+  Future<void> deleteCart(int id) async {
+    try {
+      await _cartRepository.delete(id);
+    } catch (e) {
+      throw Exception('Failed to delete cart');
+    }
+  }
+
+  Future<CartModel> createCart(CartModel cart) async {
+    try {
+      final id = await _cartRepository.insert(cart);
+      return await _cartRepository.getById(id);
+    } catch (e) {
+      throw Exception('Failed to create cart');
+    }
+  }
+
+  Future<CartModel> updateCart(CartModel cart) async {
+    try {
+      await _cartRepository.update(cart);
+      return await _cartRepository.getById(cart.id);
+    } catch (e) {
+      throw Exception('Failed to update cart');
+    }
+  }
 }

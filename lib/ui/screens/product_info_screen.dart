@@ -1,6 +1,6 @@
-import 'package:dak_louk/db/repositories/post_dao.dart';
 import 'package:dak_louk/models/cart_model.dart';
 import 'package:dak_louk/models/post_model.dart';
+import 'package:dak_louk/services/post_service.dart';
 import 'package:dak_louk/ui/widgets/add_and_remove_button.dart';
 import 'package:dak_louk/ui/widgets/appbar.dart';
 import 'package:dak_louk/ui/widgets/photo_slider.dart';
@@ -144,6 +144,7 @@ class _SimilarItems extends StatefulWidget {
 
 class _SimilarItemsState extends State<_SimilarItems> {
   late final PageController _controller;
+  final PostService _postService = PostService();
 
   @override
   void initState() {
@@ -162,7 +163,7 @@ class _SimilarItemsState extends State<_SimilarItems> {
     return SizedBox(
       height: 400,
       child: FutureBuilder<List<PostModel>>(
-        future: PostDao().getAllPosts(widget.category, 10),
+        future: _postService.getAllPosts(widget.category, 10),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());

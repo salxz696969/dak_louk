@@ -1,9 +1,8 @@
-import 'package:dak_louk/db/repositories/repository_base.dart';
+import 'package:dak_louk/db/repositories/base_repo.dart';
 import 'package:dak_louk/models/chat_model.dart';
-import 'package:dak_louk/utils/db/orm.dart';
 import 'package:dak_louk/utils/db/tables/tables.dart';
 
-class ChatDao extends BaseRepository<ChatModel> {
+class ChatRepository extends BaseRepository<ChatModel> {
   @override
   String get tableName => Tables.chats.tableName;
 
@@ -31,23 +30,5 @@ class ChatDao extends BaseRepository<ChatModel> {
     };
   }
 
-  Future<List<ChatModel>> getChatByChatRoomId(int chatRoomId) async {
-    try {
-      final statement = Clauses.where.eq(
-        Tables.chats.cols.chatRoomId,
-        chatRoomId,
-      );
-      final result = await queryThisTable(
-        where: statement.clause,
-        args: statement.args,
-        limit: 20,
-      );
-      if (result.isNotEmpty) {
-        return result;
-      }
-      throw Exception('Chat not found');
-    } catch (e) {
-      rethrow;
-    }
-  }
+  
 }

@@ -1,9 +1,8 @@
-import 'package:dak_louk/db/repositories/repository_base.dart';
+import 'package:dak_louk/db/repositories/base_repo.dart';
 import 'package:dak_louk/models/product_model.dart';
-import 'package:dak_louk/utils/db/orm.dart';
 import 'package:dak_louk/utils/db/tables/tables.dart';
 
-class ProductDao extends BaseRepository<ProductModel> {
+class ProductRepository extends BaseRepository<ProductModel> {
   @override
   String get tableName => Tables.products.tableName;
 
@@ -39,54 +38,5 @@ class ProductDao extends BaseRepository<ProductModel> {
       Tables.products.cols.image: model.image,
       Tables.products.cols.liveStreamId: model.liveStreamId,
     };
-  }
-
-  // Additional custom methods using queryThisTable
-  Future<List<ProductModel>> getAllProductsByLiveStreamId(
-    int liveStreamId,
-  ) async {
-    try {
-      final statement = Clauses.where.eq(
-        Tables.products.cols.liveStreamId,
-        liveStreamId,
-      );
-      final result = await queryThisTable(
-        where: statement.clause,
-        args: statement.args,
-      );
-      if (result.isNotEmpty) {
-        return result;
-      }
-      throw Exception('No Products found');
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  Future<List<ProductModel>> getProductsByCategory(String category) async {
-    try {
-      final statement = Clauses.where.eq(
-        Tables.products.cols.category,
-        category,
-      );
-      return await queryThisTable(
-        where: statement.clause,
-        args: statement.args,
-      );
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  Future<List<ProductModel>> getProductsByUserId(int userId) async {
-    try {
-      final statement = Clauses.where.eq(Tables.products.cols.userId, userId);
-      return await queryThisTable(
-        where: statement.clause,
-        args: statement.args,
-      );
-    } catch (e) {
-      rethrow;
-    }
   }
 }

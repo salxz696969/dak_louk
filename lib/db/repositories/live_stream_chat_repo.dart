@@ -1,11 +1,8 @@
-import 'package:dak_louk/db/repositories/repository_base.dart';
-import 'package:dak_louk/utils/db/app_database.dart';
-import 'package:dak_louk/db/repositories/user_dao.dart';
+import 'package:dak_louk/db/repositories/base_repo.dart';
 import 'package:dak_louk/models/live_stream_chat_model.dart';
-import 'package:dak_louk/utils/db/orm.dart';
 import 'package:dak_louk/utils/db/tables/tables.dart';
 
-class LiveStreamChatDao extends BaseRepository<LiveStreamChatModel> {
+class LiveStreamChatRepository extends BaseRepository<LiveStreamChatModel> {
   @override
   String get tableName => Tables.liveStreamChats.tableName;
 
@@ -35,26 +32,5 @@ class LiveStreamChatDao extends BaseRepository<LiveStreamChatModel> {
       Tables.liveStreamChats.cols.createdAt: model.createdAt,
       Tables.liveStreamChats.cols.updatedAt: model.updatedAt,
     };
-  }
-
-  Future<List<LiveStreamChatModel>> getAllLiveStreamChatByLiveStreamId(
-    int id,
-  ) async {
-    try {
-      final statement = Clauses.where.eq(
-        Tables.liveStreamChats.cols.liveStreamId,
-        id,
-      );
-      final result = await queryThisTable(
-        where: statement.clause,
-        args: statement.args,
-      );
-      if (result.isNotEmpty) {
-        return result;
-      }
-      throw Exception('LiveStreamChat not found');
-    } catch (e) {
-      rethrow;
-    }
   }
 }

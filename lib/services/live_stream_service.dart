@@ -3,9 +3,6 @@ import 'package:dak_louk/db/repositories/user_repo.dart';
 import 'package:dak_louk/db/repositories/product_repo.dart';
 import 'package:dak_louk/db/repositories/live_stream_chat_repo.dart';
 import 'package:dak_louk/models/live_stream_model.dart';
-import 'package:dak_louk/models/user_model.dart';
-import 'package:dak_louk/models/product_model.dart';
-import 'package:dak_louk/models/live_stream_chat_model.dart';
 import 'package:dak_louk/utils/db/orm.dart';
 import 'package:dak_louk/utils/db/tables/tables.dart';
 
@@ -126,19 +123,6 @@ class LiveStreamService {
       );
 
       // Get live stream chats
-      final chatStatement = Clauses.where.eq(
-        Tables.liveStreamChats.cols.liveStreamId,
-        liveStreamId,
-      );
-      final chats = await _liveStreamChatRepository.queryThisTable(
-        where: chatStatement.clause,
-        args: chatStatement.args,
-        orderBy: Clauses.orderBy
-            .desc(Tables.liveStreamChats.cols.createdAt)
-            .clause,
-        limit: 50,
-      );
-
       return LiveStreamModel(
         id: liveStream.id,
         url: liveStream.url,

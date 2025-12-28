@@ -1,10 +1,8 @@
-import 'package:dak_louk/db/repositories/repository_base.dart';
+import 'package:dak_louk/db/repositories/base_repo.dart';
 import 'package:dak_louk/models/review_model.dart';
-import 'package:dak_louk/models/user_model.dart';
-import 'package:dak_louk/utils/db/orm.dart';
 import 'package:dak_louk/utils/db/tables/tables.dart';
 
-class ReviewDao extends BaseRepository<ReviewModel> {
+class ReviewRepository extends BaseRepository<ReviewModel> {
   @override
   String get tableName => Tables.reviews.tableName;
 
@@ -30,26 +28,5 @@ class ReviewDao extends BaseRepository<ReviewModel> {
       Tables.reviews.cols.text: model.text,
       Tables.reviews.cols.rating: model.rating,
     };
-  }
-
-  Future<List<ReviewModel>> getReviewsByTargetUserId(
-    UserModel targetUser,
-  ) async {
-    try {
-      final statement = Clauses.where.eq(
-        Tables.reviews.cols.targetUserId,
-        targetUser.id,
-      );
-      final reviews = await queryThisTable(
-        where: statement.clause,
-        args: statement.args,
-      );
-      if (reviews.isNotEmpty) {
-        return reviews;
-      }
-      throw Exception('Reviews not found');
-    } catch (e) {
-      rethrow;
-    }
   }
 }

@@ -1,11 +1,10 @@
-import 'package:dak_louk/db/repositories/repository_base.dart';
+import 'package:dak_louk/db/repositories/base_repo.dart';
 import 'package:dak_louk/models/user_model.dart';
-import 'package:dak_louk/utils/db/orm.dart';
 import 'package:dak_louk/utils/db/tables/tables.dart';
 
-class UserDao extends BaseRepository<UserModel> {
+class UserRepository extends BaseRepository<UserModel> {
   @override
-  String get tableName => 'users';
+  String get tableName => Tables.users.tableName;
 
   @override
   UserModel fromMap(Map<String, dynamic> user) {
@@ -37,51 +36,5 @@ class UserDao extends BaseRepository<UserModel> {
       Tables.users.cols.createdAt: user.createdAt,
       Tables.users.cols.updatedAt: user.updatedAt,
     };
-  }
-
-  // Additional custom methods -------------------------------
-
-  Future<UserModel?> getUserByUsername(String username) async {
-    try {
-      final statement = Clauses.where.eq(Tables.users.cols.username, username);
-      final result = await queryThisTable(
-        where: statement.clause,
-        args: statement.args,
-      );
-      if (result.isNotEmpty) {
-        return result.first;
-      }
-      return null;
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  Future<List<UserModel>> getUsersByRole(String role) async {
-    try {
-      final statement = Clauses.where.eq(Tables.users.cols.role, role);
-      final orderByStmt = Clauses.orderBy.desc(Tables.users.cols.createdAt);
-      final result = await queryThisTable(
-        where: statement.clause,
-        args: statement.args,
-        orderBy: orderByStmt.clause,
-      );
-      return result;
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  Future<List<UserModel>> getTopRatedUsers({int limit = 10}) async {
-    try {
-      final statement = Clauses.orderBy.desc(Tables.users.cols.rating);
-      final result = await queryThisTable(
-        where: statement.clause,
-        limit: limit,
-      );
-      return result;
-    } catch (e) {
-      rethrow;
-    }
   }
 }

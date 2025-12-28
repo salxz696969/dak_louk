@@ -1,7 +1,6 @@
 import 'package:dak_louk/db/repositories/live_stream_chat_repo.dart';
 import 'package:dak_louk/db/repositories/user_repo.dart';
 import 'package:dak_louk/models/live_stream_chat_model.dart';
-import 'package:dak_louk/models/user_model.dart';
 import 'package:dak_louk/utils/db/orm.dart';
 import 'package:dak_louk/utils/db/tables/tables.dart';
 

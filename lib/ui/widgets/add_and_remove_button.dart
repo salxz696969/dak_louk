@@ -1,5 +1,6 @@
-import 'package:dak_louk/db/repositories/cart_dao.dart';
+import 'package:dak_louk/db/repositories/cart_repo.dart';
 import 'package:dak_louk/models/cart_model.dart';
+import 'package:dak_louk/services/cart_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -21,7 +22,7 @@ class AddAndRemoveButton extends StatefulWidget {
 
 class _AddAndRemoveButtonState extends State<AddAndRemoveButton> {
   late int currentQuantity;
-  CartDao cartDao = CartDao();
+  CartService _cartService = CartService();
 
   @override
   void initState() {
@@ -40,12 +41,12 @@ class _AddAndRemoveButtonState extends State<AddAndRemoveButton> {
               setState(() {
                 currentQuantity = 0;
               });
-              await cartDao.deleteCart(widget.cart.id);
+              await _cartService.deleteCart(widget.cart.id);
             } else if (currentQuantity > 1) {
               setState(() {
                 currentQuantity = currentQuantity - 1;
               });
-              await cartDao.updateCart(
+              await _cartService.updateCart(
                 CartModel(
                   id: widget.cart.id,
                   userId: widget.cart.userId,
@@ -79,7 +80,7 @@ class _AddAndRemoveButtonState extends State<AddAndRemoveButton> {
               setState(() {
                 currentQuantity = currentQuantity + 1;
               });
-              await cartDao.updateCart(
+              await _cartService.updateCart(
                 CartModel(
                   id: widget.cart.id,
                   userId: widget.cart.userId,

@@ -1,13 +1,8 @@
-import 'package:dak_louk/db/repositories/repository_base.dart';
-import 'package:dak_louk/db/repositories/product_dao.dart';
-import 'package:dak_louk/db/repositories/user_dao.dart';
+import 'package:dak_louk/db/repositories/base_repo.dart';
 import 'package:dak_louk/models/post_model.dart';
-import 'package:dak_louk/models/product_model.dart';
-import 'package:dak_louk/models/user_model.dart';
-import 'package:dak_louk/utils/db/orm.dart';
 import 'package:dak_louk/utils/db/tables/tables.dart';
 
-class PostDao extends BaseRepository<PostModel> {
+class PostRepository extends BaseRepository<PostModel> {
   @override
   String get tableName => Tables.posts.tableName;
 
@@ -36,18 +31,5 @@ class PostDao extends BaseRepository<PostModel> {
       Tables.posts.cols.createdAt: model.createdAt.toIso8601String(),
       Tables.posts.cols.updatedAt: model.updatedAt.toIso8601String(),
     };
-  }
-
-  Future<List<PostModel>> getPostsByUserId(int userId, int limit) async {
-    try {
-      final statement = Clauses.where.eq(Tables.posts.cols.userId, userId);
-      return await queryThisTable(
-        where: statement.clause,
-        args: statement.args,
-        limit: limit > 0 ? limit : 20,
-      );
-    } catch (e) {
-      rethrow;
-    }
   }
 }

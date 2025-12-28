@@ -1,9 +1,8 @@
-import 'package:dak_louk/db/repositories/repository_base.dart';
+import 'package:dak_louk/db/repositories/base_repo.dart';
 import 'package:dak_louk/models/chat_room_model.dart';
-import 'package:dak_louk/utils/db/orm.dart';
 import 'package:dak_louk/utils/db/tables/tables.dart';
 
-class ChatRoomDao extends BaseRepository<ChatRoomModel> {
+class ChatRoomRepository extends BaseRepository<ChatRoomModel> {
   @override
   String get tableName => Tables.chatRooms.tableName;
 
@@ -29,22 +28,5 @@ class ChatRoomDao extends BaseRepository<ChatRoomModel> {
       Tables.chatRooms.cols.createdAt: model.createdAt.toIso8601String(),
       Tables.chatRooms.cols.updatedAt: model.updatedAt.toIso8601String(),
     };
-  }
-
-  Future<List<ChatRoomModel>> getAllChatRoomsByUserId(int userId) async {
-    try {
-      final statement = Clauses.where.eq(Tables.chatRooms.cols.userId, userId);
-      final result = await queryThisTable(
-        where: statement.clause,
-        args: statement.args,
-        limit: 50,
-      );
-      if (result.isNotEmpty) {
-        return result;
-      }
-      throw Exception('ChatRooms not found');
-    } catch (e) {
-      rethrow;
-    }
   }
 }
