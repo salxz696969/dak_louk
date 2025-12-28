@@ -27,6 +27,15 @@ abstract class RepositoryBaseInterface<T> {
 
   /// Convert a model instance to a database map
   Map<String, dynamic> toMap(T model);
+
+  /// Query current table
+  Future<List<T>> queryThisTable({
+    String? where,
+    List<Object?>? args,
+    String? orderBy,
+    int? limit,
+    int? offset,
+  });
 }
 
 /// Base implementation that provides common database operations
@@ -114,7 +123,7 @@ abstract class BaseRepository<T> implements RepositoryBaseInterface<T> {
 
   // query / sql helper methods
   /// Helper method to execute custom queries
-  Future<List<Map<String, dynamic>>> queryThisTable({
+  Future<List<T>> queryThisTable({
     String? where,
     List<Object?>? args,
     String? orderBy,
@@ -123,7 +132,7 @@ abstract class BaseRepository<T> implements RepositoryBaseInterface<T> {
   }) async {
     try {
       final db = await database;
-      return await db.query(
+      final result = await db.query(
         tableName,
         where: where,
         whereArgs: args,
@@ -131,6 +140,9 @@ abstract class BaseRepository<T> implements RepositoryBaseInterface<T> {
         limit: limit,
         offset: offset,
       );
+
+      // this means that it will convert the database map to a list of models mathching it exactly with no validation
+      return result.map((map) => fromMap(map)).toList();
     } catch (e) {
       rethrow;
     }

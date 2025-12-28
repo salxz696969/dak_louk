@@ -26,36 +26,6 @@ class CartModel {
     this.product,
   });
 
-  factory CartModel.fromMap(
-    Map<String, dynamic> cart,
-    UserModel? user,
-    ProductModel? product,
-    UserModel? seller,
-  ) {
-    return CartModel(
-      id: cart['id'],
-      userId: cart['user_id'],
-      productId: cart['product_id'],
-      quantity: cart['quantity'],
-      createdAt: cart['created_at'],
-      updatedAt: cart['updated_at'],
-      seller: seller,
-      user: user,
-      product: product,
-    );
-  }
-
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'user_id': userId,
-      'product_id': productId,
-      'quantity': quantity,
-      'created_at': createdAt,
-      'updated_at': updatedAt,
-    };
-  }
-
   CartUI ui() {
     return CartUI(
       title: product?.title ?? 'Unknown',

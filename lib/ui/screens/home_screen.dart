@@ -1,6 +1,6 @@
 import 'package:dak_louk/ui/widgets/category_bar.dart';
 import 'package:dak_louk/ui/widgets/post_block.dart';
-import 'package:dak_louk/db/repository/post_dao.dart';
+import 'package:dak_louk/db/repositories/post_dao.dart';
 import 'package:dak_louk/models/post_model.dart';
 import 'package:flutter/material.dart';
 

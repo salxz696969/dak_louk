@@ -1,4 +1,4 @@
-import 'package:dak_louk/db/repository/repository_base.dart';
+import 'package:dak_louk/db/repositories/repository_base.dart';
 import 'package:dak_louk/models/user_model.dart';
 import 'package:dak_louk/utils/db/orm.dart';
 import 'package:dak_louk/utils/db/tables/tables.dart';
@@ -49,7 +49,7 @@ class UserDao extends BaseRepository<UserModel> {
         args: statement.args,
       );
       if (result.isNotEmpty) {
-        return fromMap(result.first);
+        return result.first;
       }
       return null;
     } catch (e) {
@@ -66,7 +66,7 @@ class UserDao extends BaseRepository<UserModel> {
         args: statement.args,
         orderBy: orderByStmt.clause,
       );
-      return result.map((user) => fromMap(user)).toList();
+      return result;
     } catch (e) {
       rethrow;
     }
@@ -79,7 +79,7 @@ class UserDao extends BaseRepository<UserModel> {
         where: statement.clause,
         limit: limit,
       );
-      return result.map((user) => fromMap(user)).toList();
+      return result;
     } catch (e) {
       rethrow;
     }
