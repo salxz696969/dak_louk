@@ -1,4 +1,4 @@
-import 'package:dak_louk/db/app_database.dart';
+import 'package:dak_louk/utils/db/app_database.dart';
 import 'package:dak_louk/models/product_model.dart';
 
 class ProductDao {

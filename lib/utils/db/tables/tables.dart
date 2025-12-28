@@ -1,14 +1,14 @@
-import 'package:dak_louk/utils/schema/users_table.dart';
-import 'package:dak_louk/utils/schema/products_table.dart';
-import 'package:dak_louk/utils/schema/posts_table.dart';
-import 'package:dak_louk/utils/schema/carts_table.dart';
-import 'package:dak_louk/utils/schema/chats_table.dart';
-import 'package:dak_louk/utils/schema/chatrooms_table.dart';
-import 'package:dak_louk/utils/schema/livestreams_table.dart';
-import 'package:dak_louk/utils/schema/livestream_chats_table.dart';
-import 'package:dak_louk/utils/schema/product_progress_table.dart';
-import 'package:dak_louk/utils/schema/reviews_table.dart';
-import 'package:dak_louk/utils/schema/medias_table.dart';
+import 'package:dak_louk/utils/db/tables/users_table.dart';
+import 'package:dak_louk/utils/db/tables/products_table.dart';
+import 'package:dak_louk/utils/db/tables/posts_table.dart';
+import 'package:dak_louk/utils/db/tables/carts_table.dart';
+import 'package:dak_louk/utils/db/tables/chats_table.dart';
+import 'package:dak_louk/utils/db/tables/chatrooms_table.dart';
+import 'package:dak_louk/utils/db/tables/livestreams_table.dart';
+import 'package:dak_louk/utils/db/tables/livestream_chats_table.dart';
+import 'package:dak_louk/utils/db/tables/product_progress_table.dart';
+import 'package:dak_louk/utils/db/tables/reviews_table.dart';
+import 'package:dak_louk/utils/db/tables/medias_table.dart';
 
 class Tables {
   // for generic usage at base repo

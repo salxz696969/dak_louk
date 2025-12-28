@@ -1,6 +1,5 @@
 // ignore: depend_on_referenced_packages
-import 'package:dak_louk/db/create_table.dart';
-import 'package:dak_louk/db/init_db.dart';
+import 'package:dak_louk/utils/db/init_db.dart';
 // ignore: depend_on_referenced_packages
 import 'package:sqflite/sqflite.dart';
 // ignore: depend_on_referenced_packages
@@ -35,7 +34,7 @@ class AppDatabase {
           await db.execute('PRAGMA foreign_keys = ON');
         },
         onCreate: (db, version) async {
-          await createTables(db);
+          await initDb(db);
           await insertMockData(db);
         },
       );

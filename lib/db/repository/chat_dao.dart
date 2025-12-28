@@ -1,8 +1,8 @@
-import 'package:dak_louk/db/app_database.dart';
+import 'package:dak_louk/utils/db/app_database.dart';
 import 'package:dak_louk/db/repository/user_dao.dart';
 import 'package:dak_louk/models/chat_model.dart';
-import 'package:dak_louk/utils/orm.dart';
-import 'package:dak_louk/utils/schema/tables.dart';
+import 'package:dak_louk/utils/db/orm.dart';
+import 'package:dak_louk/utils/db/tables/tables.dart';
 
 class ChatDao {
   final AppDatabase _appDatabase = AppDatabase();

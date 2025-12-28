@@ -1,4 +1,4 @@
-import 'package:dak_louk/utils/schema/tables.dart';
+import 'package:dak_louk/utils/db/tables/tables.dart';
 
 class ReviewsTable implements DbTable<ReviewsCols> {
   const ReviewsTable();
