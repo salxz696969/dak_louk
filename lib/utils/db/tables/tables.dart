@@ -49,7 +49,3 @@ abstract class BaseCols {
   static const String createdAtCol = 'created_at';
   static const String updatedAtCol = 'updated_at';
 }
-
-
-
-
