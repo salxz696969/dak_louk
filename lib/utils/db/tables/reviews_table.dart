@@ -15,6 +15,7 @@ class ReviewsCols extends BaseCols {
   static const String textCol = 'text';
   static const String ratingCol = 'rating';
 
+  String get userId => userIdCol;
   String get targetUserId => targetUserIdCol;
   String get text => textCol;
   String get rating => ratingCol;

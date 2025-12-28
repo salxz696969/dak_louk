@@ -1,6 +1,8 @@
 import 'dart:async';
-import 'package:dak_louk/db/repository/live_stream_dao.dart';
-import 'package:dak_louk/db/repository/post_dao.dart';
+import 'package:dak_louk/db/repositories/live_stream_repo.dart';
+import 'package:dak_louk/db/repositories/post_repo.dart';
+import 'package:dak_louk/services/live_stream_service.dart';
+import 'package:dak_louk/services/post_service.dart';
 import 'package:dak_louk/models/live_stream_chat_model.dart';
 import 'package:dak_louk/models/live_stream_model.dart';
 import 'package:dak_louk/models/post_model.dart';
@@ -224,12 +226,14 @@ class _TabButton extends StatelessWidget {
 
 class _PostGrid extends StatelessWidget {
   final int userId;
-  const _PostGrid({required this.userId});
+  final PostService _postService = PostService();
+
+  _PostGrid({required this.userId});
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<PostModel>>(
-      future: PostDao().getPostsByUserId(userId, 20),
+      future: _postService.getPostsByUserId(userId, 20),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Padding(
@@ -267,12 +271,13 @@ class _PostGrid extends StatelessWidget {
 
 class _LiveStreamGrid extends StatelessWidget {
   final int userId;
-  const _LiveStreamGrid({required this.userId});
+  final LiveStreamService _liveStreamService = LiveStreamService();
+  _LiveStreamGrid({required this.userId});
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<LiveStreamModel>>(
-      future: LiveStreamDao().getAllLiveStreamsByUserId(userId, 20),
+      future: _liveStreamService.getAllLiveStreamsByUserId(userId, 20),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Padding(

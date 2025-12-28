@@ -14,11 +14,11 @@ class LiveStreamsCols extends BaseCols {
   static const String userIdCol = 'user_id';
   static const String titleCol = 'title';
   static const String thumbnailUrlCol = 'thumbnail_url';
-  static const String viewsCol = 'views';
+  static const String viewCol = 'view';
 
   String get url => urlCol;
   String get userId => userIdCol;
   String get title => titleCol;
   String get thumbnailUrl => thumbnailUrlCol;
-  String get views => viewsCol;
+  String get view => viewCol;
 }

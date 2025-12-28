@@ -1,4 +1,4 @@
-import 'package:dak_louk/db/repository/cart_dao.dart';
+import 'package:dak_louk/services/cart_service.dart';
 import 'package:dak_louk/ui/widgets/appbar.dart';
 import 'package:dak_louk/ui/screens/checkout_screen.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +11,7 @@ class CartScreen extends StatefulWidget {
 }
 
 class _CartScreenState extends State<CartScreen> {
+  final CartService _cartService = CartService();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,7 +20,7 @@ class _CartScreenState extends State<CartScreen> {
         child: Appbar(title: 'Cart'),
       ),
       body: FutureBuilder(
-        future: CartDao().getCartsByUserId(1),
+        future: _cartService.getCartsByUserId(1),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -55,7 +56,7 @@ class _CartScreenState extends State<CartScreen> {
                       key: Key(cart.id.toString()),
                       direction: DismissDirection.endToStart,
                       onDismissed: (direction) async {
-                        await CartDao().deleteCart(cart.id);
+                        await _cartService.deleteCart(cart.id);
                         setState(() {});
                       },
                       background: Container(

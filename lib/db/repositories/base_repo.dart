@@ -1,7 +1,9 @@
 import 'package:dak_louk/utils/db/app_database.dart';
+import 'package:dak_louk/utils/db/orm.dart';
+import 'package:dak_louk/utils/db/tables/tables.dart';
 import 'package:sqflite/sqflite.dart';
 
-abstract class RepositoryBase<T> {
+abstract class RepositoryBaseInterface<T> {
   /// Insert a new model into the database
   Future<int> insert(T model);
 
@@ -25,10 +27,19 @@ abstract class RepositoryBase<T> {
 
   /// Convert a model instance to a database map
   Map<String, dynamic> toMap(T model);
+
+  /// Query current table
+  Future<List<T>> queryThisTable({
+    String? where,
+    List<Object?>? args,
+    String? orderBy,
+    int? limit,
+    int? offset,
+  });
 }
 
 /// Base implementation that provides common database operations
-abstract class BaseRepositoryImpl<T> implements RepositoryBase<T> {
+abstract class BaseRepository<T> implements RepositoryBaseInterface<T> {
   final AppDatabase _appDatabase = AppDatabase();
 
   Future<Database> get database async => await _appDatabase.database;
@@ -60,10 +71,11 @@ abstract class BaseRepositoryImpl<T> implements RepositoryBase<T> {
   Future<T> getById(int id) async {
     try {
       final db = await database;
+      final statement = Clauses.where.eq(Tables.id, id);
       final result = await db.query(
         tableName,
-        where: 'id = ?',
-        whereArgs: [id],
+        where: statement.clause,
+        whereArgs: statement.args,
       );
       if (result.isNotEmpty) {
         return fromMap(result.first);
@@ -82,7 +94,13 @@ abstract class BaseRepositoryImpl<T> implements RepositoryBase<T> {
       final db = await database;
       final map = toMap(model);
       final id = map['id'];
-      return await db.update(tableName, map, where: 'id = ?', whereArgs: [id]);
+      final statement = Clauses.where.eq(Tables.id, id);
+      return await db.update(
+        tableName,
+        map,
+        where: statement.clause,
+        whereArgs: statement.args,
+      );
     } catch (e) {
       rethrow;
     }
@@ -92,94 +110,39 @@ abstract class BaseRepositoryImpl<T> implements RepositoryBase<T> {
   Future<int> delete(int id) async {
     try {
       final db = await database;
-      return await db.delete(tableName, where: 'id = ?', whereArgs: [id]);
+      final statement = Clauses.where.eq(Tables.id, id);
+      return await db.delete(
+        tableName,
+        where: statement.clause,
+        whereArgs: statement.args,
+      );
     } catch (e) {
       rethrow;
     }
   }
 
+  // query / sql helper methods
   /// Helper method to execute custom queries
-  Future<List<Map<String, dynamic>>> query({
+  Future<List<T>> queryThisTable({
     String? where,
-    List<Object?>? whereArgs,
+    List<Object?>? args,
     String? orderBy,
     int? limit,
     int? offset,
   }) async {
     try {
       final db = await database;
-      return await db.query(
+      final result = await db.query(
         tableName,
         where: where,
-        whereArgs: whereArgs,
+        whereArgs: args,
         orderBy: orderBy,
         limit: limit,
         offset: offset,
       );
-    } catch (e) {
-      rethrow;
-    }
-  }
 
-  /// Helper method to execute raw queries
-  Future<List<Map<String, dynamic>>> rawQuery(
-    String sql, [
-    List<Object?>? arguments,
-  ]) async {
-    try {
-      final db = await database;
-      return await db.rawQuery(sql, arguments);
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  /// Helper method to execute custom inserts
-  Future<int> insertWithConflict(
-    T model,
-    ConflictAlgorithm conflictAlgorithm,
-  ) async {
-    try {
-      final db = await database;
-      final map = toMap(model);
-      map.remove('id');
-      return await db.insert(
-        tableName,
-        map,
-        conflictAlgorithm: conflictAlgorithm,
-      );
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  /// Helper method to check if a record exists
-  Future<bool> exists(int id) async {
-    try {
-      final db = await database;
-      final result = await db.query(
-        tableName,
-        columns: ['id'],
-        where: 'id = ?',
-        whereArgs: [id],
-      );
-      return result.isNotEmpty;
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  /// Helper method to get count of records
-  Future<int> count({String? where, List<Object?>? whereArgs}) async {
-    try {
-      final db = await database;
-      final result = await db.query(
-        tableName,
-        columns: ['COUNT(*) as count'],
-        where: where,
-        whereArgs: whereArgs,
-      );
-      return Sqflite.firstIntValue(result) ?? 0;
+      // this means that it will convert the database map to a list of models mathching it exactly with no validation
+      return result.map((map) => fromMap(map)).toList();
     } catch (e) {
       rethrow;
     }

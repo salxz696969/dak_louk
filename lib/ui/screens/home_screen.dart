@@ -1,6 +1,6 @@
+import 'package:dak_louk/services/post_service.dart';
 import 'package:dak_louk/ui/widgets/category_bar.dart';
 import 'package:dak_louk/ui/widgets/post_block.dart';
-import 'package:dak_louk/db/repository/post_dao.dart';
 import 'package:dak_louk/models/post_model.dart';
 import 'package:flutter/material.dart';
 
@@ -12,6 +12,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final PostService _postService = PostService();
   String selectedCategory = 'all';
 
   void onCategorySelected(String category) {
@@ -29,7 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
         const SizedBox(height: 20.0),
         Expanded(
           child: FutureBuilder<List<PostModel>>(
-            future: PostDao().getAllPosts(selectedCategory, 100),
+            future: _postService.getAllPosts(selectedCategory, 100),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());

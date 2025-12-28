@@ -3,6 +3,7 @@
 class Clauses {
   static const where = _Where('', []);
   static const orderBy = _OrderBy('');
+  static const like = _Like('', []);
 }
 
 class _Where {
@@ -88,6 +89,21 @@ class _OrderBy {
 
   _OrderBy asc(String column) {
     return _OrderBy('$column ASC');
+  }
+}
+
+class _Like {
+  final String clause;
+  final List<Object?> args;
+
+  const _Like(this.clause, this.args);
+
+  _Like like(String column, String value) {
+    return _Like('$column LIKE ?', ['%$value%']);
+  }
+
+  _Like notLike(String column, String value) {
+    return _Like('$column NOT LIKE ?', ['%$value%']);
   }
 }
 

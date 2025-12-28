@@ -23,34 +23,4 @@ class ReviewModel {
     this.user,
     this.targetUser,
   });
-
-  factory ReviewModel.fromMap(
-    Map<String, dynamic> review,
-    UserModel? user,
-    UserModel? targetUser,
-  ) {
-    return ReviewModel(
-      id: review['id'],
-      userId: review['user_id'],
-      targetUserId: review['target_user_id'],
-      text: review['text'],
-      rating: review['rating'],
-      createdAt: DateTime.parse(review['created_at']),
-      updatedAt: DateTime.parse(review['updated_at']),
-      user: user,
-      targetUser: targetUser,
-    );
-  }
-
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'user_id': userId,
-      'target_user_id': targetUserId,
-      'text': text,
-      'rating': rating,
-      'created_at': createdAt.toIso8601String(),
-      'updated_at': updatedAt.toIso8601String(),
-    };
-  }
 }

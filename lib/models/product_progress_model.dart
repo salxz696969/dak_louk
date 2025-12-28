@@ -23,34 +23,4 @@ class ProductProgressModel {
     this.user,
     this.product,
   });
-
-  factory ProductProgressModel.fromMap(
-    Map<String, dynamic> productProgress,
-    UserModel? user,
-    ProductModel? product,
-  ) {
-    return ProductProgressModel(
-      id: productProgress['id'],
-      userId: productProgress['user_id'],
-      productId: productProgress['product_id'],
-      status: ProgressStatus.values.firstWhere(
-        (e) => e.toString() == 'ProgressStatus.${productProgress['status']}',
-      ),
-      createdAt: DateTime.parse(productProgress['created_at']),
-      updatedAt: DateTime.parse(productProgress['updated_at']),
-      user: user,
-      product: product,
-    );
-  }
-
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'user_id': userId,
-      'product_id': productId,
-      'status': status.toString().split('.').last,
-      'created_at': createdAt.toIso8601String(),
-      'updated_at': updatedAt.toIso8601String(),
-    };
-  }
 }

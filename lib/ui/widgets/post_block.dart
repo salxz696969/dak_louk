@@ -1,6 +1,7 @@
-import 'package:dak_louk/db/repository/cart_dao.dart';
+import 'package:dak_louk/db/repositories/cart_repo.dart';
 import 'package:dak_louk/models/cart_model.dart';
 import 'package:dak_louk/models/post_model.dart';
+import 'package:dak_louk/services/cart_service.dart';
 import 'package:dak_louk/ui/widgets/add_and_remove_button.dart';
 import 'package:dak_louk/ui/screens/product_info_screen.dart';
 import 'package:dak_louk/ui/widgets/photo_slider.dart';
@@ -141,7 +142,7 @@ class _AddToCartButton extends StatefulWidget {
 class _AddToCartButtonState extends State<_AddToCartButton> {
   late int cartId;
   late bool isAdded;
-  CartDao cartDao = CartDao();
+  CartService _cartService = CartService();
 
   @override
   void initState() {
@@ -151,10 +152,7 @@ class _AddToCartButtonState extends State<_AddToCartButton> {
   }
 
   void onAdd() async {
-    setState(() {
-      isAdded = true;
-    });
-    cartId = await cartDao.insertCart(
+    final cart = await _cartService.createCart(
       CartModel(
         id: 0,
         userId: widget.cart.userId,
@@ -164,6 +162,12 @@ class _AddToCartButtonState extends State<_AddToCartButton> {
         updatedAt: DateTime.now().toIso8601String(),
       ),
     );
+    setState(() {
+      cartId = cart.id;
+    });
+    setState(() {
+      isAdded = true;
+    });
   }
 
   @override
