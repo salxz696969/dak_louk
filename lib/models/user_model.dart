@@ -20,6 +20,4 @@ class UserModel {
     required this.createdAt,
     required this.updatedAt,
   });
-
-  
 }

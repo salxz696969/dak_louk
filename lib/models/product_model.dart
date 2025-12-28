@@ -31,38 +31,4 @@ class ProductModel {
     this.liveStreamId,
     this.user,
   });
-
-  factory ProductModel.fromMap(Map<String, dynamic> product, String image) {
-    return ProductModel(
-      id: product['id'],
-      userId: product['user_id'],
-      title: product['title'],
-      description: product['description'],
-      category: ProductCategory.values.firstWhere(
-        (e) => e.name == product['category'],
-      ),
-      price: product['price'],
-      quantity: product['quantity'],
-      liveStreamId: product['live_stream_id'],
-      image: image,
-      createdAt: DateTime.parse(product['created_at']),
-      updatedAt: DateTime.parse(product['updated_at']),
-    );
-  }
-
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'user_id': userId,
-      'title': title,
-      'description': description,
-      'category': category.name,
-      'price': price,
-      'quantity': quantity,
-      'live_stream_id': liveStreamId,
-      'image': image,
-      'created_at': createdAt.toIso8601String(),
-      'updated_at': updatedAt.toIso8601String(),
-    };
-  }
 }

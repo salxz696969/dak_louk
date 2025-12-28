@@ -55,40 +55,6 @@ class LiveStreamModel {
     }
   }
 
-  factory LiveStreamModel.fromMap(
-    Map<String, dynamic> liveStream,
-    UserModel? user,
-    List<ProductModel>? products,
-    List<LiveStreamChatModel>? liveStreamChats,
-  ) {
-    return LiveStreamModel(
-      id: liveStream['id'],
-      url: liveStream['url'],
-      userId: liveStream['user_id'],
-      title: liveStream['title'],
-      thumbnailUrl: liveStream['thumbnail_url'],
-      view: liveStream['view'],
-      createdAt: DateTime.parse(liveStream['created_at']),
-      updatedAt: DateTime.parse(liveStream['updated_at']),
-      user: user,
-      products: products,
-      liveStreamChats: liveStreamChats,
-    );
-  }
-
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'url': url,
-      'user_id': userId,
-      'title': title,
-      'thumbnail_url': thumbnailUrl,
-      'view': view,
-      'created_at': createdAt.toIso8601String(),
-      'updated_at': updatedAt.toIso8601String(),
-    };
-  }
-
   LiveStreamUI ui() {
     final user = this.user;
     final products = this.products ?? [];

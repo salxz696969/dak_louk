@@ -26,36 +26,6 @@ class PostModel {
     this.user,
   });
 
-  factory PostModel.fromMap(
-    Map<String, dynamic> post,
-    ProductModel? product,
-    UserModel? user,
-    List<String>? images,
-  ) {
-    return PostModel(
-      id: post['id'],
-      userId: post['user_id'],
-      title: post['title'],
-      productId: post['product_id'],
-      createdAt: DateTime.parse(post['created_at']),
-      updatedAt: DateTime.parse(post['updated_at']),
-      product: product,
-      user: user,
-      images: images,
-    );
-  }
-
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'user_id': userId,
-      'title': title,
-      'product_id': productId,
-      'created_at': createdAt.toIso8601String(),
-      'updated_at': updatedAt.toIso8601String(),
-    };
-  }
-
   static String timeAgo(DateTime date) {
     final now = DateTime.now();
     final difference = now.difference(date);

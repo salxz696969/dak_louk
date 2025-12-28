@@ -19,27 +19,4 @@ class ChatModel {
     required this.updatedAt,
     this.user,
   });
-
-  factory ChatModel.fromMap(Map<String, dynamic> chat, UserModel? user) {
-    return ChatModel(
-      id: chat['id'],
-      userId: chat['user_id'],
-      text: chat['text'],
-      createdAt: DateTime.parse(chat['created_at']),
-      updatedAt: DateTime.parse(chat['updated_at']),
-      user: user,
-      chatRoomId: chat['chat_room_id'],
-    );
-  }
-
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'user_id': userId,
-      'text': text,
-      'chat_room_id': chatRoomId,
-      'created_at': createdAt.toIso8601String(),
-      'updated_at': updatedAt.toIso8601String(),
-    };
-  }
 }

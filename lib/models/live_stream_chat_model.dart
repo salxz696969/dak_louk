@@ -19,30 +19,4 @@ class LiveStreamChatModel {
     required this.updatedAt,
     this.user,
   });
-
-  factory LiveStreamChatModel.fromMap(
-    Map<String, dynamic> liveStreamChat,
-    UserModel? user,
-  ) {
-    return LiveStreamChatModel(
-      id: liveStreamChat['id'],
-      text: liveStreamChat['text'],
-      userId: liveStreamChat['user_id'],
-      liveStreamId: liveStreamChat['live_stream_id'],
-      createdAt: DateTime.parse(liveStreamChat['created_at']),
-      updatedAt: DateTime.parse(liveStreamChat['updated_at']),
-      user: user,
-    );
-  }
-
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'text': text,
-      'user_id': userId,
-      'live_stream_id': liveStreamId,
-      'created_at': createdAt.toIso8601String(),
-      'updated_at': updatedAt.toIso8601String(),
-    };
-  }
 }
