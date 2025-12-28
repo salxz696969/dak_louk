@@ -32,7 +32,17 @@ class ProductProgressDao extends BaseRepository<ProductProgressModel> {
 
   @override
   Map<String, dynamic> toMap(ProductProgressModel model) {
-    return model.toMap();
+    return {
+      Tables.productProgress.cols.id: model.id,
+      Tables.productProgress.cols.userId: model.userId,
+      Tables.productProgress.cols.productId: model.productId,
+      Tables.productProgress.cols.status: model.status
+          .toString()
+          .split('.')
+          .last,
+      Tables.productProgress.cols.createdAt: model.createdAt.toIso8601String(),
+      Tables.productProgress.cols.updatedAt: model.updatedAt.toIso8601String(),
+    };
   }
 
   Future<List<ProductProgressModel>> getProductProgressesByUserId(
@@ -55,7 +65,14 @@ class ProductProgressDao extends BaseRepository<ProductProgressModel> {
           final product = await productDao.getById(progress.productId);
           final user = await userDao.getById(progress.userId);
           progresses.add(
-            ProductProgressModel.fromMap(progress.toMap(), user, product),
+            ProductProgressModel(
+              id: progress.id,
+              userId: progress.userId,
+              productId: progress.productId,
+              status: progress.status,
+              createdAt: progress.createdAt,
+              updatedAt: progress.updatedAt,
+            ),
           );
         }
       }
