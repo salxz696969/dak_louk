@@ -1,5 +1,5 @@
-import 'package:dak_louk/db/app_database.dart';
-import 'package:dak_louk/db/dao/user_dao.dart';
+import 'package:dak_louk/utils/db/app_database.dart';
+import 'package:dak_louk/db/repository/user_dao.dart';
 import 'package:dak_louk/models/review_model.dart';
 import 'package:dak_louk/models/user_model.dart';
 

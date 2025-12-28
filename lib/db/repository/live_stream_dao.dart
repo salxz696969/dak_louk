@@ -1,7 +1,7 @@
-import 'package:dak_louk/db/app_database.dart';
-import 'package:dak_louk/db/dao/live_stream_chat_dao.dart';
-import 'package:dak_louk/db/dao/product_dao.dart';
-import 'package:dak_louk/db/dao/user_dao.dart';
+import 'package:dak_louk/utils/db/app_database.dart';
+import 'package:dak_louk/db/repository/live_stream_chat_dao.dart';
+import 'package:dak_louk/db/repository/product_dao.dart';
+import 'package:dak_louk/db/repository/user_dao.dart';
 import 'package:dak_louk/models/live_stream_model.dart';
 
 class LiveStreamDao {
