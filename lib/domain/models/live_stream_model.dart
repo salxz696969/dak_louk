@@ -1,31 +1,31 @@
-import 'package:dak_louk/models/product_model.dart';
-import 'package:dak_louk/models/user_model.dart';
-import 'package:flutter/material.dart';
+part of domain;
 
-class PostModel {
+class LiveStreamModel {
   final int id;
+  final String url;
   final int userId;
   final String title;
-  final int productId;
+  final String thumbnailUrl;
+  final int view;
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  final int? liveStreamId;
-  final List<String>? images;
-  final ProductModel? product;
   final UserModel? user;
+  final List<ProductModel>? products;
+  final List<LiveStreamChatModel>? liveStreamChats;
 
-  PostModel({
+  LiveStreamModel({
     required this.id,
+    required this.url,
     required this.userId,
     required this.title,
-    required this.productId,
+    required this.thumbnailUrl,
+    required this.view,
     required this.createdAt,
     required this.updatedAt,
-    this.liveStreamId,
-    this.images,
-    this.product,
     this.user,
+    this.products,
+    this.liveStreamChats,
   });
 
   static String timeAgo(DateTime date) {
@@ -52,72 +52,91 @@ class PostModel {
     }
   }
 
-  PostUI ui() {
+  LiveStreamUI ui() {
     final user = this.user;
-    final product = this.product;
-    final images = (this.images?.map((img) => AssetImage(img)).toList()) ?? [];
+    final products = this.products ?? [];
+    final liveStreamChats = this.liveStreamChats ?? [];
 
-    final profileImage = (user?.profileImageUrl != null)
-        ? AssetImage(user!.profileImageUrl)
-        : const AssetImage('assets/profiles/profile1.png');
+    // Use AssetImage for local assets, fallback if needed
+    final thumbnail = (thumbnailUrl.isNotEmpty)
+        ? thumbnailUrl
+        : 'assets/thumbnails/default.png';
+
+    final profileImage =
+        (user?.profileImageUrl != null && user!.profileImageUrl.isNotEmpty)
+        ? user.profileImageUrl
+        : 'assets/profiles/profile1.png';
 
     final username = user?.username ?? 'Unknown';
     final rating = user?.rating.toStringAsFixed(2) ?? '0.00';
 
+    // Use first product if available
+    final product = products.isNotEmpty ? products.first : null;
     final quantity = product?.quantity.toString() ?? '1';
     final price = product?.price.toStringAsFixed(2) ?? '0.0';
     final description = product?.description ?? '';
     final title = this.title;
-    final category = this.product?.category.name;
-    final productId = this.product?.id;
-    final date = timeAgo(createdAt);
+    final category = product?.category.name;
+    final productId = product?.id ?? 0;
+    final date = LiveStreamModel.timeAgo(createdAt);
 
-    return PostUI(
-      bio: user?.bio ?? '',
-      userId: userId,
+    return LiveStreamUI(
+      thumbnail: thumbnail,
+      url: url,
+      title: title,
+      user: user!,
+      products: products,
+      liveStreamChats: liveStreamChats,
+      timeAgo: date,
       profileImage: profileImage,
       username: username,
       rating: rating,
+      view: view.toString(),
       quantity: quantity,
       price: price,
       description: description,
-      title: title,
       category: category,
-      date: date,
-      images: images,
-      productId: productId ?? 0,
+      productId: productId,
     );
   }
 }
 
-class PostUI {
-  final AssetImage profileImage;
-  final int userId;
+class LiveStreamUI {
+  final String thumbnail;
+  final String url;
+  final String title;
+  final UserModel user;
+  final List<ProductModel> products;
+  final List<LiveStreamChatModel> liveStreamChats;
+  final String timeAgo;
+  final String view;
+
+  // Additional fields for UI, similar to PostUI
+  final String profileImage;
   final String username;
   final String rating;
   final String quantity;
   final String price;
   final String description;
-  final String title;
   final String? category;
-  final String date;
-  final List<AssetImage> images;
   final int productId;
-  final String bio;
 
-  PostUI({
-    required this.bio,
+  LiveStreamUI({
+    required this.thumbnail,
+    required this.url,
+    required this.title,
+    required this.user,
+    required this.products,
+    required this.liveStreamChats,
+    required this.timeAgo,
     required this.profileImage,
+    required this.view,
     required this.username,
     required this.rating,
     required this.quantity,
     required this.price,
     required this.description,
-    required this.title,
     required this.category,
-    required this.date,
-    required this.images,
-    required this.userId,
     required this.productId,
   });
 }

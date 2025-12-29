@@ -1,22 +1,22 @@
-import 'package:dak_louk/models/user_model.dart';
+part of domain;
 
-class ChatRoomModel {
+class LiveStreamChatModel {
   final int id;
+  final String text;
   final int userId;
-  final int targetUserId;
+  final int liveStreamId;
   final DateTime createdAt;
   final DateTime updatedAt;
 
   final UserModel? user;
-  final UserModel? targetUser;
 
-  ChatRoomModel({
+  LiveStreamChatModel({
     required this.id,
+    required this.text,
     required this.userId,
-    required this.targetUserId,
-    required this.user,
-    required this.targetUser,
+    required this.liveStreamId,
     required this.createdAt,
     required this.updatedAt,
+    this.user,
   });
 }

@@ -1,6 +1,4 @@
-import 'package:dak_louk/models/product_model.dart';
-import 'package:dak_louk/models/progress_status_enum.dart';
-import 'package:dak_louk/models/user_model.dart';
+part of domain;
 
 class ProductProgressModel {
   final int id;

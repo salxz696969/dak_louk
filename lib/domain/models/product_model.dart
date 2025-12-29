@@ -1,6 +1,4 @@
-import 'package:dak_louk/models/user_model.dart';
-
-import 'product_category_enum.dart';
+part of domain;
 
 class ProductModel {
   final int id;

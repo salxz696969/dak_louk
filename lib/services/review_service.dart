@@ -1,7 +1,6 @@
 import 'package:dak_louk/db/repositories/review_repo.dart';
 import 'package:dak_louk/db/repositories/user_repo.dart';
-import 'package:dak_louk/models/review_model.dart';
-import 'package:dak_louk/models/user_model.dart';
+import 'package:dak_louk/domain/domain.dart';
 import 'package:dak_louk/utils/db/orm.dart';
 import 'package:dak_louk/utils/db/tables/tables.dart';
 

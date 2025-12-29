@@ -1,5 +1,4 @@
-import 'package:dak_louk/models/cart_model.dart';
-import 'package:dak_louk/models/post_model.dart';
+import 'package:dak_louk/domain/domain.dart';
 import 'package:dak_louk/services/post_service.dart';
 import 'package:dak_louk/ui/widgets/add_and_remove_button.dart';
 import 'package:dak_louk/ui/widgets/appbar.dart';
@@ -47,11 +46,11 @@ class _ProductInfoScreenState extends State<ProductInfoScreen> {
                 userId: ui.userId,
                 rating: ui.rating,
                 bio: ui.bio,
-                profile: ui.profileImage,
+                profile: AssetImage(ui.profileImage),
                 username: ui.username,
               ),
             ),
-            PhotoSlider(quantity: ui.quantity, images: ui.images),
+            PhotoSlider(quantity: ui.quantity, images: ui.images.map((image) => AssetImage(image)).toList()),
             const SizedBox(height: 10),
             Padding(
               padding: const EdgeInsets.all(12.0),
@@ -235,7 +234,7 @@ class _SimilarItemCardState extends State<_SimilarItemCard> {
                 children: [
                   AspectRatio(
                     aspectRatio: 4 / 3,
-                    child: Image(image: ui.images[0], fit: BoxFit.cover),
+                    child: Image(image: AssetImage(ui.images[0]), fit: BoxFit.cover),
                   ),
                   Positioned(
                     top: 8,
@@ -280,7 +279,7 @@ class _SimilarItemCardState extends State<_SimilarItemCard> {
                     children: [
                       CircleAvatar(
                         radius: 18,
-                        backgroundImage: ui.profileImage,
+                        backgroundImage: AssetImage(ui.profileImage),
                       ),
                       const SizedBox(width: 6),
                       Column(

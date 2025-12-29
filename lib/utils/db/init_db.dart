@@ -1,6 +1,5 @@
 import 'dart:math';
-import 'package:dak_louk/models/product_category_enum.dart';
-import 'package:dak_louk/models/progress_status_enum.dart';
+import 'package:dak_louk/domain/domain.dart';
 import 'package:sqflite/sqflite.dart';
 
 Future<void> initDb(Database db) async {

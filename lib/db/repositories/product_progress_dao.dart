@@ -1,6 +1,5 @@
 import 'package:dak_louk/db/repositories/base_repo.dart';
-import 'package:dak_louk/models/product_progress_model.dart';
-import 'package:dak_louk/models/progress_status_enum.dart';
+import 'package:dak_louk/domain/domain.dart';
 import 'package:dak_louk/utils/db/tables/tables.dart';
 
 class ProductProgressRepository extends BaseRepository<ProductProgressModel> {

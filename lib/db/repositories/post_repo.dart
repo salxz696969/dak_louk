@@ -1,5 +1,5 @@
 import 'package:dak_louk/db/repositories/base_repo.dart';
-import 'package:dak_louk/models/post_model.dart';
+import 'package:dak_louk/domain/domain.dart';
 import 'package:dak_louk/utils/db/tables/tables.dart';
 
 class PostRepository extends BaseRepository<PostModel> {

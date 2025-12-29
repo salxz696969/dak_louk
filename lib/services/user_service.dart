@@ -1,5 +1,5 @@
 import 'package:dak_louk/db/repositories/user_repo.dart';
-import 'package:dak_louk/models/user_model.dart';
+import 'package:dak_louk/domain/domain.dart';
 import 'package:dak_louk/utils/db/orm.dart';
 import 'package:dak_louk/utils/db/tables/tables.dart';
 
@@ -52,7 +52,10 @@ class UserService {
   }
 
   // Authentication related business logic
-  Future<UserModel?> authenticateUser(String username, String passwordHash) async {
+  Future<UserModel?> authenticateUser(
+    String username,
+    String passwordHash,
+  ) async {
     try {
       final user = await getUserByUsername(username);
       if (user != null && user.passwordHash == passwordHash) {
@@ -80,7 +83,7 @@ class UserService {
       if (!isAvailable) {
         throw Exception('Username already exists');
       }
-      
+
       final id = await _userRepository.insert(user);
       return await _userRepository.getById(id);
     } catch (e) {

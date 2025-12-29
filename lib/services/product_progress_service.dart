@@ -1,8 +1,7 @@
 import 'package:dak_louk/db/repositories/product_progress_dao.dart';
 import 'package:dak_louk/db/repositories/product_repo.dart';
 import 'package:dak_louk/db/repositories/user_repo.dart';
-import 'package:dak_louk/models/product_progress_model.dart';
-import 'package:dak_louk/models/progress_status_enum.dart';
+import 'package:dak_louk/domain/domain.dart';
 import 'package:dak_louk/utils/db/orm.dart';
 import 'package:dak_louk/utils/db/tables/tables.dart';
 

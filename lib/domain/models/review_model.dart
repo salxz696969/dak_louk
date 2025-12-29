@@ -1,22 +1,26 @@
-import 'package:dak_louk/models/user_model.dart';
+part of domain;
 
-class ChatModel {
+class ReviewModel {
   final int id;
   final int userId;
+  final int targetUserId;
   final String text;
-  final int chatRoomId;
+  final double rating;
   final DateTime createdAt;
   final DateTime updatedAt;
 
   final UserModel? user;
+  final UserModel? targetUser;
 
-  ChatModel({
+  ReviewModel({
     required this.id,
     required this.userId,
+    required this.targetUserId,
     required this.text,
-    required this.chatRoomId,
+    required this.rating,
     required this.createdAt,
     required this.updatedAt,
     this.user,
+    this.targetUser,
   });
 }

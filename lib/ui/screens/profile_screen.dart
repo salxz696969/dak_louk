@@ -1,11 +1,7 @@
 import 'dart:async';
-import 'package:dak_louk/db/repositories/live_stream_repo.dart';
-import 'package:dak_louk/db/repositories/post_repo.dart';
 import 'package:dak_louk/services/live_stream_service.dart';
 import 'package:dak_louk/services/post_service.dart';
-import 'package:dak_louk/models/live_stream_chat_model.dart';
-import 'package:dak_louk/models/live_stream_model.dart';
-import 'package:dak_louk/models/post_model.dart';
+import 'package:dak_louk/domain/domain.dart';
 import 'package:dak_louk/ui/screens/chat_screen.dart';
 import 'package:dak_louk/ui/screens/product_info_screen.dart';
 import 'package:dak_louk/ui/widgets/appbar.dart';
@@ -333,7 +329,7 @@ class _VideoContainer extends StatelessWidget {
       child: Stack(
         children: [
           Positioned.fill(
-            child: Image(image: livestream.ui().thumbnail, fit: BoxFit.cover),
+            child: Image(image: AssetImage(livestream.ui().thumbnail), fit: BoxFit.cover),
           ),
 
           const Center(
@@ -539,7 +535,7 @@ class _PhotoContainer extends StatelessWidget {
       child: Stack(
         children: [
           Positioned.fill(
-            child: Image(image: post.ui().images[0], fit: BoxFit.cover),
+            child: Image(image: AssetImage(post.ui().images[0]), fit: BoxFit.cover),
           ),
           if (post.ui().images.length > 1)
             Positioned(

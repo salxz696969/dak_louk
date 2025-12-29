@@ -3,7 +3,7 @@ import 'package:dak_louk/utils/db/orm.dart';
 import 'package:dak_louk/utils/db/tables/tables.dart';
 import 'package:sqflite/sqflite.dart';
 
-abstract class RepositoryBaseInterface<T> {
+abstract class BaseRepositoryInterface<T> {
   /// Insert a new model into the database
   Future<int> insert(T model);
 
@@ -39,7 +39,7 @@ abstract class RepositoryBaseInterface<T> {
 }
 
 /// Base implementation that provides common database operations
-abstract class BaseRepository<T> implements RepositoryBaseInterface<T> {
+abstract class BaseRepository<T> implements BaseRepositoryInterface<T> {
   final AppDatabase _appDatabase = AppDatabase();
 
   Future<Database> get database async => await _appDatabase.database;
