@@ -1,9 +1,11 @@
+import 'package:dak_louk/domain/domain.dart';
+
 abstract class CacheInterface {
   /// Set a value in the cache
-  void set<T>(String key, T data);
+  void set<T extends Cacheable>(String key, T data);
 
   /// Get a value from the cache
-  T? get<T>(String key);
+  T? get<T extends Cacheable>(String key);
 
   /// Delete a value from the cache
   void del(String key);
@@ -24,15 +26,15 @@ class Cache implements CacheInterface {
   static final Cache _instance = Cache._internal();
   factory Cache() => _instance;
 
-  final Map<String, Object> _cache = {};
+  final Map<String, Cacheable> _cache = {};
 
   @override
-  void set<T>(String key, T data) {
-    _cache[key] = data as Object;
+  void set<T extends Cacheable>(String key, T data) {
+    _cache[key] = data;
   }
 
   @override
-  T? get<T>(String key) {
+  T? get<T extends Cacheable>(String key) {
     return _cache[key] as T?;
   }
 
