@@ -1,6 +1,6 @@
 part of domain;
 
-class ProductModel {
+class ProductModel  extends Cacheable{
   final int id;
   final int userId;
   final String title;

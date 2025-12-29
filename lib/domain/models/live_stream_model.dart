@@ -1,6 +1,6 @@
 part of domain;
 
-class LiveStreamModel {
+class LiveStreamModel  extends Cacheable {
   final int id;
   final String url;
   final int userId;
@@ -101,7 +101,7 @@ class LiveStreamModel {
   }
 }
 
-class LiveStreamUI {
+class LiveStreamUI  extends Cacheable {
   final String thumbnail;
   final String url;
   final String title;

@@ -1,6 +1,6 @@
 part of domain;
 
-class ProductProgressModel {
+class ProductProgressModel  extends Cacheable{
   final int id;
   final int userId;
   final int productId;

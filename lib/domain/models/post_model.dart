@@ -1,6 +1,6 @@
 part of domain;
 
-class PostModel {
+class PostModel  extends Cacheable{
   final int id;
   final int userId;
   final String title;
@@ -88,7 +88,7 @@ class PostModel {
   }
 }
 
-class PostUI {
+class PostUI  extends Cacheable {
   final String profileImage;
   final int userId;
   final String username;

@@ -1,6 +1,6 @@
 part of domain;
 
-class CartModel {
+class CartModel extends Cacheable {
   final int id;
   final int userId;
   final int productId;

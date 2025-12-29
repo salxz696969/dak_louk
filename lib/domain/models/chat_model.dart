@@ -1,6 +1,6 @@
 part of domain;
 
-class ChatModel {
+class ChatModel extends Cacheable {
   final int id;
   final int userId;
   final String text;

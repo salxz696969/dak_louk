@@ -1,6 +1,6 @@
 part of domain;
 
-class ReviewModel {
+class ReviewModel extends Cacheable {
   final int id;
   final int userId;
   final int targetUserId;
