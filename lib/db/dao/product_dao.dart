@@ -56,6 +56,32 @@ class ProductDao {
     }
   }
 
+  Future<List<ProductModel>> getAllProducts(String category, int limit) async {
+    try {
+      final db = await _appDatabase.database;
+      List<Map<String, dynamic>> result = <Map<String, dynamic>>[];
+      if (limit <= 0) {
+        limit = 100;
+      }
+      if (category == 'all') {
+        result = await db.query('products', limit: limit);
+      } else {
+        result = await db.query(
+          'products',
+          limit: limit,
+          where: 'category = ?',
+          whereArgs: [category],
+        );
+      }
+
+      return result
+          .map((map) => ProductModel.fromMap(map, map['image_url'] as String))
+          .toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<int> updateProduct(ProductModel product) async {
     try {
       final db = await _appDatabase.database;

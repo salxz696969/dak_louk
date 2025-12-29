@@ -69,6 +69,49 @@ class PostDao {
     }
   }
 
+  Future<List<PostModel>> getPostsByLiveStreamId(
+    int liveStreamId,
+  ) async {
+    try {
+      final db = await _appDatabase.database;
+      final result = await db.query(
+        'posts',
+        where: 'live_stream_id = ?',
+        whereArgs: [liveStreamId],
+      );
+
+      final UserDao userDao = UserDao();
+      final ProductDao productDao = ProductDao();
+
+      final posts = await Future.wait(
+        result.map((map) async {
+          final UserModel user = await userDao.getUserById(
+            map['user_id'] as int,
+          );
+          final ProductModel product = await productDao.getProductById(
+            map['product_id'] as int,
+          );
+          final postId = map['id'] as int;
+          final mediaResults = await db.query(
+            'medias',
+            where: 'post_id = ?',
+            whereArgs: [postId],
+          );
+          return PostModel.fromMap(
+            map,
+            product,
+            user,
+            mediaResults.map((media) => media['url'] as String).toList(),
+          );
+        }),
+      );
+
+      return posts;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<List<PostModel>> getPostsByUserId(int userId, int limit) async {
     try {
       final db = await _appDatabase.database;

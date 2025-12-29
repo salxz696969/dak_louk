@@ -23,7 +23,7 @@ class LiveStreamChatDao {
       final db = await _appDatabase.database;
       final result = await db.query(
         'live_stream_chats',
-        where: 'id = ?',
+        where: 'live_stream_id = ?',
         whereArgs: [id],
       );
       if (result.isNotEmpty) {

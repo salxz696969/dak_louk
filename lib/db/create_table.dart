@@ -6,7 +6,7 @@ Future<void> createTables(Database db) async {
   await db.execute('''
       CREATE TABLE users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT UNIQUE,
+        username TEXT,
         password_hash TEXT,
         profile_image_url TEXT,
         rating REAL,
@@ -24,9 +24,12 @@ Future<void> createTables(Database db) async {
         user_id INTEGER,
         title TEXT,
         product_id INTEGER,
+        live_stream_id INTEGER,
         category TEXT CHECK(category IN ('vehicles','property','electronics','home','fashion','jobs','services','entertainment','kids','pets','business','others')),
         created_at TEXT,
         updated_at TEXT,
+        FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+        FOREIGN KEY (live_stream_id) REFERENCES live_streams(id) ON DELETE CASCADE,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
       )
     ''');
@@ -68,12 +71,10 @@ Future<void> createTables(Database db) async {
         category TEXT CHECK(category IN ('vehicles','property','electronics','home','fashion','jobs','services','entertainment','kids','pets','business','others')),
         price REAL,
         quantity INTEGER DEFAULT 1,
-        live_stream_id INTEGER,
         image_url TEXT,
         created_at TEXT,
         updated_at TEXT,
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-        FOREIGN KEY (live_stream_id) REFERENCES live_streams(id) ON DELETE SET NULL
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
       )
     ''');
 

@@ -45,4 +45,21 @@ class LiveStreamChatModel {
       'updated_at': updatedAt.toIso8601String(),
     };
   }
+
+  LiveStreamChatUI ui() {
+    return LiveStreamChatUI(
+      username: user?.username ?? 'Unknown',
+      text: text,
+    );
+  }
+}
+
+class LiveStreamChatUI{
+  final String username;
+  final String text;
+
+  LiveStreamChatUI({
+    required this.username,
+    required this.text,
+  });
 }

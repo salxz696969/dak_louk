@@ -1,5 +1,5 @@
 import 'package:dak_louk/models/live_stream_chat_model.dart';
-import 'package:dak_louk/models/product_model.dart';
+import 'package:dak_louk/models/post_model.dart';
 import 'package:dak_louk/models/user_model.dart';
 import 'package:flutter/widgets.dart';
 
@@ -14,7 +14,7 @@ class LiveStreamModel {
   final DateTime updatedAt;
 
   final UserModel? user;
-  final List<ProductModel>? products;
+  final List<PostModel>? posts;
   final List<LiveStreamChatModel>? liveStreamChats;
 
   LiveStreamModel({
@@ -27,7 +27,7 @@ class LiveStreamModel {
     required this.createdAt,
     required this.updatedAt,
     this.user,
-    this.products,
+    this.posts,
     this.liveStreamChats,
   });
 
@@ -58,7 +58,7 @@ class LiveStreamModel {
   factory LiveStreamModel.fromMap(
     Map<String, dynamic> liveStream,
     UserModel? user,
-    List<ProductModel>? products,
+    List<PostModel>? posts,
     List<LiveStreamChatModel>? liveStreamChats,
   ) {
     return LiveStreamModel(
@@ -71,7 +71,7 @@ class LiveStreamModel {
       createdAt: DateTime.parse(liveStream['created_at']),
       updatedAt: DateTime.parse(liveStream['updated_at']),
       user: user,
-      products: products,
+      posts: posts,
       liveStreamChats: liveStreamChats,
     );
   }
@@ -91,8 +91,8 @@ class LiveStreamModel {
 
   LiveStreamUI ui() {
     final user = this.user;
-    final products = this.products ?? [];
-    final liveStreamChats = this.liveStreamChats ?? [];
+    final posts = this.posts ?? [];
+    final liveStreamChats = this.liveStreamChats;
 
     // Use AssetImage for local assets, fallback if needed
     final thumbnail = (thumbnailUrl.isNotEmpty)
@@ -107,14 +107,14 @@ class LiveStreamModel {
     final username = user?.username ?? 'Unknown';
     final rating = user?.rating.toStringAsFixed(2) ?? '0.00';
 
-    // Use first product if available
-    final product = products.isNotEmpty ? products.first : null;
-    final quantity = product?.quantity.toString() ?? '1';
-    final price = product?.price.toStringAsFixed(2) ?? '0.0';
-    final description = product?.description ?? '';
+    // Use first post if available
+    final post = posts.isNotEmpty ? posts.first : null;
+    final quantity = post?.product?.quantity.toString() ?? '1';
+    final price = post?.product?.price.toStringAsFixed(2) ?? '0.0';
+    final description = post?.product?.description ?? '';
     final title = this.title;
-    final category = product?.category.name;
-    final productId = product?.id ?? 0;
+    final category = post?.product?.category.name;
+    final postId = post?.id ?? 0;
     final date = LiveStreamModel.timeAgo(createdAt);
 
     return LiveStreamUI(
@@ -122,8 +122,8 @@ class LiveStreamModel {
       url: url,
       title: title,
       user: user!,
-      products: products,
-      liveStreamChats: liveStreamChats,
+      posts: posts,
+      liveStreamChats: liveStreamChats ?? [],
       timeAgo: date,
       profileImage: profileImage,
       username: username,
@@ -133,7 +133,7 @@ class LiveStreamModel {
       price: price,
       description: description,
       category: category,
-      productId: productId,
+      postId: postId,
     );
   }
 }
@@ -143,7 +143,7 @@ class LiveStreamUI {
   final String url;
   final String title;
   final UserModel user;
-  final List<ProductModel> products;
+  final List<PostModel> posts;
   final List<LiveStreamChatModel> liveStreamChats;
   final String timeAgo;
   final String view;
@@ -156,14 +156,14 @@ class LiveStreamUI {
   final String price;
   final String description;
   final String? category;
-  final int productId;
+  final int postId;
 
   LiveStreamUI({
     required this.thumbnail,
     required this.url,
     required this.title,
     required this.user,
-    required this.products,
+    required this.posts,
     required this.liveStreamChats,
     required this.timeAgo,
     required this.profileImage,
@@ -174,6 +174,6 @@ class LiveStreamUI {
     required this.price,
     required this.description,
     required this.category,
-    required this.productId,
+    required this.postId,
   });
 }

@@ -1,5 +1,6 @@
 import 'package:dak_louk/models/product_model.dart';
 import 'package:dak_louk/models/user_model.dart';
+import 'package:dak_louk/utils/time_ago.dart';
 import 'package:flutter/material.dart';
 
 class PostModel {
@@ -13,6 +14,7 @@ class PostModel {
   final List<String>? images;
   final ProductModel? product;
   final UserModel? user;
+  final int? liveStreamId;
 
   PostModel({
     required this.id,
@@ -22,6 +24,7 @@ class PostModel {
     required this.createdAt,
     required this.updatedAt,
     this.images,
+    this.liveStreamId,
     this.product,
     this.user,
   });
@@ -56,29 +59,7 @@ class PostModel {
     };
   }
 
-  static String timeAgo(DateTime date) {
-    final now = DateTime.now();
-    final difference = now.difference(date);
-
-    if (difference.inSeconds < 60) {
-      return '${difference.inSeconds}s ago';
-    } else if (difference.inMinutes < 60) {
-      return '${difference.inMinutes}m ago';
-    } else if (difference.inHours < 24) {
-      return '${difference.inHours}h ago';
-    } else if (difference.inDays < 7) {
-      return '${difference.inDays}d ago';
-    } else if (difference.inDays < 30) {
-      final weeks = (difference.inDays / 7).floor();
-      return '${weeks}w ago';
-    } else if (difference.inDays < 365) {
-      final months = (difference.inDays / 30).floor();
-      return '${months}mo ago';
-    } else {
-      final years = (difference.inDays / 365).floor();
-      return '${years}y ago';
-    }
-  }
+  
 
   PostUI ui() {
     final user = this.user;

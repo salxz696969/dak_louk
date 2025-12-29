@@ -1,5 +1,4 @@
 import 'package:dak_louk/models/user_model.dart';
-
 import 'product_category_enum.dart';
 
 class ProductModel {
@@ -14,7 +13,6 @@ class ProductModel {
   final DateTime updatedAt;
   final String image;
 
-  final int? liveStreamId;
   final UserModel? user;
 
   ProductModel({
@@ -28,7 +26,6 @@ class ProductModel {
     required this.createdAt,
     required this.updatedAt,
     required this.image,
-    this.liveStreamId,
     this.user,
   });
 
@@ -43,7 +40,6 @@ class ProductModel {
       ),
       price: product['price'],
       quantity: product['quantity'],
-      liveStreamId: product['live_stream_id'],
       image: image,
       createdAt: DateTime.parse(product['created_at']),
       updatedAt: DateTime.parse(product['updated_at']),
@@ -59,10 +55,10 @@ class ProductModel {
       'category': category.name,
       'price': price,
       'quantity': quantity,
-      'live_stream_id': liveStreamId,
       'image': image,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
     };
   }
+
 }
