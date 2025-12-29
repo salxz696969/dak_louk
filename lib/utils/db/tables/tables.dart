@@ -10,6 +10,8 @@ import 'package:dak_louk/utils/db/tables/product_progress_table.dart';
 import 'package:dak_louk/utils/db/tables/reviews_table.dart';
 import 'package:dak_louk/utils/db/tables/medias_table.dart';
 
+// Tables.users.cols.userId - user_id
+
 class Tables {
   // for generic usage at base repo
   static const String id = 'id';

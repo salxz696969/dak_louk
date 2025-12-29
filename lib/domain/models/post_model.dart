@@ -1,8 +1,6 @@
-import 'package:dak_louk/models/product_model.dart';
-import 'package:dak_louk/models/user_model.dart';
-import 'package:flutter/material.dart';
+part of domain;
 
-class PostModel {
+class PostModel  extends Cacheable{
   final int id;
   final int userId;
   final String title;
@@ -10,6 +8,7 @@ class PostModel {
   final DateTime createdAt;
   final DateTime updatedAt;
 
+  final int? liveStreamId;
   final List<String>? images;
   final ProductModel? product;
   final UserModel? user;
@@ -21,6 +20,7 @@ class PostModel {
     required this.productId,
     required this.createdAt,
     required this.updatedAt,
+    this.liveStreamId,
     this.images,
     this.product,
     this.user,
@@ -53,11 +53,11 @@ class PostModel {
   PostUI ui() {
     final user = this.user;
     final product = this.product;
-    final images = (this.images?.map((img) => AssetImage(img)).toList()) ?? [];
+    final images = this.images ?? [];
 
     final profileImage = (user?.profileImageUrl != null)
-        ? AssetImage(user!.profileImageUrl)
-        : const AssetImage('assets/profiles/profile1.png');
+        ? user!.profileImageUrl
+        : 'assets/profiles/profile1.png';
 
     final username = user?.username ?? 'Unknown';
     final rating = user?.rating.toStringAsFixed(2) ?? '0.00';
@@ -88,8 +88,8 @@ class PostModel {
   }
 }
 
-class PostUI {
-  final AssetImage profileImage;
+class PostUI  extends Cacheable {
+  final String profileImage;
   final int userId;
   final String username;
   final String rating;
@@ -99,7 +99,7 @@ class PostUI {
   final String title;
   final String? category;
   final String date;
-  final List<AssetImage> images;
+  final List<String> images;
   final int productId;
   final String bio;
 

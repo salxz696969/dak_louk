@@ -1,9 +1,6 @@
-import 'package:dak_louk/models/live_stream_chat_model.dart';
-import 'package:dak_louk/models/product_model.dart';
-import 'package:dak_louk/models/user_model.dart';
-import 'package:flutter/widgets.dart';
+part of domain;
 
-class LiveStreamModel {
+class LiveStreamModel  extends Cacheable {
   final int id;
   final String url;
   final int userId;
@@ -62,13 +59,13 @@ class LiveStreamModel {
 
     // Use AssetImage for local assets, fallback if needed
     final thumbnail = (thumbnailUrl.isNotEmpty)
-        ? AssetImage(thumbnailUrl)
-        : const AssetImage('assets/thumbnails/default.png');
+        ? thumbnailUrl
+        : 'assets/thumbnails/default.png';
 
     final profileImage =
         (user?.profileImageUrl != null && user!.profileImageUrl.isNotEmpty)
-        ? AssetImage(user.profileImageUrl)
-        : const AssetImage('assets/profiles/profile1.png');
+        ? user.profileImageUrl
+        : 'assets/profiles/profile1.png';
 
     final username = user?.username ?? 'Unknown';
     final rating = user?.rating.toStringAsFixed(2) ?? '0.00';
@@ -104,8 +101,8 @@ class LiveStreamModel {
   }
 }
 
-class LiveStreamUI {
-  final AssetImage thumbnail;
+class LiveStreamUI  extends Cacheable {
+  final String thumbnail;
   final String url;
   final String title;
   final UserModel user;
@@ -115,7 +112,7 @@ class LiveStreamUI {
   final String view;
 
   // Additional fields for UI, similar to PostUI
-  final AssetImage profileImage;
+  final String profileImage;
   final String username;
   final String rating;
   final String quantity;

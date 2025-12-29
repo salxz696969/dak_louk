@@ -1,4 +1,4 @@
-import 'package:dak_louk/models/cart_model.dart';
+import 'package:dak_louk/domain/domain.dart';
 import 'package:dak_louk/ui/widgets/add_and_remove_button.dart';
 import 'package:dak_louk/ui/widgets/appbar.dart';
 import 'package:flutter/material.dart';
@@ -60,7 +60,7 @@ class _ProductSection extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(10),
             child: Image(
-              image: ui.image[0],
+              image: AssetImage(ui.image[0]),
               fit: BoxFit.cover,
               width: double.infinity,
             ),

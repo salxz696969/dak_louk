@@ -1,6 +1,4 @@
-import 'package:dak_louk/db/repositories/cart_repo.dart';
-import 'package:dak_louk/models/cart_model.dart';
-import 'package:dak_louk/models/post_model.dart';
+import 'package:dak_louk/domain/domain.dart';
 import 'package:dak_louk/services/cart_service.dart';
 import 'package:dak_louk/ui/widgets/add_and_remove_button.dart';
 import 'package:dak_louk/ui/screens/product_info_screen.dart';
@@ -41,13 +39,13 @@ class _PostBlockState extends State<PostBlock> {
         UsernameContainer(
           bio: widget.post.ui().bio,
           userId: widget.post.ui().userId,
-          profile: widget.post.ui().profileImage,
+          profile: AssetImage(widget.post.ui().profileImage),
           username: widget.post.ui().username,
           rating: widget.post.ui().rating,
         ),
         PhotoSlider(
           quantity: widget.post.ui().quantity,
-          images: widget.post.ui().images,
+          images: widget.post.ui().images.map((image) => AssetImage(image)).toList(),
         ),
         if (widget.post.ui().images.isNotEmpty) const SizedBox(height: 8.0),
         Padding(padding: const EdgeInsets.symmetric(horizontal: 12.0)),

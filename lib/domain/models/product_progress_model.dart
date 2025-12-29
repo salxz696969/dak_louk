@@ -1,8 +1,6 @@
-import 'package:dak_louk/models/product_model.dart';
-import 'package:dak_louk/models/progress_status_enum.dart';
-import 'package:dak_louk/models/user_model.dart';
+part of domain;
 
-class ProductProgressModel {
+class ProductProgressModel  extends Cacheable{
   final int id;
   final int userId;
   final int productId;

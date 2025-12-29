@@ -1,6 +1,6 @@
 import 'package:dak_louk/db/repositories/base_repo.dart';
-import 'package:dak_louk/models/product_model.dart';
 import 'package:dak_louk/utils/db/tables/tables.dart';
+import 'package:dak_louk/domain/domain.dart';
 
 class ProductRepository extends BaseRepository<ProductModel> {
   @override
@@ -19,7 +19,6 @@ class ProductRepository extends BaseRepository<ProductModel> {
       createdAt: map[Tables.products.cols.createdAt],
       updatedAt: map[Tables.products.cols.updatedAt],
       image: map[Tables.products.cols.image],
-      liveStreamId: map[Tables.products.cols.liveStreamId],
     );
   }
 
@@ -36,7 +35,6 @@ class ProductRepository extends BaseRepository<ProductModel> {
       Tables.products.cols.createdAt: model.createdAt,
       Tables.products.cols.updatedAt: model.updatedAt,
       Tables.products.cols.image: model.image,
-      Tables.products.cols.liveStreamId: model.liveStreamId,
     };
   }
 }

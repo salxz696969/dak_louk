@@ -1,20 +1,20 @@
-import 'package:dak_louk/models/user_model.dart';
+part of domain;
 
-class ChatModel {
+class LiveStreamChatModel  extends Cacheable{
   final int id;
-  final int userId;
   final String text;
-  final int chatRoomId;
+  final int userId;
+  final int liveStreamId;
   final DateTime createdAt;
   final DateTime updatedAt;
 
   final UserModel? user;
 
-  ChatModel({
+  LiveStreamChatModel({
     required this.id,
-    required this.userId,
     required this.text,
-    required this.chatRoomId,
+    required this.userId,
+    required this.liveStreamId,
     required this.createdAt,
     required this.updatedAt,
     this.user,

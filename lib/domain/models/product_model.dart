@@ -1,8 +1,6 @@
-import 'package:dak_louk/models/user_model.dart';
+part of domain;
 
-import 'product_category_enum.dart';
-
-class ProductModel {
+class ProductModel  extends Cacheable{
   final int id;
   final int userId;
   final String title;
@@ -14,7 +12,6 @@ class ProductModel {
   final DateTime updatedAt;
   final String image;
 
-  final int? liveStreamId;
   final UserModel? user;
 
   ProductModel({
@@ -28,7 +25,6 @@ class ProductModel {
     required this.createdAt,
     required this.updatedAt,
     required this.image,
-    this.liveStreamId,
     this.user,
   });
 }

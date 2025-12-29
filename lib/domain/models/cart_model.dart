@@ -1,8 +1,6 @@
-import 'package:dak_louk/models/product_model.dart';
-import 'package:dak_louk/models/user_model.dart';
-import 'package:flutter/material.dart';
+part of domain;
 
-class CartModel {
+class CartModel extends Cacheable {
   final int id;
   final int userId;
   final int productId;
@@ -31,7 +29,7 @@ class CartModel {
       title: product?.title ?? 'Unknown',
       price: product != null ? '\$${product!.price.toStringAsFixed(2)}' : 'N/A',
       quantity: quantity,
-      image: [AssetImage(product?.image ?? 'assets/images/coffee1.png')],
+      image: [product?.image ?? 'assets/images/coffee1.png'],
       sellerName: seller?.username ?? 'Unknown',
       sellerRating: double.parse((seller?.rating ?? 0.0).toStringAsFixed(2)),
     );
@@ -42,7 +40,7 @@ class CartUI {
   final String title;
   final String price;
   final int quantity;
-  final List<AssetImage> image;
+  final List<String> image;
   final String sellerName;
   final double sellerRating;
 

@@ -1,7 +1,7 @@
 import 'package:dak_louk/db/repositories/post_repo.dart';
 import 'package:dak_louk/db/repositories/product_repo.dart';
 import 'package:dak_louk/db/repositories/user_repo.dart';
-import 'package:dak_louk/models/post_model.dart';
+import 'package:dak_louk/domain/domain.dart';
 import 'package:dak_louk/utils/db/orm.dart';
 import 'package:dak_louk/utils/db/tables/tables.dart';
 

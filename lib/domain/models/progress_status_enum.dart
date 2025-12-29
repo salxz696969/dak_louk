@@ -1,3 +1,5 @@
+part of domain;
+
 enum ProgressStatus {
   waiting('waiting'),
   accepted('accepted'),

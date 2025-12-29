@@ -1,5 +1,5 @@
 import 'package:dak_louk/db/repositories/product_repo.dart';
-import 'package:dak_louk/models/product_model.dart';
+import 'package:dak_louk/domain/domain.dart';
 import 'package:dak_louk/utils/db/orm.dart';
 import 'package:dak_louk/utils/db/tables/tables.dart';
 
@@ -152,7 +152,6 @@ class ProductService {
         createdAt: product.createdAt,
         updatedAt: DateTime.now(),
         image: product.image,
-        liveStreamId: product.liveStreamId,
       );
 
       await _productRepository.update(updatedProduct);

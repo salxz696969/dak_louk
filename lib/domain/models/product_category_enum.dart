@@ -1,3 +1,5 @@
+part of domain;
+
 enum ProductCategory {
   vehicles('vehicles'),
   property('property'),

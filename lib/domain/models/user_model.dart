@@ -1,4 +1,6 @@
-class UserModel {
+part of domain;
+
+class UserModel extends Cacheable {
   final int id;
   final String username;
   final String passwordHash;
