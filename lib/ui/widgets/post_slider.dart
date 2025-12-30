@@ -34,7 +34,7 @@ class _PostSliderState extends State<PostSlider> {
     return SizedBox(
       height: 400,
       child: Padding(
-        padding: const EdgeInsets.only(left: 30.0),
+        padding: const EdgeInsets.symmetric(horizontal: 12.0),
         child: PageView.builder(
           controller: _controller,
           padEnds: false,

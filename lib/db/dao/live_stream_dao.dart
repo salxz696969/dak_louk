@@ -25,13 +25,11 @@ class LiveStreamDao {
       if (result.isNotEmpty) {
         final List<LiveStreamModel> liveStreams = [];
         final UserDao userDao = UserDao();
+        final PostDao postDao = PostDao();
         final LiveStreamChatDao liveStreamChatDao = LiveStreamChatDao();
         for (var map in result) {
           final user = await userDao.getUserById(map['user_id'] as int);
-          final postDao = PostDao();
-          final posts = await postDao.getPostsByLiveStreamId(
-            map['id'] as int,
-          );  
+          final posts = await postDao.getPostsByLiveStreamId(map['id'] as int);
           final liveStreamChats = await liveStreamChatDao
               .getAllLiveStreamChatByLiveStreamId(map['id'] as int);
           liveStreams.add(
@@ -65,9 +63,7 @@ class LiveStreamDao {
         final LiveStreamChatDao liveStreamChatDao = LiveStreamChatDao();
         for (var map in result) {
           final user = await userDao.getUserById(map['user_id'] as int);
-          final posts = await postDao.getPostsByLiveStreamId(
-            map['id'] as int,
-          );
+          final posts = await postDao.getPostsByLiveStreamId(map['id'] as int);
           final liveStreamChats = await liveStreamChatDao
               .getAllLiveStreamChatByLiveStreamId(map['id'] as int);
           liveStreams.add(
