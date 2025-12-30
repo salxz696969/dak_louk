@@ -16,13 +16,35 @@ class ChatDao {
     }
   }
 
+  Future<List<ChatModel>> getChatsByUserIdAndTargetUserId(
+    int userId,
+    int targetUserId,
+  ) async {
+    try {
+      final db = await _appDatabase.database;
+      final result = await db.query(
+        'chat_rooms',
+        where:
+            '(user_id = ? AND target_user_id = ?) OR (user_id = ? AND target_user_id = ?)',
+        whereArgs: [userId, targetUserId, targetUserId, userId],
+        limit: 1,
+      );
+      if (result.isNotEmpty) {
+        final chatRoomId = result.first['id'] as int;
+        return getChatByChatRoomId(chatRoomId);
+      }
+      return [];
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<List<ChatModel>> getChatByChatRoomId(int chatRoomId) async {
     try {
       final db = await _appDatabase.database;
       final result = await db.query(
         'chats',
         where: 'chat_room_id = ?',
-        limit: 20,
         whereArgs: [chatRoomId],
       );
       if (result.isNotEmpty) {
@@ -34,7 +56,16 @@ class ChatDao {
         }
         return chats;
       }
-      throw Exception('Chat not found');
+      return [
+        ChatModel(
+          id: 0,
+          userId: 0,
+          text: '',
+          chatRoomId: chatRoomId,
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        ),
+      ];
     } catch (e) {
       rethrow;
     }
@@ -58,6 +89,28 @@ class ChatDao {
     try {
       final db = await _appDatabase.database;
       return await db.delete('chats', where: 'id = ?', whereArgs: [id]);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<ChatModel> getLatestChatByChatRoomId(int chatRoomId) async {
+    try {
+      final db = await _appDatabase.database;
+      final result = await db.query(
+        'chats',
+        where: 'chat_room_id = ?',
+        orderBy: 'created_at DESC',
+        limit: 1,
+        whereArgs: [chatRoomId],
+      );
+      if (result.isNotEmpty) {
+        final userDao = UserDao();
+        final map = result.first;
+        final user = await userDao.getUserById(map['user_id'] as int);
+        return ChatModel.fromMap(map, user);
+      }
+      throw Exception('Chat not found');
     } catch (e) {
       rethrow;
     }

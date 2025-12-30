@@ -1,3 +1,7 @@
+import 'package:dak_louk/db/dao/chat_dao.dart';
+import 'package:dak_louk/db/dao/chat_room_dao.dart';
+import 'package:dak_louk/models/chat_room_model.dart';
+import 'package:dak_louk/ui/screens/chat_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:dak_louk/ui/screens/profile_screen.dart';
 import 'package:flutter/material.dart';
@@ -73,7 +77,40 @@ class UsernameContainer extends StatelessWidget {
           ),
           InkWell(
             child: const Icon(CupertinoIcons.chat_bubble, size: 36),
-            onTap: () {},
+            onTap: () async {
+              final chatRoomId = await ChatRoomDao().getChatRoomId(1, userId);
+              if (chatRoomId != -1) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ChatScreen(
+                      targetUserName: username,
+                      chatDao: ChatDao().getChatByChatRoomId(chatRoomId),
+                    ),
+                  ),
+                );
+              } else {
+                final newChatRoom = ChatRoomModel(
+                  id: 1,
+                  userId: 1,
+                  targetUserId: userId,
+                  createdAt: DateTime.now(),
+                  updatedAt: DateTime.now(),
+                );
+                final newChatRoomId = await ChatRoomDao().insertChatRoom(
+                  newChatRoom,
+                );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ChatScreen(
+                      targetUserName: username,
+                      chatDao: ChatDao().getChatByChatRoomId(newChatRoomId),
+                    ),
+                  ),
+                );
+              }
+            },
           ),
         ],
       ),

@@ -167,13 +167,27 @@ Future<void> insertMockData(Database db) async {
   }
 
   // 4️⃣ POSTS
-  for (int i = 1; i <= 100; i++) {
+  for (int i = 1; i <= 50; i++) {
     await db.insert('posts', {
       'id': 100 + i,
       'user_id': 1,
       'title': postTitles[rand.nextInt(postTitles.length)],
       'product_id': rand.nextInt(49) + 1,
       'live_stream_id': rand.nextInt(19) + 1,
+      'category':
+          ProductCategory.values[i % ProductCategory.values.length].name,
+      'created_at': now,
+      'updated_at': now,
+    });
+  }
+
+  for(int i = 51; i <= 100; i++) {
+    await db.insert('posts', {
+      'id': 100 + i,
+      'user_id': rand.nextInt(49) + 2,
+      'title': postTitles[rand.nextInt(postTitles.length)],
+      'product_id': rand.nextInt(49) + 1,
+      'live_stream_id': null,
       'category':
           ProductCategory.values[i % ProductCategory.values.length].name,
       'created_at': now,
@@ -193,30 +207,42 @@ Future<void> insertMockData(Database db) async {
     }
   }
 
-  // 6️⃣ CHAT ROOMS
-  for (int i = 1; i <= 10; i++) {
+  // 6️⃣ CHAT ROOMS (User 1 with 20 other users)
+  int chatRoomId = 1;
+
+  for (int otherUserId = 2; otherUserId <= 21; otherUserId++) {
     await db.insert('chat_rooms', {
-      'id': i,
-      'user_id': i,
-      'target_user_id': i + 1,
+      'id': chatRoomId,
+      'user_id': 1,
+      'target_user_id': otherUserId,
       'created_at': now,
       'updated_at': now,
     });
+
+    chatRoomId++;
   }
 
-  // 7️⃣ CHATS
+  // 7️⃣ CHATS (20 messages per chat room)
   int chatId = 1;
-  for (int roomId = 1; roomId <= 10; roomId++) {
-    for (int j = 0; j < 5; j++) {
+  chatRoomId = 1;
+
+  for (int otherUserId = 2; otherUserId <= 21; otherUserId++) {
+    for (int j = 0; j < 20; j++) {
+      final senderId = rand.nextBool() ? 1 : otherUserId;
+
       await db.insert('chats', {
         'id': chatId++,
-        'user_id': roomId,
-        'chat_room_id': roomId,
+        'user_id': senderId,
+        'chat_room_id': chatRoomId,
         'text': chatMessages[rand.nextInt(chatMessages.length)],
-        'created_at': now,
+        'created_at': DateTime.now()
+            .subtract(Duration(minutes: rand.nextInt(300)))
+            .toIso8601String(),
         'updated_at': now,
       });
     }
+
+    chatRoomId++;
   }
 
   // 8️⃣ LIVE STREAM CHATS

@@ -27,12 +27,12 @@ class PostDao {
         limit = 100;
       }
       if (category == 'all') {
-        result = await db.query('posts', limit: limit);
+        result = await db.query('posts', limit: limit, where: 'user_id != 1');
       } else {
         result = await db.query(
           'posts',
           limit: limit,
-          where: 'category = ?',
+          where: 'category = ? and user_id != 1',
           whereArgs: [category],
         );
       }
