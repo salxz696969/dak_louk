@@ -3,17 +3,18 @@ import 'package:dak_louk/domain/domain.dart';
 import 'package:dak_louk/utils/db/app_database.dart';
 import 'package:dak_louk/utils/db/orm.dart';
 import 'package:dak_louk/utils/db/tables/tables.dart';
+import 'package:dak_louk/utils/error.dart';
 import 'package:sqflite/sqflite.dart';
 
 abstract class BaseRepositoryInterface<T extends Cacheable> {
-  /// Insert a new model into the database
-  Future<int> insert(T model);
-
   /// Get all models from the database
   Future<List<T>> getAll();
 
   /// Get a model by its ID
   Future<T> getById(int id);
+
+  /// Insert a new model into the database
+  Future<int> insert(T model);
 
   /// Update an existing model in the database
   Future<int> update(T model);
@@ -49,35 +50,15 @@ abstract class BaseRepository<T extends Cacheable>
   Future<Database> get database async => await _appDatabase.database;
 
   @override
-  Future<int> insert(T model) async {
-    try {
-      final db = await database;
-      final cacheKey = _getBaseCacheKey();
-      final map = toMap(model);
-      map.remove('id');
-      final result = await db.insert(tableName, map);
-      if (result > 0) {
-        _cache.set(cacheKey, model);
-        return result;
-      }
-      throw Exception(
-        'Failed to insert ${tableName.substring(0, tableName.length - 1).toUpperCase()}',
-      );
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  @override
   Future<List<T>> getAll() async {
     try {
       if (_cache.exists(_getBaseCacheKey())) {
-        return _cache.get(_getBaseCacheKey()) as List<T>;
+        return _cache.getList(_getBaseCacheKey()) as List<T>;
       }
       final db = await database;
       final result = await db.query(tableName);
       final models = result.map((map) => fromMap(map)).toList();
-      _cache.set(_getBaseCacheKey(), models as Cacheable);
+      _cache.setList(_getBaseCacheKey(), models);
       return models;
     } catch (e) {
       rethrow;
@@ -99,11 +80,33 @@ abstract class BaseRepository<T extends Cacheable>
       );
       if (result.isNotEmpty) {
         final model = fromMap(result.first);
-        _cache.set(_getBaseCacheKey(), model as Cacheable);
+        _cache.set(_getBaseCacheKey() + ":$id", model);
         return model;
       }
       throw Exception(
         '${tableName.substring(0, tableName.length - 1).toUpperCase()} not found',
+      );
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<int> insert(T model) async {
+    try {
+      final db = await database;
+      final cacheKey = _getBaseCacheKey();
+      final map = toMap(model);
+      map.remove('id');
+      final result = await db.insert(tableName, map);
+      if (result > 0) {
+        _cache.set(cacheKey, model);
+        return result;
+      }
+      throw AppError(
+        type: ErrorType.DB_ERROR,
+        message:
+            'Failed to insert ${tableName.substring(0, tableName.length - 1).toUpperCase()}',
       );
     } catch (e) {
       rethrow;
@@ -129,8 +132,10 @@ abstract class BaseRepository<T extends Cacheable>
         _cache.set(cacheKey, updatedModel as Cacheable);
         return result;
       }
-      throw Exception(
-        '${tableName.substring(0, tableName.length - 1).toUpperCase()} not found',
+      throw AppError(
+        type: ErrorType.DB_ERROR,
+        message:
+            'Failed to update ${tableName.substring(0, tableName.length - 1).toUpperCase()}',
       );
     } catch (e) {
       rethrow;
@@ -151,11 +156,17 @@ abstract class BaseRepository<T extends Cacheable>
         _cache.del(_getBaseCacheKey());
         return result;
       }
-      throw Exception(
-        '${tableName.substring(0, tableName.length - 1).toUpperCase()} not found',
+      throw AppError(
+        type: ErrorType.INTERNAL_ERROR,
+        message:
+            'An unexpected error occurred while deleting ${tableName.substring(0, tableName.length - 1).toUpperCase()}',
       );
     } catch (e) {
-      rethrow;
+      throw AppError(
+        type: ErrorType.INTERNAL_ERROR,
+        message:
+            'An unexpected error occurred while deleting ${tableName.substring(0, tableName.length - 1).toUpperCase()}',
+      );
     }
   }
 

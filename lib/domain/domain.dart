@@ -1,6 +1,6 @@
 library domain;
 
-part '../utils/cacheable.dart';
+part 'models/cacheable.dart';
 part 'models/cart_model.dart';
 part 'models/user_model.dart';
 part 'models/product_model.dart';
