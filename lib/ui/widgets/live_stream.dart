@@ -70,12 +70,22 @@ class _LiveStreamState extends State<LiveStream> {
             onTap: () {
               showModalBottomSheet(
                 showDragHandle: true,
-                backgroundColor: Colors.black,
+                backgroundColor:  Color(0xFF1A1A1A),
                 context: context,
                 builder: (context) => SizedBox(
-                  height: 400,
-                  child: Center(
-                    child: _FeaturedProduct(liveStreamId: widget.livestream.id),
+                  height: 450,
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 16),
+                    child: Column(
+                      children: [
+                        const Text(
+                          'Featured Products',
+                          style: TextStyle(fontSize: 18, color: Colors.white70),
+                        ),
+                        const SizedBox(height: 20),
+                        _FeaturedProduct(liveStreamId: widget.livestream.id),
+                      ],
+                    ),
                   ),
                 ),
               );
