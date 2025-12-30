@@ -11,8 +11,10 @@ class LiveStreamModel  extends Cacheable {
   final DateTime updatedAt;
 
   final UserModel? user;
-  final List<ProductModel>? products;
+  final List<PostModel>? posts;
   final List<LiveStreamChatModel>? liveStreamChats;
+
+  final List<ProductModel>? products;
 
   LiveStreamModel({
     required this.id,
@@ -24,8 +26,9 @@ class LiveStreamModel  extends Cacheable {
     required this.createdAt,
     required this.updatedAt,
     this.user,
-    this.products,
+    this.posts,
     this.liveStreamChats,
+    this.products,
   });
 
   static String timeAgo(DateTime date) {
@@ -54,8 +57,8 @@ class LiveStreamModel  extends Cacheable {
 
   LiveStreamUI ui() {
     final user = this.user;
-    final products = this.products ?? [];
-    final liveStreamChats = this.liveStreamChats ?? [];
+    final posts = this.posts ?? [];
+    final liveStreamChats = this.liveStreamChats;
 
     // Use AssetImage for local assets, fallback if needed
     final thumbnail = (thumbnailUrl.isNotEmpty)
@@ -70,14 +73,14 @@ class LiveStreamModel  extends Cacheable {
     final username = user?.username ?? 'Unknown';
     final rating = user?.rating.toStringAsFixed(2) ?? '0.00';
 
-    // Use first product if available
-    final product = products.isNotEmpty ? products.first : null;
-    final quantity = product?.quantity.toString() ?? '1';
-    final price = product?.price.toStringAsFixed(2) ?? '0.0';
-    final description = product?.description ?? '';
+    // Use first post if available
+    final post = posts.isNotEmpty ? posts.first : null;
+    final quantity = post?.product?.quantity.toString() ?? '1';
+    final price = post?.product?.price.toStringAsFixed(2) ?? '0.0';
+    final description = post?.product?.description ?? '';
     final title = this.title;
-    final category = product?.category.name;
-    final productId = product?.id ?? 0;
+    final category = post?.product?.category.name;
+    final postId = post?.id ?? 0;
     final date = LiveStreamModel.timeAgo(createdAt);
 
     return LiveStreamUI(
@@ -85,8 +88,8 @@ class LiveStreamModel  extends Cacheable {
       url: url,
       title: title,
       user: user!,
-      products: products,
-      liveStreamChats: liveStreamChats,
+      posts: posts,
+      liveStreamChats: liveStreamChats ?? [],
       timeAgo: date,
       profileImage: profileImage,
       username: username,
@@ -96,7 +99,7 @@ class LiveStreamModel  extends Cacheable {
       price: price,
       description: description,
       category: category,
-      productId: productId,
+      postId: postId,
     );
   }
 }
@@ -106,7 +109,7 @@ class LiveStreamUI  extends Cacheable {
   final String url;
   final String title;
   final UserModel user;
-  final List<ProductModel> products;
+  final List<PostModel> posts;
   final List<LiveStreamChatModel> liveStreamChats;
   final String timeAgo;
   final String view;
@@ -119,14 +122,14 @@ class LiveStreamUI  extends Cacheable {
   final String price;
   final String description;
   final String? category;
-  final int productId;
+  final int postId;
 
   LiveStreamUI({
     required this.thumbnail,
     required this.url,
     required this.title,
     required this.user,
-    required this.products,
+    required this.posts,
     required this.liveStreamChats,
     required this.timeAgo,
     required this.profileImage,
@@ -137,6 +140,6 @@ class LiveStreamUI  extends Cacheable {
     required this.price,
     required this.description,
     required this.category,
-    required this.productId,
+    required this.postId,
   });
 }
