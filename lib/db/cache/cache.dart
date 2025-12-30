@@ -4,23 +4,31 @@ import 'package:dak_louk/domain/domain.dart';
 // example: final cacheValue = cache.get<PostModel>('post:1');
 // then you can use cacheValue.single or cacheValue.many to get the data (careful usage depending on the type of the cache value, using wrong method can cause null)
 // basically CacheValue<T> = Single<T> | Many<T> in typescript
-sealed class CacheValue<T extends Cacheable> {
-  T? get single => this is Single<T> ? (this as Single<T>).data : null;
-  List<T>? get many => this is Many<T> ? (this as Many<T>).data : null;
+
+// NOTE:
+// CacheValue is non-generic, so from a type-system perspective a Many cache
+// could theoretically contain mixed Cacheable instances.
+// However, cache keys are repository-scoped and owned exclusively by this
+// BaseRepository<T>, which guarantees by architecture and data flow that
+// all cached values under this key are of type T.
+// Therefore, the cast here is safe by construction.
+sealed class CacheValue {
+  Cacheable? get single => this is Single ? (this as Single).data : null;
+  List<Cacheable>? get many => this is Many ? (this as Many).data : null;
 }
 
-class Single<T extends Cacheable> extends CacheValue<T> {
-  final T data;
+class Single extends CacheValue {
+  final Cacheable data;
   Single(this.data);
   @override
-  T? get single => data;
+  Cacheable? get single => data;
 }
 
-class Many<T extends Cacheable> extends CacheValue<T> {
-  final List<T> data;
+class Many extends CacheValue {
+  final List<Cacheable> data;
   Many(this.data);
   @override
-  List<T>? get many => data;
+  List<Cacheable>? get many => data;
 }
 
 abstract class CacheInterface {
@@ -28,10 +36,10 @@ abstract class CacheInterface {
   // // ! in typescript i would do a simple type union
   // // ! to solve we can use a sealed wrapper class like CacheValue with Single and Many but overkill for now
   /// Set a value in the cache
-  void set<T extends Cacheable>(String key, CacheValue<T> data);
+  void set(String key, CacheValue data);
 
   /// Get a value from the cache
-  CacheValue<T>? get<T extends Cacheable>(String key);
+  CacheValue? get(String key);
 
   /// Delete a value from the cache
   void del(String key);
@@ -53,16 +61,16 @@ class Cache implements CacheInterface {
   factory Cache() => _instance;
 
   // change from cacheble to allow for lists of cacheable objects
-  final Map<String, Object> _cache = {};
+  final Map<String, CacheValue> _cache = {};
 
   @override
-  void set<T extends Cacheable>(String key, CacheValue<T> data) {
-    _cache[key] = data as Object;
+  void set(String key, CacheValue data) {
+    _cache[key] = data;
   }
 
   @override
-  CacheValue<T>? get<T extends Cacheable>(String key) {
-    return _cache[key] as CacheValue<T>?;
+  CacheValue? get(String key) {
+    return _cache[key] as CacheValue;
   }
 
   @override
