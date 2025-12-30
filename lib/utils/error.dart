@@ -82,7 +82,7 @@ enum ErrorType {
   UNKNOWN,
 }
 
-class AppError {
+class AppError implements Exception {
   final ErrorType type;
   // for custom messages
   String? message;
