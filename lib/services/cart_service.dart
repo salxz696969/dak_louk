@@ -21,6 +21,9 @@ class CartService {
       }
       throw AppError(type: ErrorType.NOT_FOUND, message: 'No carts found');
     } catch (e) {
+      if (e is AppError) {
+        rethrow;
+      }
       rethrow;
     }
   }
@@ -29,6 +32,9 @@ class CartService {
     try {
       await _cartRepository.delete(id);
     } catch (e) {
+      if (e is AppError) {
+        rethrow;
+      }
       throw AppError(
         type: ErrorType.DB_ERROR,
         message: 'Failed to delete cart',
@@ -45,6 +51,9 @@ class CartService {
       }
       return null;
     } catch (e) {
+      if (e is AppError) {
+        rethrow;
+      }
       throw AppError(
         type: ErrorType.DB_ERROR,
         message: 'Failed to create cart',

@@ -52,7 +52,7 @@ abstract class BaseRepository<T extends Cacheable>
   @override
   Future<List<T>> getAll() async {
     try {
-      final cacheKey = _getBaseCacheKey() + ":all";
+      final cacheKey = '$_getBaseCacheKey():all';
       if (_cache.exists(cacheKey)) {
         final cached = _cache.get(cacheKey);
         return _expectMany(cached);
@@ -77,7 +77,7 @@ abstract class BaseRepository<T extends Cacheable>
   @override
   Future<T?> getById(int id) async {
     try {
-      final cacheKey = _getBaseCacheKey() + ":$id";
+      final cacheKey = '$_getBaseCacheKey():$id';
       if (_cache.exists(cacheKey)) {
         final cached = _cache.get(cacheKey);
         return _expectSingle(cached);
@@ -89,11 +89,12 @@ abstract class BaseRepository<T extends Cacheable>
         where: statement.clause,
         whereArgs: statement.args,
       );
-      if (!result.isEmpty) {
+      if (result.isNotEmpty) {
         final model = fromMap(result.first);
         _cache.set(cacheKey, Single(model));
         return model;
       }
+      return null;
     } catch (e) {
       if (e is AppError) {
         rethrow;
@@ -115,11 +116,19 @@ abstract class BaseRepository<T extends Cacheable>
       // maybe change
       map.remove('id');
       final id = await db.insert(tableName, map);
+      if (id > 0) {
+        final modelWithId = fromMap({...map, 'id': id});
+        _cache.set('$cacheKey:$id', Single(modelWithId));
+        // set the list caches of the model
+        _cache.get('$cacheKey:all')?.many?.add(modelWithId);
+        return id;
+      }
+      throw AppError(
+        type: ErrorType.DB_ERROR,
+        message:
+            'Failed to insert ${tableName.substring(0, tableName.length - 1).toUpperCase()}',
+      );
       // set the single caches
-      _cache.set(cacheKey + ":$id", Single(model));
-      // set the list caches of the model
-      _cache.get(cacheKey + ":all")?.many?.add(model);
-      return id;
     } catch (e) {
       if (e is AppError) {
         rethrow;
@@ -139,19 +148,25 @@ abstract class BaseRepository<T extends Cacheable>
       final cacheKey = _getBaseCacheKey();
       final map = toMap(model);
       final id = map['id'];
-      final statement = Clauses.where.eq(Tables.id, id);
-      final result = await db.update(
-        tableName,
-        map,
-        where: statement.clause,
-        whereArgs: statement.args,
-      );
-      final updatedModel = fromMap(map);
-      _cache.set(cacheKey + ":$id", Single(updatedModel));
-      // couldve used id to remove from the list but since cacheble is inaccesable to the id field of the model i couldnt
-      final newCache = await getAll();
-      _cache.set(cacheKey + ":all", Many(newCache));
-      return result;
+      if (id > 0) {
+        final statement = Clauses.where.eq(Tables.id, id);
+        final rowsAffected = await db.update(
+          tableName,
+          map,
+          where: statement.clause,
+          whereArgs: statement.args,
+        );
+        if (rowsAffected > 0) {
+          final updatedModel = fromMap(map);
+          _cache.set('$cacheKey:$id', Single(updatedModel));
+          // couldve used id to remove from the list but since cacheble is inaccesable to the id field of the model i couldnt
+          final newCache = await getAll();
+          _cache.set('$cacheKey:all', Many(newCache));
+          return rowsAffected;
+        }
+        return 0;
+      }
+      return 0;
     } catch (e) {
       if (e is AppError) {
         rethrow;
@@ -175,11 +190,11 @@ abstract class BaseRepository<T extends Cacheable>
         where: statement.clause,
         whereArgs: statement.args,
       );
-      _cache.del(cacheKey + ":$id");
-      _cache.del(cacheKey + ":all");
+      _cache.del('$cacheKey:$id');
+      _cache.del('$cacheKey:all');
       // couldve used id to remove from the list but since cacheble is inaccesable to the id field of the model i couldnt
       final newCache = await getAll();
-      _cache.set(cacheKey + ":all", Many(newCache));
+      _cache.set('$cacheKey:all', Many(newCache));
       return result;
     } catch (e) {
       if (e is AppError) {

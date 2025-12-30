@@ -10,15 +10,18 @@ class ProductRepository extends BaseRepository<ProductModel> {
   ProductModel fromMap(Map<String, dynamic> map) {
     return ProductModel(
       id: map[Tables.products.cols.id] as int,
-      userId: map[Tables.products.cols.userId],
-      title: map[Tables.products.cols.title],
-      description: map[Tables.products.cols.description],
-      category: map[Tables.products.cols.category],
-      price: map[Tables.products.cols.price],
-      quantity: map[Tables.products.cols.quantity],
-      createdAt: map[Tables.products.cols.createdAt],
-      updatedAt: map[Tables.products.cols.updatedAt],
-      image: map[Tables.products.cols.image],
+      userId: map[Tables.products.cols.userId] as int,
+      title: map[Tables.products.cols.title] as String,
+      description: map[Tables.products.cols.description] as String,
+      category: ProductCategory.values.firstWhere(
+        (e) => e.name == map[Tables.products.cols.category],
+        orElse: () => ProductCategory.others,
+      ),
+      price: (map[Tables.products.cols.price] as num).toDouble(),
+      quantity: map[Tables.products.cols.quantity] as int,
+      createdAt: DateTime.parse(map[Tables.products.cols.createdAt] as String),
+      updatedAt: DateTime.parse(map[Tables.products.cols.updatedAt] as String),
+      image: map[Tables.products.cols.image] as String,
     );
   }
 
@@ -32,8 +35,8 @@ class ProductRepository extends BaseRepository<ProductModel> {
       Tables.products.cols.category: model.category.name,
       Tables.products.cols.price: model.price,
       Tables.products.cols.quantity: model.quantity,
-      Tables.products.cols.createdAt: model.createdAt,
-      Tables.products.cols.updatedAt: model.updatedAt,
+      Tables.products.cols.createdAt: model.createdAt.toIso8601String(),
+      Tables.products.cols.updatedAt: model.updatedAt.toIso8601String(),
       Tables.products.cols.image: model.image,
     };
   }
