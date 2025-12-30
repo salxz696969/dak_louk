@@ -23,14 +23,90 @@ class LiveStreamService {
         Tables.liveStreams.cols.userId,
         userId,
       );
-      final result = await _liveStreamRepository.queryThisTable(
+      final liveStreams = await _liveStreamRepository.queryThisTable(
         where: statement.clause,
         args: statement.args,
         limit: limit,
       );
 
-      if (result.isNotEmpty) {
-        return result;
+      if (liveStreams.isNotEmpty) {
+        // Populate relations like in the original DAO
+        final enrichedLiveStreams = await Future.wait(
+          liveStreams.map((liveStream) async {
+            final user = await _userRepository.getById(liveStream.userId);
+
+            // Get products associated with this live stream
+            final productStatement = Clauses.where.eq(
+              Tables.products.cols.liveStreamId,
+              liveStream.id,
+            );
+            final products = await _productRepository.queryThisTable(
+              where: productStatement.clause,
+              args: productStatement.args,
+            );
+
+            return LiveStreamModel(
+              id: liveStream.id,
+              url: liveStream.url,
+              userId: liveStream.userId,
+              title: liveStream.title,
+              thumbnailUrl: liveStream.thumbnailUrl,
+              view: liveStream.view,
+              createdAt: liveStream.createdAt,
+              updatedAt: liveStream.updatedAt,
+              user: user,
+              products: products,
+            );
+          }),
+        );
+
+        return enrichedLiveStreams;
+      }
+      throw Exception('No LiveStreams found');
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // Migrated from LiveStreamDao
+  Future<List<LiveStreamModel>> getAllLiveStreams(int limit) async {
+    try {
+      final liveStreams = await _liveStreamRepository.queryThisTable(
+        limit: limit,
+      );
+
+      if (liveStreams.isNotEmpty) {
+        // Populate relations like in the original DAO
+        final enrichedLiveStreams = await Future.wait(
+          liveStreams.map((liveStream) async {
+            final user = await _userRepository.getById(liveStream.userId);
+
+            // Get products associated with this live stream
+            final productStatement = Clauses.where.eq(
+              Tables.products.cols.liveStreamId,
+              liveStream.id,
+            );
+            final products = await _productRepository.queryThisTable(
+              where: productStatement.clause,
+              args: productStatement.args,
+            );
+
+            return LiveStreamModel(
+              id: liveStream.id,
+              url: liveStream.url,
+              userId: liveStream.userId,
+              title: liveStream.title,
+              thumbnailUrl: liveStream.thumbnailUrl,
+              view: liveStream.view,
+              createdAt: liveStream.createdAt,
+              updatedAt: liveStream.updatedAt,
+              user: user,
+              products: products,
+            );
+          }),
+        );
+
+        return enrichedLiveStreams;
       }
       throw Exception('No LiveStreams found');
     } catch (e) {
@@ -204,7 +280,7 @@ class LiveStreamService {
     }
   }
 
-  Future<List<LiveStreamModel>> getAllLiveStreams() async {
+  Future<List<LiveStreamModel>> getAllLiveStreamsSimple() async {
     try {
       return await _liveStreamRepository.getAll();
     } catch (e) {

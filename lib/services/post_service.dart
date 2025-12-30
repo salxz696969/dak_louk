@@ -125,6 +125,52 @@ class PostService {
     }
   }
 
+  // Migrated from PostDao
+  Future<List<PostModel>> getPostsByLiveStreamId(int liveStreamId) async {
+    try {
+      final statement = Clauses.where.eq('live_stream_id', liveStreamId);
+      final posts = await _postRepository.queryThisTable(
+        where: statement.clause,
+        args: statement.args,
+      );
+
+      // Populate relations like in the original DAO
+      final enrichedPosts = await Future.wait(
+        posts.map((post) async {
+          final user = await _userRepository.getById(post.userId);
+          final product = await _productRepository.getById(post.productId);
+
+          // Get media URLs
+          final db = await _postRepository.database;
+          final mediaResults = await db.query(
+            'medias',
+            where: 'post_id = ?',
+            whereArgs: [post.id],
+          );
+          final mediaUrls = mediaResults
+              .map((media) => media['url'] as String)
+              .toList();
+
+          return PostModel(
+            id: post.id,
+            userId: post.userId,
+            title: post.title,
+            productId: post.productId,
+            createdAt: post.createdAt,
+            updatedAt: post.updatedAt,
+            product: product,
+            user: user,
+            images: mediaUrls,
+          );
+        }),
+      );
+
+      return enrichedPosts;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<List<PostModel>> getRecentPosts({int limit = 20}) async {
     try {
       final orderByStmt = Clauses.orderBy.desc(Tables.posts.cols.createdAt);

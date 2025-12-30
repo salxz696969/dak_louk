@@ -1,6 +1,6 @@
 part of domain;
 
-class LiveStreamChatModel {
+class LiveStreamChatModel extends Cacheable {
   final int id;
   final String text;
   final int userId;

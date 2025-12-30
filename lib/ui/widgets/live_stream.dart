@@ -1,7 +1,6 @@
 import 'dart:async';
-
-import 'package:dak_louk/db/dao/post_dao.dart';
 import 'package:dak_louk/domain/domain.dart';
+import 'package:dak_louk/services/post_service.dart';
 import 'package:dak_louk/ui/widgets/post_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
@@ -202,12 +201,13 @@ class _LiveStreamChatBoxState extends State<_LiveStreamChatBox> {
 
 class _FeaturedProduct extends StatelessWidget {
   final int liveStreamId;
-  const _FeaturedProduct({required this.liveStreamId});
+  final PostService _postService = PostService();
+  _FeaturedProduct({required this.liveStreamId});
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<PostModel>>(
-      future: PostDao().getPostsByLiveStreamId(liveStreamId),
+      future: _postService.getPostsByLiveStreamId(liveStreamId),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());

@@ -18,15 +18,29 @@ class LiveStreamChatService {
         Tables.liveStreamChats.cols.liveStreamId,
         liveStreamId,
       );
-      final result = await _liveStreamChatRepository.queryThisTable(
+      final chats = await _liveStreamChatRepository.queryThisTable(
         where: statement.clause,
         args: statement.args,
-        orderBy: Clauses.orderBy
-            .desc(Tables.liveStreamChats.cols.createdAt)
-            .clause,
       );
-      if (result.isNotEmpty) {
-        return result;
+
+      if (chats.isNotEmpty) {
+        // Populate user relations like in the original DAO
+        final enrichedChats = await Future.wait(
+          chats.map((chat) async {
+            final user = await _userRepository.getById(chat.userId);
+            return LiveStreamChatModel(
+              id: chat.id,
+              text: chat.text,
+              userId: chat.userId,
+              liveStreamId: chat.liveStreamId,
+              createdAt: chat.createdAt,
+              updatedAt: chat.updatedAt,
+              user: user,
+            );
+          }),
+        );
+
+        return enrichedChats;
       }
       throw Exception('LiveStreamChat not found');
     } catch (e) {

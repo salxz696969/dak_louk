@@ -55,6 +55,29 @@ class ProductService {
     }
   }
 
+  // Migrated from ProductDao
+  Future<List<ProductModel>> getAllProducts(String category, int limit) async {
+    try {
+      if (limit <= 0) limit = 100;
+
+      if (category == 'all') {
+        return await _productRepository.queryThisTable(limit: limit);
+      } else {
+        final statement = Clauses.where.eq(
+          Tables.products.cols.category,
+          category,
+        );
+        return await _productRepository.queryThisTable(
+          where: statement.clause,
+          args: statement.args,
+          limit: limit,
+        );
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   // Additional business logic
   Future<List<ProductModel>> searchProducts(String searchTerm) async {
     try {
@@ -196,7 +219,7 @@ class ProductService {
     }
   }
 
-  Future<List<ProductModel>> getAllProducts() async {
+  Future<List<ProductModel>> getAllProductsSimple() async {
     try {
       return await _productRepository.getAll();
     } catch (e) {

@@ -1,5 +1,5 @@
-import 'package:dak_louk/db/dao/live_stream_dao.dart';
 import 'package:dak_louk/domain/domain.dart';
+import 'package:dak_louk/services/live_stream_service.dart';
 import 'package:dak_louk/ui/widgets/live_stream.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -12,10 +12,11 @@ class LiveStreamScreen extends StatefulWidget {
 }
 
 class _LiveStreamScreenState extends State<LiveStreamScreen> {
+  final LiveStreamService _liveStreamService = LiveStreamService();
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<LiveStreamModel>>(
-      future: LiveStreamDao().getAllLiveStreams(20),
+      future: _liveStreamService.getAllLiveStreamsSimple(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
