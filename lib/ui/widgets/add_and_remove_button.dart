@@ -52,7 +52,7 @@ class _AddAndRemoveButtonState extends State<AddAndRemoveButton> {
                   productId: widget.cart.productId,
                   quantity: currentQuantity,
                   createdAt: widget.cart.createdAt,
-                  updatedAt: DateTime.now().toIso8601String(),
+                  updatedAt: DateTime.now(),
                 ),
               );
             }
@@ -86,7 +86,7 @@ class _AddAndRemoveButtonState extends State<AddAndRemoveButton> {
                   productId: widget.cart.productId,
                   quantity: currentQuantity,
                   createdAt: widget.cart.createdAt,
-                  updatedAt: DateTime.now().toIso8601String(),
+                  updatedAt: DateTime.now(),
                 ),
               );
             }

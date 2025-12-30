@@ -14,7 +14,7 @@ import 'package:dak_louk/utils/db/tables/medias_table.dart';
 
 class Tables {
   // for generic usage at base repo
-  static const String id = 'id';
+  static String get id => 'id';
 
   // all tables
   static const users = UsersTable();

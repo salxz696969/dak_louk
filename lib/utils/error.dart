@@ -90,7 +90,7 @@ class AppError implements Exception {
   String? message;
 
   AppError({required this.type, this.message = ''}) {
-    print('${type.name}: $message');
-    debugPrintStack(label: 'AppError: $type: $message');
+    debugPrint('${type.name}: $message');
+    // debugPrintStack(label: 'AppError: $type: $message');
   }
 }

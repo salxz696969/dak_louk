@@ -1,8 +1,8 @@
 import 'package:dak_louk/db/cache/cache.dart';
 import 'package:dak_louk/domain/domain.dart';
+import 'package:dak_louk/utils/db/tables/tables.dart';
 import 'package:dak_louk/utils/db/app_database.dart';
 import 'package:dak_louk/utils/db/orm.dart';
-import 'package:dak_louk/utils/db/tables/tables.dart';
 import 'package:dak_louk/utils/error.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -52,7 +52,7 @@ abstract class BaseRepository<T extends Cacheable>
   @override
   Future<List<T>> getAll() async {
     try {
-      final cacheKey = '$_getBaseCacheKey():all';
+      final cacheKey = '${_getBaseCacheKey()}:all';
       if (_cache.exists(cacheKey)) {
         final cached = _cache.get(cacheKey);
         return _expectMany(cached);
@@ -77,8 +77,9 @@ abstract class BaseRepository<T extends Cacheable>
   @override
   Future<T?> getById(int id) async {
     try {
-      final cacheKey = '$_getBaseCacheKey():$id';
+      final cacheKey = '${_getBaseCacheKey()}:$id';
       if (_cache.exists(cacheKey)) {
+        _cache.flushAll();
         final cached = _cache.get(cacheKey);
         return _expectSingle(cached);
       }
@@ -114,10 +115,10 @@ abstract class BaseRepository<T extends Cacheable>
       final cacheKey = _getBaseCacheKey();
       final map = toMap(model);
       // maybe change
-      map.remove('id');
+      map.remove(Tables.id);
       final id = await db.insert(tableName, map);
       if (id > 0) {
-        final modelWithId = fromMap({...map, 'id': id});
+        final modelWithId = fromMap({...map, Tables.id: id});
         _cache.set('$cacheKey:$id', Single(modelWithId));
         // set the list caches of the model
         _cache.get('$cacheKey:all')?.many?.add(modelWithId);
@@ -147,7 +148,7 @@ abstract class BaseRepository<T extends Cacheable>
       final db = await database;
       final cacheKey = _getBaseCacheKey();
       final map = toMap(model);
-      final id = map['id'];
+      final id = map[Tables.id];
       if (id > 0) {
         final statement = Clauses.where.eq(Tables.id, id);
         final rowsAffected = await db.update(
@@ -269,16 +270,18 @@ abstract class BaseRepository<T extends Cacheable>
     if (value == null) {
       throw AppError(
         type: ErrorType.CACHE_ERROR,
-        message: 'Expected single cache',
+        message: 'Expected single cache but got null',
       );
     }
-    final single = value.single;
-    if (single == null) {
+
+    final singleValue = value.single;
+    if (singleValue == null) {
       throw AppError(
         type: ErrorType.CACHE_ERROR,
-        message: 'Expected single cache',
+        message: 'Expected single cache but got ${value.runtimeType}',
       );
     }
-    return single as T;
+
+    return singleValue as T;
   }
 }
