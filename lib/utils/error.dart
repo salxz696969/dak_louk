@@ -1,5 +1,7 @@
 // ai assited in generating the types of erros and helped define, hwoever, only a few will be used most often
 
+import 'package:flutter/foundation.dart';
+
 enum ErrorType {
   // =======================
   // Data / Persistence
@@ -87,5 +89,8 @@ class AppError implements Exception {
   // for custom messages
   String? message;
 
-  AppError({required this.type, this.message = ''});
+  AppError({required this.type, this.message = ''}) {
+    print('${type.name}: $message');
+    debugPrintStack(label: 'AppError: $type: $message');
+  }
 }

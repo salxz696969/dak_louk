@@ -18,15 +18,29 @@ class LiveStreamChatService {
         Tables.liveStreamChats.cols.liveStreamId,
         liveStreamId,
       );
-      final result = await _liveStreamChatRepository.queryThisTable(
+      final chats = await _liveStreamChatRepository.queryThisTable(
         where: statement.clause,
         args: statement.args,
-        orderBy: Clauses.orderBy
-            .desc(Tables.liveStreamChats.cols.createdAt)
-            .clause,
       );
-      if (result.isNotEmpty) {
-        return result;
+
+      if (chats.isNotEmpty) {
+        // Populate user relations like in the original DAO
+        final enrichedChats = await Future.wait(
+          chats.map((chat) async {
+            final user = await _userRepository.getById(chat.userId);
+            return LiveStreamChatModel(
+              id: chat.id,
+              text: chat.text,
+              userId: chat.userId,
+              liveStreamId: chat.liveStreamId,
+              createdAt: chat.createdAt,
+              updatedAt: chat.updatedAt,
+              user: user,
+            );
+          }),
+        );
+
+        return enrichedChats;
       }
       throw Exception('LiveStreamChat not found');
     } catch (e) {
@@ -196,27 +210,39 @@ class LiveStreamChatService {
   }
 
   // Basic CRUD operations
-  Future<LiveStreamChatModel> sendMessage(LiveStreamChatModel chat) async {
+  Future<LiveStreamChatModel?> sendMessage(LiveStreamChatModel chat) async {
     try {
       final id = await _liveStreamChatRepository.insert(chat);
-      return await _liveStreamChatRepository.getById(id);
+      final newChat = await _liveStreamChatRepository.getById(id);
+      if (newChat != null) {
+        return newChat;
+      }
+      return null;
     } catch (e) {
       rethrow;
     }
   }
 
-  Future<LiveStreamChatModel> getChatById(int id) async {
+  Future<LiveStreamChatModel?> getChatById(int id) async {
     try {
-      return await _liveStreamChatRepository.getById(id);
+      final newChat = await _liveStreamChatRepository.getById(id);
+      if (newChat != null) {
+        return newChat;
+      }
+      return null;
     } catch (e) {
       rethrow;
     }
   }
 
-  Future<LiveStreamChatModel> updateChat(LiveStreamChatModel chat) async {
+  Future<LiveStreamChatModel?> updateChat(LiveStreamChatModel chat) async {
     try {
       await _liveStreamChatRepository.update(chat);
-      return await _liveStreamChatRepository.getById(chat.id);
+      final newChat = await _liveStreamChatRepository.getById(chat.id);
+      if (newChat != null) {
+        return newChat;
+      }
+      return null;
     } catch (e) {
       rethrow;
     }

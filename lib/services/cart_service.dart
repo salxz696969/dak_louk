@@ -2,6 +2,7 @@ import 'package:dak_louk/db/repositories/cart_repo.dart';
 import 'package:dak_louk/domain/domain.dart';
 import 'package:dak_louk/utils/db/orm.dart';
 import 'package:dak_louk/utils/db/tables/tables.dart';
+import 'package:dak_louk/utils/error.dart';
 
 class CartService {
   final CartRepository _cartRepository = CartRepository();
@@ -18,8 +19,11 @@ class CartService {
       if (carts.isNotEmpty) {
         return carts;
       }
-      throw Exception('No carts found');
+      throw AppError(type: ErrorType.NOT_FOUND, message: 'No carts found');
     } catch (e) {
+      if (e is AppError) {
+        rethrow;
+      }
       rethrow;
     }
   }
@@ -28,25 +32,48 @@ class CartService {
     try {
       await _cartRepository.delete(id);
     } catch (e) {
-      throw Exception('Failed to delete cart');
+      if (e is AppError) {
+        rethrow;
+      }
+      throw AppError(
+        type: ErrorType.DB_ERROR,
+        message: 'Failed to delete cart',
+      );
     }
   }
 
-  Future<CartModel> createCart(CartModel cart) async {
+  Future<CartModel?> createCart(CartModel cart) async {
     try {
       final id = await _cartRepository.insert(cart);
-      return await _cartRepository.getById(id);
+      final newCart = await _cartRepository.getById(id);
+      if (newCart != null) {
+        return newCart;
+      }
+      return null;
     } catch (e) {
-      throw Exception('Failed to create cart');
+      if (e is AppError) {
+        rethrow;
+      }
+      throw AppError(
+        type: ErrorType.DB_ERROR,
+        message: 'Failed to create cart',
+      );
     }
   }
 
-  Future<CartModel> updateCart(CartModel cart) async {
+  Future<CartModel?> updateCart(CartModel cart) async {
     try {
       await _cartRepository.update(cart);
-      return await _cartRepository.getById(cart.id);
+      final newCart = await _cartRepository.getById(cart.id);
+      if (newCart != null) {
+        return newCart;
+      }
+      return null;
     } catch (e) {
-      throw Exception('Failed to update cart');
+      throw AppError(
+        type: ErrorType.DB_ERROR,
+        message: 'Failed to update cart',
+      );
     }
   }
 }

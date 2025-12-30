@@ -167,12 +167,15 @@ class ProductProgressService {
     }
   }
 
-  Future<ProductProgressModel> updateOrderStatus(
+  Future<ProductProgressModel?> updateOrderStatus(
     int progressId,
     ProgressStatus newStatus,
   ) async {
     try {
       final progress = await _productProgressRepository.getById(progressId);
+      if (progress == null) {
+        return null;
+      }
       final updatedProgress = ProductProgressModel(
         id: progress.id,
         userId: progress.userId,
@@ -183,7 +186,11 @@ class ProductProgressService {
       );
 
       await _productProgressRepository.update(updatedProgress);
-      return updatedProgress;
+      final newProgress = await _productProgressRepository.getById(progressId);
+      if (newProgress != null) {
+        return newProgress;
+      }
+      return null;
     } catch (e) {
       rethrow;
     }
@@ -276,6 +283,9 @@ class ProductProgressService {
   Future<bool> canCancelOrder(int progressId) async {
     try {
       final progress = await _productProgressRepository.getById(progressId);
+      if (progress == null) {
+        return false;
+      }
       return progress.status == ProgressStatus.waiting ||
           progress.status == ProgressStatus.accepted;
     } catch (e) {
@@ -283,45 +293,64 @@ class ProductProgressService {
     }
   }
 
-  Future<ProductProgressModel> cancelOrder(int progressId) async {
+  Future<ProductProgressModel?> cancelOrder(int progressId) async {
     try {
       final canCancel = await canCancelOrder(progressId);
       if (!canCancel) {
-        throw Exception('Order cannot be cancelled at this stage');
+        return null;
       }
 
-      return await updateOrderStatus(progressId, ProgressStatus.cancelled);
+      final updatedProgress = await updateOrderStatus(
+        progressId,
+        ProgressStatus.cancelled,
+      );
+      if (updatedProgress != null) {
+        return updatedProgress;
+      }
+      return null;
     } catch (e) {
       rethrow;
     }
   }
 
   // Basic CRUD operations
-  Future<ProductProgressModel> createProgress(
+  Future<ProductProgressModel?> createProgress(
     ProductProgressModel progress,
   ) async {
     try {
       final id = await _productProgressRepository.insert(progress);
-      return await _productProgressRepository.getById(id);
+      final newProgress = await _productProgressRepository.getById(id);
+      if (newProgress != null) {
+        return newProgress;
+      }
+      return null;
     } catch (e) {
       rethrow;
     }
   }
 
-  Future<ProductProgressModel> getProgressById(int id) async {
+  Future<ProductProgressModel?> getProgressById(int id) async {
     try {
-      return await _productProgressRepository.getById(id);
+      final newProgress = await _productProgressRepository.getById(id);
+      if (newProgress != null) {
+        return newProgress;
+      }
+      return null;
     } catch (e) {
       rethrow;
     }
   }
 
-  Future<ProductProgressModel> updateProgress(
+  Future<ProductProgressModel?> updateProgress(
     ProductProgressModel progress,
   ) async {
     try {
       await _productProgressRepository.update(progress);
-      return await _productProgressRepository.getById(progress.id);
+      final newProgress = await _productProgressRepository.getById(progress.id);
+      if (newProgress != null) {
+        return newProgress;
+      }
+      return null;
     } catch (e) {
       rethrow;
     }

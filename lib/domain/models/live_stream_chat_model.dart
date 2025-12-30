@@ -1,6 +1,6 @@
 part of domain;
 
-class LiveStreamChatModel  extends Cacheable{
+class LiveStreamChatModel extends Cacheable {
   final int id;
   final String text;
   final int userId;
@@ -19,4 +19,41 @@ class LiveStreamChatModel  extends Cacheable{
     required this.updatedAt,
     this.user,
   });
+
+  factory LiveStreamChatModel.fromMap(
+    Map<String, dynamic> liveStreamChat,
+    UserModel? user,
+  ) {
+    return LiveStreamChatModel(
+      id: liveStreamChat['id'],
+      text: liveStreamChat['text'],
+      userId: liveStreamChat['user_id'],
+      liveStreamId: liveStreamChat['live_stream_id'],
+      createdAt: DateTime.parse(liveStreamChat['created_at']),
+      updatedAt: DateTime.parse(liveStreamChat['updated_at']),
+      user: user,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'text': text,
+      'user_id': userId,
+      'live_stream_id': liveStreamId,
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt.toIso8601String(),
+    };
+  }
+
+  LiveStreamChatUI ui() {
+    return LiveStreamChatUI(username: user?.username ?? 'Unknown', text: text);
+  }
+}
+
+class LiveStreamChatUI {
+  final String username;
+  final String text;
+
+  LiveStreamChatUI({required this.username, required this.text});
 }

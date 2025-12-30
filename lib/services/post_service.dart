@@ -1,3 +1,4 @@
+import 'package:dak_louk/db/repositories/media_repo.dart';
 import 'package:dak_louk/db/repositories/post_repo.dart';
 import 'package:dak_louk/db/repositories/product_repo.dart';
 import 'package:dak_louk/db/repositories/user_repo.dart';
@@ -9,7 +10,7 @@ class PostService {
   final PostRepository _postRepository = PostRepository();
   final UserRepository _userRepository = UserRepository();
   final ProductRepository _productRepository = ProductRepository();
-
+  final MediaRepository _mediaRepository = MediaRepository();
   // Business logic methods migrated from PostRepository
   Future<List<PostModel>> getPostsByUserId(int userId, int limit) async {
     try {
@@ -27,15 +28,15 @@ class PostService {
           final product = await _productRepository.getById(post.productId);
 
           // Get media URLs
-          final db = await _postRepository.database;
-          final mediaResults = await db.query(
-            'medias',
-            where: 'post_id = ?',
-            whereArgs: [post.id],
+          final statement = Clauses.where.eq(
+            Tables.medias.cols.postId,
+            post.id,
           );
-          final mediaUrls = mediaResults
-              .map((media) => media['url'] as String)
-              .toList();
+          final mediaResults = await _mediaRepository.queryThisTable(
+            where: statement.clause,
+            args: statement.args,
+          );
+          final mediaUrls = mediaResults.map((media) => media.url).toList();
 
           return PostModel(
             id: post.id,
@@ -65,7 +66,10 @@ class PostService {
       if (category == 'all') {
         posts = await _postRepository.queryThisTable(limit: limit);
       } else {
-        final statement = Clauses.where.eq('category', category);
+        final statement = Clauses.where.eq(
+          Tables.posts.cols.category,
+          category,
+        );
         posts = await _postRepository.queryThisTable(
           where: statement.clause,
           args: statement.args,
@@ -80,15 +84,16 @@ class PostService {
           final product = await _productRepository.getById(post.productId);
 
           // Get media URLs
-          final db = await _postRepository.database;
-          final mediaResults = await db.query(
-            'medias',
-            where: 'post_id = ?',
-            whereArgs: [post.id],
+          final statement = Clauses.where.eq(
+            Tables.medias.cols.postId,
+            post.id,
           );
-          final mediaUrls = mediaResults
-              .map((media) => media['url'] as String)
-              .toList();
+
+          final mediaResults = await _mediaRepository.queryThisTable(
+            where: statement.clause,
+            args: statement.args,
+          );
+          final mediaUrls = mediaResults.map((media) => media.url).toList();
 
           return PostModel(
             id: post.id,
@@ -125,6 +130,55 @@ class PostService {
     }
   }
 
+  // Migrated from PostDao
+  Future<List<PostModel>> getPostsByLiveStreamId(int liveStreamId) async {
+    try {
+      final statement = Clauses.where.eq(
+        Tables.liveStreams.cols.id,
+        liveStreamId,
+      );
+      final posts = await _postRepository.queryThisTable(
+        where: statement.clause,
+        args: statement.args,
+      );
+
+      // Populate relations like in the original DAO
+      final enrichedPosts = await Future.wait(
+        posts.map((post) async {
+          final user = await _userRepository.getById(post.userId);
+          final product = await _productRepository.getById(post.productId);
+
+          // Get media URLs
+          final statement = Clauses.where.eq(
+            Tables.medias.cols.postId,
+            post.id,
+          );
+          final mediaResults = await _mediaRepository.queryThisTable(
+            where: statement.clause,
+            args: statement.args,
+          );
+          final mediaUrls = mediaResults.map((media) => media.url).toList();
+
+          return PostModel(
+            id: post.id,
+            userId: post.userId,
+            title: post.title,
+            productId: post.productId,
+            createdAt: post.createdAt,
+            updatedAt: post.updatedAt,
+            product: product,
+            user: user,
+            images: mediaUrls,
+          );
+        }),
+      );
+
+      return enrichedPosts;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<List<PostModel>> getRecentPosts({int limit = 20}) async {
     try {
       final orderByStmt = Clauses.orderBy.desc(Tables.posts.cols.createdAt);
@@ -152,13 +206,15 @@ class PostService {
   // Media management
   Future<void> addMediaToPost(int postId, String mediaUrl) async {
     try {
-      final db = await _postRepository.database;
-      await db.insert('medias', {
-        'post_id': postId,
-        'url': mediaUrl,
-        'created_at': DateTime.now().toIso8601String(),
-        'updated_at': DateTime.now().toIso8601String(),
-      });
+      await _mediaRepository.insert(
+        MediaModel(
+          id: 0,
+          postId: postId,
+          url: mediaUrl,
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        ),
+      );
     } catch (e) {
       rethrow;
     }
@@ -166,20 +222,19 @@ class PostService {
 
   Future<List<String>> getPostMediaUrls(int postId) async {
     try {
-      final db = await _postRepository.database;
-      final mediaResults = await db.query(
-        'medias',
-        where: 'post_id = ?',
-        whereArgs: [postId],
+      final statement = Clauses.where.eq(Tables.medias.cols.postId, postId);
+      final mediaResults = await _mediaRepository.queryThisTable(
+        where: statement.clause,
+        args: statement.args,
       );
-      return mediaResults.map((media) => media['url'] as String).toList();
+      return mediaResults.map((media) => media.url).toList();
     } catch (e) {
       rethrow;
     }
   }
 
   // Basic CRUD operations
-  Future<PostModel> createPost(
+  Future<PostModel?> createPost(
     PostModel post, {
     List<String>? mediaUrls,
   }) async {
@@ -193,24 +248,36 @@ class PostService {
         }
       }
 
-      return await _postRepository.getById(id);
+      final newPost = await _postRepository.getById(id);
+      if (newPost != null) {
+        return newPost;
+      }
+      return null;
     } catch (e) {
       rethrow;
     }
   }
 
-  Future<PostModel> getPostById(int id) async {
+  Future<PostModel?> getPostById(int id) async {
     try {
-      return await _postRepository.getById(id);
+      final newPost = await _postRepository.getById(id);
+      if (newPost != null) {
+        return newPost;
+      }
+      return null;
     } catch (e) {
       rethrow;
     }
   }
 
-  Future<PostModel> updatePost(PostModel post) async {
+  Future<PostModel?> updatePost(PostModel post) async {
     try {
       await _postRepository.update(post);
-      return await _postRepository.getById(post.id);
+      final newPost = await _postRepository.getById(post.id);
+      if (newPost != null) {
+        return newPost;
+      }
+      return null;
     } catch (e) {
       rethrow;
     }
@@ -219,8 +286,14 @@ class PostService {
   Future<void> deletePost(int postId) async {
     try {
       // Delete associated media first
-      final db = await _postRepository.database;
-      await db.delete('medias', where: 'post_id = ?', whereArgs: [postId]);
+      final statement = Clauses.where.eq(Tables.medias.cols.postId, postId);
+      final mediaResults = await _mediaRepository.queryThisTable(
+        where: statement.clause,
+        args: statement.args,
+      );
+      for (final media in mediaResults) {
+        await _mediaRepository.delete(media.postId);
+      }
 
       // Delete the post
       await _postRepository.delete(postId);

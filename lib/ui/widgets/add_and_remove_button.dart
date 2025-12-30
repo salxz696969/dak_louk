@@ -75,7 +75,7 @@ class _AddAndRemoveButtonState extends State<AddAndRemoveButton> {
         const SizedBox(width: 5),
         InkWell(
           onTap: () async {
-            if (currentQuantity < widget.cart.product!.quantity) {
+            if (currentQuantity < widget.cart.quantity) {
               setState(() {
                 currentQuantity = currentQuantity + 1;
               });

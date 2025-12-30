@@ -1,13 +1,12 @@
-import 'dart:async';
+import 'package:dak_louk/domain/domain.dart';
 import 'package:dak_louk/services/live_stream_service.dart';
 import 'package:dak_louk/services/post_service.dart';
-import 'package:dak_louk/domain/domain.dart';
 import 'package:dak_louk/ui/screens/chat_screen.dart';
 import 'package:dak_louk/ui/screens/product_info_screen.dart';
 import 'package:dak_louk/ui/widgets/appbar.dart';
+import 'package:dak_louk/ui/screens/fullscreen_video_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:video_player/video_player.dart';
 
 class ProfileScreen extends StatefulWidget {
   final int userId;
@@ -67,6 +66,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       const SizedBox(width: 8),
                       Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             widget.username,
@@ -314,7 +314,6 @@ class _VideoContainer extends StatelessWidget {
   final LiveStreamModel livestream;
 
   const _VideoContainer({required this.livestream});
-
   @override
   Widget build(BuildContext context) {
     return InkWell(
@@ -322,20 +321,18 @@ class _VideoContainer extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => FullScreenVideo(livestream: livestream),
+            builder: (_) => FullScreenVideoScreen(livestream: livestream),
           ),
         );
       },
       child: Stack(
         children: [
           Positioned.fill(
-            child: Image(image: AssetImage(livestream.ui().thumbnail), fit: BoxFit.cover),
+            child: Image(
+              image: AssetImage(livestream.ui().thumbnail),
+              fit: BoxFit.cover,
+            ),
           ),
-
-          const Center(
-            child: Icon(Icons.play_circle_fill, color: Colors.white, size: 48),
-          ),
-
           Positioned(
             bottom: 8,
             right: 8,
@@ -343,7 +340,7 @@ class _VideoContainer extends StatelessWidget {
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
                 color: Colors.black54,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
                 '${livestream.view} views',
@@ -352,165 +349,6 @@ class _VideoContainer extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class FullScreenVideo extends StatefulWidget {
-  final LiveStreamModel livestream;
-
-  const FullScreenVideo({super.key, required this.livestream});
-
-  @override
-  State<FullScreenVideo> createState() => _FullScreenVideoState();
-}
-
-class _FullScreenVideoState extends State<FullScreenVideo> {
-  late VideoPlayerController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _controller = VideoPlayerController.asset(widget.livestream.url)
-      ..initialize().then((_) {
-        if (!mounted) return;
-        setState(() {});
-        _controller.play();
-      });
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        iconTheme: const IconThemeData(color: Colors.white),
-      ),
-      body: Center(
-        child: _controller.value.isInitialized
-            ? Stack(
-                children: [
-                  AspectRatio(
-                    aspectRatio: _controller.value.aspectRatio,
-                    child: VideoPlayer(_controller),
-                  ),
-                  _LiveStreamChatBox(
-                    chats: widget.livestream.ui().liveStreamChats,
-                  ),
-                ],
-              )
-            : const CircularProgressIndicator(),
-      ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.white,
-        onPressed: () {
-          setState(() {
-            _controller.value.isPlaying
-                ? _controller.pause()
-                : _controller.play();
-          });
-        },
-        child: Icon(
-          _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
-          color: Colors.black,
-        ),
-      ),
-    );
-  }
-}
-
-class _LiveStreamChatBox extends StatefulWidget {
-  final List<LiveStreamChatModel> chats;
-
-  const _LiveStreamChatBox({required this.chats});
-
-  @override
-  State<_LiveStreamChatBox> createState() => __LiveStreamChatBoxState();
-}
-
-class __LiveStreamChatBoxState extends State<_LiveStreamChatBox> {
-  late List<LiveStreamChatModel> _messages;
-  late Timer _timer;
-  final ScrollController _scrollController = ScrollController();
-
-  int _counter = 1;
-
-  @override
-  void initState() {
-    super.initState();
-    _messages = List.from(widget.chats);
-
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      setState(() {
-        _messages.add(
-          LiveStreamChatModel(
-            id: DateTime.now().millisecondsSinceEpoch,
-            userId: 0,
-            liveStreamId: 0,
-            text: 'Hello $_counter 👋',
-            createdAt: DateTime.now(),
-            updatedAt: DateTime.now(),
-          ),
-        );
-        _counter++;
-      });
-
-      // auto scroll to bottom
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (_scrollController.hasClients) {
-          _scrollController.animateTo(
-            _scrollController.position.maxScrollExtent,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeOut,
-          );
-        }
-      });
-    });
-  }
-
-  @override
-  void dispose() {
-    _timer.cancel();
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(8),
-      decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.4),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: ListView.builder(
-        controller: _scrollController,
-        itemCount: _messages.length,
-        itemBuilder: (context, index) {
-          final chat = _messages[index];
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 2),
-            child: RichText(
-              text: TextSpan(
-                children: [
-                  TextSpan(
-                    text: chat.text,
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
       ),
     );
   }
@@ -535,7 +373,10 @@ class _PhotoContainer extends StatelessWidget {
       child: Stack(
         children: [
           Positioned.fill(
-            child: Image(image: AssetImage(post.ui().images[0]), fit: BoxFit.cover),
+            child: Image(
+              image: AssetImage(post.ui().images[0]),
+              fit: BoxFit.cover,
+            ),
           ),
           if (post.ui().images.length > 1)
             Positioned(

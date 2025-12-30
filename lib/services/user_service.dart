@@ -77,7 +77,7 @@ class UserService {
     }
   }
 
-  Future<UserModel> createUser(UserModel user) async {
+  Future<UserModel?> createUser(UserModel user) async {
     try {
       final isAvailable = await isUsernameAvailable(user.username);
       if (!isAvailable) {
@@ -85,16 +85,24 @@ class UserService {
       }
 
       final id = await _userRepository.insert(user);
-      return await _userRepository.getById(id);
+      final newUser = await _userRepository.getById(id);
+      if (newUser != null) {
+        return newUser;
+      }
+      return null;
     } catch (e) {
       rethrow;
     }
   }
 
-  Future<UserModel> updateUserProfile(UserModel user) async {
+  Future<UserModel?> updateUserProfile(UserModel user) async {
     try {
       await _userRepository.update(user);
-      return await _userRepository.getById(user.id);
+      final newUser = await _userRepository.getById(user.id);
+      if (newUser != null) {
+        return newUser;
+      }
+      return null;
     } catch (e) {
       rethrow;
     }
@@ -108,9 +116,13 @@ class UserService {
     }
   }
 
-  Future<UserModel> getUserById(int id) async {
+  Future<UserModel?> getUserById(int id) async {
     try {
-      return await _userRepository.getById(id);
+      final newUser = await _userRepository.getById(id);
+      if (newUser != null) {
+        return newUser;
+      }
+      return null;
     } catch (e) {
       rethrow;
     }

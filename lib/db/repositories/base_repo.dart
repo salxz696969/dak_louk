@@ -11,7 +11,7 @@ abstract class BaseRepositoryInterface<T extends Cacheable> {
   Future<List<T>> getAll();
 
   /// Get a model by its ID
-  Future<T> getById(int id);
+  Future<T?> getById(int id);
 
   /// Insert a new model into the database
   Future<int> insert(T model);
@@ -52,7 +52,7 @@ abstract class BaseRepository<T extends Cacheable>
   @override
   Future<List<T>> getAll() async {
     try {
-      final cacheKey = _getBaseCacheKey() + ":all";
+      final cacheKey = '$_getBaseCacheKey():all';
       if (_cache.exists(cacheKey)) {
         final cached = _cache.get(cacheKey);
         return _expectMany(cached);
@@ -75,9 +75,9 @@ abstract class BaseRepository<T extends Cacheable>
   }
 
   @override
-  Future<T> getById(int id) async {
+  Future<T?> getById(int id) async {
     try {
-      final cacheKey = _getBaseCacheKey() + ":$id";
+      final cacheKey = '$_getBaseCacheKey():$id';
       if (_cache.exists(cacheKey)) {
         final cached = _cache.get(cacheKey);
         return _expectSingle(cached);
@@ -94,11 +94,7 @@ abstract class BaseRepository<T extends Cacheable>
         _cache.set(cacheKey, Single(model));
         return model;
       }
-      throw AppError(
-        type: ErrorType.NOT_FOUND,
-        message:
-            '${tableName.substring(0, tableName.length - 1).toUpperCase()} not found',
-      );
+      return null;
     } catch (e) {
       if (e is AppError) {
         rethrow;
@@ -121,10 +117,10 @@ abstract class BaseRepository<T extends Cacheable>
       map.remove('id');
       final id = await db.insert(tableName, map);
       if (id > 0) {
-        // set the single caches
-        _cache.set(cacheKey + ":$id", Single(model));
+        final modelWithId = fromMap({...map, 'id': id});
+        _cache.set('$cacheKey:$id', Single(modelWithId));
         // set the list caches of the model
-        _cache.get(cacheKey + ":all")?.many?.add(model);
+        _cache.get('$cacheKey:all')?.many?.add(modelWithId);
         return id;
       }
       throw AppError(
@@ -132,6 +128,7 @@ abstract class BaseRepository<T extends Cacheable>
         message:
             'Failed to insert ${tableName.substring(0, tableName.length - 1).toUpperCase()}',
       );
+      // set the single caches
     } catch (e) {
       if (e is AppError) {
         rethrow;
@@ -151,26 +148,25 @@ abstract class BaseRepository<T extends Cacheable>
       final cacheKey = _getBaseCacheKey();
       final map = toMap(model);
       final id = map['id'];
-      final statement = Clauses.where.eq(Tables.id, id);
-      final result = await db.update(
-        tableName,
-        map,
-        where: statement.clause,
-        whereArgs: statement.args,
-      );
-      if (result > 0) {
-        final updatedModel = fromMap(map);
-        _cache.set(cacheKey + ":$id", Single(updatedModel));
-        // couldve used id to remove from the list but since cacheble is inaccesable to the id field of the model i couldnt
-        final newCache = await getAll();
-        _cache.set(cacheKey + ":all", Many(newCache));
-        return result;
+      if (id > 0) {
+        final statement = Clauses.where.eq(Tables.id, id);
+        final rowsAffected = await db.update(
+          tableName,
+          map,
+          where: statement.clause,
+          whereArgs: statement.args,
+        );
+        if (rowsAffected > 0) {
+          final updatedModel = fromMap(map);
+          _cache.set('$cacheKey:$id', Single(updatedModel));
+          // couldve used id to remove from the list but since cacheble is inaccesable to the id field of the model i couldnt
+          final newCache = await getAll();
+          _cache.set('$cacheKey:all', Many(newCache));
+          return rowsAffected;
+        }
+        return 0;
       }
-      throw AppError(
-        type: ErrorType.DB_ERROR,
-        message:
-            'Failed to update ${tableName.substring(0, tableName.length - 1).toUpperCase()}',
-      );
+      return 0;
     } catch (e) {
       if (e is AppError) {
         rethrow;
@@ -194,19 +190,12 @@ abstract class BaseRepository<T extends Cacheable>
         where: statement.clause,
         whereArgs: statement.args,
       );
-      if (result > 0) {
-        _cache.del(cacheKey + ":$id");
-        _cache.del(cacheKey + ":all");
-        // couldve used id to remove from the list but since cacheble is inaccesable to the id field of the model i couldnt
-        final newCache = await getAll();
-        _cache.set(cacheKey + ":all", Many(newCache));
-        return result;
-      }
-      throw AppError(
-        type: ErrorType.INTERNAL_ERROR,
-        message:
-            'An unexpected error occurred while deleting ${tableName.substring(0, tableName.length - 1).toUpperCase()}',
-      );
+      _cache.del('$cacheKey:$id');
+      _cache.del('$cacheKey:all');
+      // couldve used id to remove from the list but since cacheble is inaccesable to the id field of the model i couldnt
+      final newCache = await getAll();
+      _cache.set('$cacheKey:all', Many(newCache));
+      return result;
     } catch (e) {
       if (e is AppError) {
         rethrow;
@@ -239,15 +228,8 @@ abstract class BaseRepository<T extends Cacheable>
         offset: offset,
       );
 
-      if (result.isNotEmpty) {
-        // this means that it will convert the database map to a list of models mathching it exactly with no validation
-        return result.map((map) => fromMap(map)).toList();
-      }
-      throw AppError(
-        type: ErrorType.NOT_FOUND,
-        message:
-            '${tableName.substring(0, tableName.length - 1).toUpperCase()} not found',
-      );
+      // this means that it will convert the database map to a list of models mathching it exactly with no validation
+      return result.map((map) => fromMap(map)).toList();
     } catch (e) {
       if (e is AppError) {
         rethrow;

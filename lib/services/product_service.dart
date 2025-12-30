@@ -55,6 +55,29 @@ class ProductService {
     }
   }
 
+  // Migrated from ProductDao
+  Future<List<ProductModel>> getAllProducts(String category, int limit) async {
+    try {
+      if (limit <= 0) limit = 100;
+
+      if (category == 'all') {
+        return await _productRepository.queryThisTable(limit: limit);
+      } else {
+        final statement = Clauses.where.eq(
+          Tables.products.cols.category,
+          category,
+        );
+        return await _productRepository.queryThisTable(
+          where: statement.clause,
+          args: statement.args,
+          limit: limit,
+        );
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   // Additional business logic
   Future<List<ProductModel>> searchProducts(String searchTerm) async {
     try {
@@ -129,18 +152,24 @@ class ProductService {
   Future<bool> isProductAvailable(int productId, int requestedQuantity) async {
     try {
       final product = await _productRepository.getById(productId);
+      if (product == null) {
+        return false;
+      }
       return product.quantity >= requestedQuantity;
     } catch (e) {
       rethrow;
     }
   }
 
-  Future<ProductModel> updateProductQuantity(
+  Future<ProductModel?> updateProductQuantity(
     int productId,
     int newQuantity,
   ) async {
     try {
       final product = await _productRepository.getById(productId);
+      if (product == null) {
+        return null;
+      }
       final updatedProduct = ProductModel(
         id: product.id,
         userId: product.userId,
@@ -155,34 +184,50 @@ class ProductService {
       );
 
       await _productRepository.update(updatedProduct);
-      return updatedProduct;
+      final newProduct = await _productRepository.getById(productId);
+      if (newProduct != null) {
+        return newProduct;
+      }
+      return null;
     } catch (e) {
       rethrow;
     }
   }
 
   // Basic CRUD operations
-  Future<ProductModel> createProduct(ProductModel product) async {
+  Future<ProductModel?> createProduct(ProductModel product) async {
     try {
       final id = await _productRepository.insert(product);
-      return await _productRepository.getById(id);
+      final newProduct = await _productRepository.getById(id);
+      if (newProduct != null) {
+        return newProduct;
+      }
+      return null;
     } catch (e) {
       rethrow;
     }
   }
 
-  Future<ProductModel> getProductById(int id) async {
+  Future<ProductModel?> getProductById(int id) async {
     try {
-      return await _productRepository.getById(id);
+      final newProduct = await _productRepository.getById(id);
+      if (newProduct != null) {
+        return newProduct;
+      }
+      return null;
     } catch (e) {
       rethrow;
     }
   }
 
-  Future<ProductModel> updateProduct(ProductModel product) async {
+  Future<ProductModel?> updateProduct(ProductModel product) async {
     try {
       await _productRepository.update(product);
-      return await _productRepository.getById(product.id);
+      final newProduct = await _productRepository.getById(product.id);
+      if (newProduct != null) {
+        return newProduct;
+      }
+      return null;
     } catch (e) {
       rethrow;
     }
@@ -196,7 +241,7 @@ class ProductService {
     }
   }
 
-  Future<List<ProductModel>> getAllProducts() async {
+  Future<List<ProductModel>> getAllProductsSimple() async {
     try {
       return await _productRepository.getAll();
     } catch (e) {
