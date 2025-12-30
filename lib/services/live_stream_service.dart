@@ -161,9 +161,12 @@ class LiveStreamService {
     }
   }
 
-  Future<LiveStreamModel> incrementViewCount(int liveStreamId) async {
+  Future<LiveStreamModel?> incrementViewCount(int liveStreamId) async {
     try {
       final liveStream = await _liveStreamRepository.getById(liveStreamId);
+      if (liveStream == null) {
+        return null;
+      }
       final updatedLiveStream = LiveStreamModel(
         id: liveStream.id,
         url: liveStream.url,
@@ -183,9 +186,12 @@ class LiveStreamService {
   }
 
   // Get live stream with all relations populated
-  Future<LiveStreamModel> getLiveStreamWithRelations(int liveStreamId) async {
+  Future<LiveStreamModel?> getLiveStreamWithRelations(int liveStreamId) async {
     try {
       final liveStream = await _liveStreamRepository.getById(liveStreamId);
+      if (liveStream == null) {
+        return null;
+      }
       final user = await _userRepository.getById(liveStream.userId);
 
       // Get products associated with this live stream
@@ -231,27 +237,39 @@ class LiveStreamService {
   }
 
   // Basic CRUD operations
-  Future<LiveStreamModel> createLiveStream(LiveStreamModel liveStream) async {
+  Future<LiveStreamModel?> createLiveStream(LiveStreamModel liveStream) async {
     try {
       final id = await _liveStreamRepository.insert(liveStream);
-      return await _liveStreamRepository.getById(id);
+      final newLiveStream = await _liveStreamRepository.getById(id);
+      if (newLiveStream != null) {
+        return newLiveStream;
+      }
+      return null;
     } catch (e) {
       rethrow;
     }
   }
 
-  Future<LiveStreamModel> getLiveStreamById(int id) async {
+  Future<LiveStreamModel?> getLiveStreamById(int id) async {
     try {
-      return await _liveStreamRepository.getById(id);
+      final newLiveStream = await _liveStreamRepository.getById(id);
+      if (newLiveStream != null) {
+        return newLiveStream;
+      }
+      return null;
     } catch (e) {
       rethrow;
     }
   }
 
-  Future<LiveStreamModel> updateLiveStream(LiveStreamModel liveStream) async {
+  Future<LiveStreamModel?> updateLiveStream(LiveStreamModel liveStream) async {
     try {
       await _liveStreamRepository.update(liveStream);
-      return await _liveStreamRepository.getById(liveStream.id);
+      final newLiveStream = await _liveStreamRepository.getById(liveStream.id);
+      if (newLiveStream != null) {
+        return newLiveStream;
+      }
+      return null;
     } catch (e) {
       rethrow;
     }
@@ -275,14 +293,6 @@ class LiveStreamService {
 
       // Delete the live stream
       await _liveStreamRepository.delete(liveStreamId);
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  Future<List<LiveStreamModel>> getAllLiveStreamsSimple() async {
-    try {
-      return await _liveStreamRepository.getAll();
     } catch (e) {
       rethrow;
     }

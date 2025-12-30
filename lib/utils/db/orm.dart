@@ -111,57 +111,57 @@ class _Like {
 
 // i want to use it like: RawQuery.select().from().join().on() bt its just wrongly implemented
 
-class RawQuery {
-  RawQuery();
-  static _Select select(List<String> columns) {
-    return _Select(columns);
-  }
-}
+// class RawQuery {
+//   RawQuery();
+//   static _Select select(List<String> columns) {
+//     return _Select(columns);
+//   }
+// }
 
-class _Select {
-  const _Select(this.columns);
+// class _Select {
+//   const _Select(this.columns);
 
-  final List<String> columns;
-  static _From from(String table) {
-    return _From(table);
-  }
-}
+//   final List<String> columns;
+//   static _From from(String table) {
+//     return _From(table);
+//   }
+// }
 
-class _From {
-  final String table;
+// class _From {
+//   final String table;
 
-  const _From(this.table);
+//   const _From(this.table);
 
-  static _Join join(String table) {
-    return _Join(table);
-  }
+//   static _Join join(String table) {
+//     return _Join(table);
+//   }
 
-  static _Where where(_Where condition) {
-    return _Where(condition.clause, condition.args);
-  }
+//   static _Where where(_Where condition) {
+//     return _Where(condition.clause, condition.args);
+//   }
 
-  static _OrderBy orderBy(_OrderBy orderBy) {
-    return _OrderBy(orderBy.clause);
-  }
-}
+//   static _OrderBy orderBy(_OrderBy orderBy) {
+//     return _OrderBy(orderBy.clause);
+//   }
+// }
 
-class _Join {
-  final String table;
+// class _Join {
+//   final String table;
 
-  const _Join(this.table);
+//   const _Join(this.table);
 
-  static _On on(String column, String value) {
-    return _On(column, value);
-  }
-}
+//   static _On on(String column, String value) {
+//     return _On(column, value);
+//   }
+// }
 
-class _On {
-  final String column;
-  final String value;
+// class _On {
+//   final String column;
+//   final String value;
 
-  const _On(this.column, this.value);
+//   const _On(this.column, this.value);
 
-  static _On on(String column, String value) {
-    return _On(column, value);
-  }
-}
+//   static _On on(String column, String value) {
+//     return _On(column, value);
+//   }
+// }

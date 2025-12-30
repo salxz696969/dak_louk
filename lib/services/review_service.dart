@@ -144,17 +144,22 @@ class ReviewService {
     }
   }
 
-  Future<List<ReviewModel>> getReviewsWithUserInfo(int targetUserId) async {
+  Future<List<ReviewModel?>> getReviewsWithUserInfo(int targetUserId) async {
     try {
-      final reviews = await getReviewsByTargetUserId(
-        await _userRepository.getById(targetUserId),
-      );
+      final targetUser = await _userRepository.getById(targetUserId);
+      if (targetUser == null) {
+        return [];
+      }
+      final reviews = await getReviewsByTargetUserId(targetUser);
 
       // Populate user information for each review
       final enrichedReviews = await Future.wait(
         reviews.map((review) async {
           final user = await _userRepository.getById(review.userId);
           final targetUser = await _userRepository.getById(review.targetUserId);
+          if (user == null || targetUser == null) {
+            return null;
+          }
           return ReviewModel(
             id: review.id,
             userId: review.userId,
@@ -235,6 +240,9 @@ class ReviewService {
     try {
       final averageRating = await getAverageRatingForUser(targetUserId);
       final targetUser = await _userRepository.getById(targetUserId);
+      if (targetUser == null) {
+        return;
+      }
 
       final updatedUser = UserModel(
         id: targetUser.id,
@@ -255,7 +263,7 @@ class ReviewService {
   }
 
   // Basic CRUD operations with rating updates
-  Future<ReviewModel> createReview(ReviewModel review) async {
+  Future<ReviewModel?> createReview(ReviewModel review) async {
     try {
       // Check if user has already reviewed this target
       final existingReview = await getUserReviewForTarget(
@@ -272,21 +280,28 @@ class ReviewService {
       // Update target user's rating
       await updateUserRating(review.targetUserId);
 
-      return createdReview;
+      if (createdReview != null) {
+        return createdReview;
+      }
+      return null;
     } catch (e) {
       rethrow;
     }
   }
 
-  Future<ReviewModel> getReviewById(int id) async {
+  Future<ReviewModel?> getReviewById(int id) async {
     try {
-      return await _reviewRepository.getById(id);
+      final newReview = await _reviewRepository.getById(id);
+      if (newReview != null) {
+        return newReview;
+      }
+      return null;
     } catch (e) {
       rethrow;
     }
   }
 
-  Future<ReviewModel> updateReview(ReviewModel review) async {
+  Future<ReviewModel?> updateReview(ReviewModel review) async {
     try {
       await _reviewRepository.update(review);
       final updatedReview = await _reviewRepository.getById(review.id);
@@ -294,7 +309,10 @@ class ReviewService {
       // Update target user's rating
       await updateUserRating(review.targetUserId);
 
-      return updatedReview;
+      if (updatedReview != null) {
+        return updatedReview;
+      }
+      return null;
     } catch (e) {
       rethrow;
     }
@@ -306,7 +324,7 @@ class ReviewService {
       await _reviewRepository.delete(reviewId);
 
       // Update target user's rating
-      await updateUserRating(review.targetUserId);
+      await updateUserRating(review!.targetUserId);
     } catch (e) {
       rethrow;
     }

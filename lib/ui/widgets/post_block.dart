@@ -45,7 +45,11 @@ class _PostBlockState extends State<PostBlock> {
         ),
         PhotoSlider(
           quantity: widget.post.ui().quantity,
-          images: widget.post.ui().images.map((image) => AssetImage(image)).toList(),
+          images: widget.post
+              .ui()
+              .images
+              .map((image) => AssetImage(image))
+              .toList(),
         ),
         if (widget.post.ui().images.isNotEmpty) const SizedBox(height: 8.0),
         Padding(padding: const EdgeInsets.symmetric(horizontal: 12.0)),
@@ -161,7 +165,7 @@ class _AddToCartButtonState extends State<_AddToCartButton> {
       ),
     );
     setState(() {
-      cartId = cart.id;
+      cartId = cart!.id;
     });
     setState(() {
       isAdded = true;

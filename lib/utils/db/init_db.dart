@@ -74,7 +74,7 @@ Future<void> initDb(Database db) async {
         image_url TEXT,
         created_at TEXT,
         updated_at TEXT,
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
       )
     ''');
 
@@ -214,10 +214,10 @@ final lastNames = [
   'Young',
 ];
 
-String randomName(Random rand) {
+String randomName(Random rand, int userId) {
   final first = firstNames[rand.nextInt(firstNames.length)];
   final last = lastNames[rand.nextInt(lastNames.length)];
-  return '$first $last';
+  return '$first $last $userId'; // Add userId to ensure uniqueness
 }
 
 // Your other mock data arrays
@@ -283,7 +283,7 @@ Future<void> insertMockData(Database db) async {
   for (int i = 1; i <= 100; i++) {
     await db.insert('users', {
       'id': i,
-      'username': randomName(rand),
+      'username': randomName(rand, i),
       'password_hash': 'hash_user$i',
       'profile_image_url': profileImage,
       'rating': (rand.nextDouble() * 2) + 3.0,

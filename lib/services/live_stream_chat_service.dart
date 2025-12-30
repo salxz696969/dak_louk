@@ -210,27 +210,39 @@ class LiveStreamChatService {
   }
 
   // Basic CRUD operations
-  Future<LiveStreamChatModel> sendMessage(LiveStreamChatModel chat) async {
+  Future<LiveStreamChatModel?> sendMessage(LiveStreamChatModel chat) async {
     try {
       final id = await _liveStreamChatRepository.insert(chat);
-      return await _liveStreamChatRepository.getById(id);
+      final newChat = await _liveStreamChatRepository.getById(id);
+      if (newChat != null) {
+        return newChat;
+      }
+      return null;
     } catch (e) {
       rethrow;
     }
   }
 
-  Future<LiveStreamChatModel> getChatById(int id) async {
+  Future<LiveStreamChatModel?> getChatById(int id) async {
     try {
-      return await _liveStreamChatRepository.getById(id);
+      final newChat = await _liveStreamChatRepository.getById(id);
+      if (newChat != null) {
+        return newChat;
+      }
+      return null;
     } catch (e) {
       rethrow;
     }
   }
 
-  Future<LiveStreamChatModel> updateChat(LiveStreamChatModel chat) async {
+  Future<LiveStreamChatModel?> updateChat(LiveStreamChatModel chat) async {
     try {
       await _liveStreamChatRepository.update(chat);
-      return await _liveStreamChatRepository.getById(chat.id);
+      final newChat = await _liveStreamChatRepository.getById(chat.id);
+      if (newChat != null) {
+        return newChat;
+      }
+      return null;
     } catch (e) {
       rethrow;
     }
