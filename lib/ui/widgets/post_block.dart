@@ -88,8 +88,8 @@ class _ActionsAndMeta extends StatelessWidget {
                   userId: 1,
                   productId: ui.productId,
                   quantity: int.parse(ui.quantity),
-                  createdAt: DateTime.now().toIso8601String(),
-                  updatedAt: DateTime.now().toIso8601String(),
+                  createdAt: DateTime.now(),
+                  updatedAt: DateTime.now(),
                 ),
               ),
             ],
@@ -160,8 +160,8 @@ class _AddToCartButtonState extends State<_AddToCartButton> {
         userId: widget.cart.userId,
         productId: widget.cart.productId,
         quantity: 1,
-        createdAt: DateTime.now().toIso8601String(),
-        updatedAt: DateTime.now().toIso8601String(),
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
       ),
     );
     setState(() {

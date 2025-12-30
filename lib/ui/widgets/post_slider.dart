@@ -88,7 +88,10 @@ class _SimilarItemCardState extends State<_SimilarItemCard> {
                 children: [
                   AspectRatio(
                     aspectRatio: 4 / 3,
-                    child: Image(image: AssetImage(ui.images[0]), fit: BoxFit.cover),
+                    child: Image(
+                      image: AssetImage(ui.images[0]),
+                      fit: BoxFit.cover,
+                    ),
                   ),
                   Positioned(
                     top: 8,
@@ -220,8 +223,8 @@ class _SimilarItemCardState extends State<_SimilarItemCard> {
                                     userId: 1,
                                     productId: ui.productId,
                                     quantity: int.parse(ui.quantity),
-                                    createdAt: DateTime.now().toIso8601String(),
-                                    updatedAt: DateTime.now().toIso8601String(),
+                                    createdAt: DateTime.now(),
+                                    updatedAt: DateTime.now(),
                                   ),
                                 ),
                               )

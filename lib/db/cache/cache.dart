@@ -52,6 +52,8 @@ abstract class CacheInterface {
 
   /// Get the cache size
   int getSize();
+
+  List<CacheValue> getAll();
 }
 
 class Cache implements CacheInterface {
@@ -70,7 +72,7 @@ class Cache implements CacheInterface {
 
   @override
   CacheValue? get(String key) {
-    return _cache[key] as CacheValue;
+    return _cache[key];
   }
 
   @override
@@ -91,5 +93,10 @@ class Cache implements CacheInterface {
   @override
   int getSize() {
     return _cache.length;
+  }
+
+  @override
+  List<CacheValue> getAll() {
+    return _cache.values.toList();
   }
 }

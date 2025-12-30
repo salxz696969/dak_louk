@@ -7,6 +7,9 @@ class UserRepository extends BaseRepository<UserModel> {
   String get tableName => Tables.users.tableName;
 
   @override
+  BaseCols get cols => Tables.users.cols;
+
+  @override
   UserModel fromMap(Map<String, dynamic> user) {
     return UserModel(
       // didn't use string in bracket because we want to make sure it matches the schema as well

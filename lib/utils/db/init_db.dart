@@ -3,162 +3,165 @@ import 'package:dak_louk/domain/domain.dart';
 import 'package:sqflite/sqflite.dart';
 
 Future<void> initDb(Database db) async {
-  // users
+  // 1️⃣ USERS - Base table, no dependencies
   await db.execute('''
       CREATE TABLE users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT UNIQUE,
-        password_hash TEXT,
+        username TEXT UNIQUE NOT NULL,
+        password_hash TEXT NOT NULL,
         profile_image_url TEXT,
-        rating REAL,
+        rating REAL DEFAULT 0.0,
         bio TEXT,
-        role TEXT CHECK(role IN ('user', 'merchant')),
-        created_at TEXT,
-        updated_at TEXT
+        role TEXT CHECK(role IN ('user', 'merchant')) DEFAULT 'user',
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL
       )
     ''');
 
-  // posts
+  // 2️⃣ PRODUCTS - Depends on users only
+  await db.execute('''
+      CREATE TABLE products (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        title TEXT NOT NULL,
+        description TEXT,
+        category TEXT CHECK(category IN ('vehicles','property','electronics','home','fashion','jobs','services','entertainment','kids','pets','business','others')),
+        price REAL NOT NULL,
+        quantity INTEGER DEFAULT 1,
+        image_url TEXT,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      )
+    ''');
+
+  // 3️⃣ LIVE_STREAMS - Depends on users only
+  await db.execute('''
+      CREATE TABLE live_streams (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        url TEXT NOT NULL,
+        user_id INTEGER NOT NULL,
+        title TEXT NOT NULL,
+        thumbnail_url TEXT,
+        view INTEGER DEFAULT 0,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      )
+    ''');
+
+  // 4️⃣ POSTS - Bridge table connecting products and live_streams
   await db.execute('''
       CREATE TABLE posts (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER,
-        title TEXT,
-        product_id INTEGER,
+        user_id INTEGER NOT NULL,
+        title TEXT NOT NULL,
+        product_id INTEGER NOT NULL,
         live_stream_id INTEGER,
-        category TEXT CHECK(category IN ('vehicles','property','electronics','home','fashion','jobs','services','entertainment','kids','pets','business','others')),
-        created_at TEXT,
-        updated_at TEXT,
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
         FOREIGN KEY (live_stream_id) REFERENCES live_streams(id) ON DELETE SET NULL
       )
     ''');
 
-  // live_streams
-  await db.execute('''
-      CREATE TABLE live_streams (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        url TEXT,
-        user_id INTEGER,
-        title TEXT,
-        thumbnail_url TEXT,
-        view INTEGER,
-        created_at TEXT,
-        updated_at TEXT,
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-      )
-    ''');
-
-  // medias
+  // 5️⃣ MEDIAS - Depends on posts
   await db.execute('''
       CREATE TABLE medias (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        url TEXT,
-        post_id INTEGER,
-        created_at TEXT,
-        updated_at TEXT,
+        url TEXT NOT NULL,
+        post_id INTEGER NOT NULL,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
         FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
       )
     ''');
 
-  // products
-  await db.execute('''
-      CREATE TABLE products (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER,
-        title TEXT,
-        description TEXT,
-        category TEXT CHECK(category IN ('vehicles','property','electronics','home','fashion','jobs','services','entertainment','kids','pets','business','others')),
-        price REAL,
-        quantity INTEGER DEFAULT 1,
-        image_url TEXT,
-        created_at TEXT,
-        updated_at TEXT,
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-      )
-    ''');
-
-  // product_progress
-  await db.execute('''
-      CREATE TABLE product_progress (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER,
-        product_id INTEGER,
-        status TEXT CHECK(status IN ('waiting','accepted','delivering','completed','cancelled')),
-        created_at TEXT,
-        updated_at TEXT,
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-        FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
-      )
-    ''');
-
-  // chat_rooms
+  // 6️⃣ CHAT_ROOMS - Depends on users
   await db.execute('''
       CREATE TABLE chat_rooms (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER,
-        target_user_id INTEGER,
-        created_at TEXT,
-        updated_at TEXT,
+        user_id INTEGER NOT NULL,
+        target_user_id INTEGER NOT NULL,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-        FOREIGN KEY (target_user_id) REFERENCES users(id) ON DELETE CASCADE
+        FOREIGN KEY (target_user_id) REFERENCES users(id) ON DELETE CASCADE,
+        UNIQUE(user_id, target_user_id)
       )
     ''');
 
-  // chats
+  // 7️⃣ CHATS - Depends on chat_rooms and users
   await db.execute('''
       CREATE TABLE chats (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER,
-        chat_room_id INTEGER,
-        text TEXT,
-        created_at TEXT,
-        updated_at TEXT,
+        user_id INTEGER NOT NULL,
+        chat_room_id INTEGER NOT NULL,
+        text TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
         FOREIGN KEY (chat_room_id) REFERENCES chat_rooms(id) ON DELETE CASCADE,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
       )
     ''');
 
-  // live_stream_chats
+  // 8️⃣ LIVE_STREAM_CHATS - Depends on live_streams and users
   await db.execute('''
       CREATE TABLE live_stream_chats (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        text TEXT,
-        user_id INTEGER,
-        live_stream_id INTEGER,
-        created_at TEXT,
-        updated_at TEXT,
+        text TEXT NOT NULL,
+        user_id INTEGER NOT NULL,
+        live_stream_id INTEGER NOT NULL,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
         FOREIGN KEY (live_stream_id) REFERENCES live_streams(id) ON DELETE CASCADE
       )
     ''');
 
-  // reviews
+  // 9️⃣ REVIEWS - Depends on users (both reviewer and target)
   await db.execute('''
       CREATE TABLE reviews (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER,
-        target_user_id INTEGER,
-        text TEXT,
-        rating REAL,
-        created_at TEXT,
-        updated_at TEXT,
+        user_id INTEGER NOT NULL,
+        target_user_id INTEGER NOT NULL,
+        text TEXT NOT NULL,
+        rating REAL NOT NULL CHECK(rating >= 0.0 AND rating <= 5.0),
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-        FOREIGN KEY (target_user_id) REFERENCES users(id) ON DELETE CASCADE
+        FOREIGN KEY (target_user_id) REFERENCES users(id) ON DELETE CASCADE,
+        UNIQUE(user_id, target_user_id)
       )
     ''');
 
-  // carts
+  // 🔟 PRODUCT_PROGRESS - Depends on users and products
+  await db.execute('''
+      CREATE TABLE product_progress (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        product_id INTEGER NOT NULL,
+        status TEXT CHECK(status IN ('waiting','accepted','delivering','completed','cancelled')) DEFAULT 'waiting',
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+      )
+    ''');
+
+  // 1️⃣1️⃣ CARTS - Depends on users and products
   await db.execute('''
       CREATE TABLE carts (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER,
-        product_id INTEGER,
-        quantity INTEGER,
-        created_at TEXT,
-        updated_at TEXT,
+        user_id INTEGER NOT NULL,
+        product_id INTEGER NOT NULL,
+        quantity INTEGER DEFAULT 1 CHECK(quantity > 0),
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-        FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+        FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+        UNIQUE(user_id, product_id)
       )
     ''');
 }
@@ -326,16 +329,16 @@ Future<void> insertMockData(Database db) async {
     });
   }
 
-  // 4️⃣ POSTS
+  // 4️⃣ POSTS - Bridge between products and live streams
   for (int i = 1; i <= 100; i++) {
     await db.insert('posts', {
       'id': 100 + i,
       'user_id': 1,
       'title': postTitles[rand.nextInt(postTitles.length)],
-      'product_id': rand.nextInt(49) + 1,
-      'live_stream_id': rand.nextInt(19) + 1,
-      'category':
-          ProductCategory.values[i % ProductCategory.values.length].name,
+      'product_id': rand.nextInt(50) + 1, // 1-50 products available
+      'live_stream_id': i <= 50
+          ? rand.nextInt(20) + 1
+          : null, // Only half have live streams
       'created_at': now,
       'updated_at': now,
     });
@@ -353,24 +356,27 @@ Future<void> insertMockData(Database db) async {
     }
   }
 
-  // 6️⃣ CHAT ROOMS
+  // 6️⃣ CHAT ROOMS - Unique pairs of users
   for (int i = 1; i <= 10; i++) {
+    final targetUserId = i + 1 <= 100
+        ? i + 1
+        : 1; // Wrap around to avoid out of bounds
     await db.insert('chat_rooms', {
       'id': i,
       'user_id': i,
-      'target_user_id': i + 1,
+      'target_user_id': targetUserId,
       'created_at': now,
       'updated_at': now,
     });
   }
 
-  // 7️⃣ CHATS
+  // 7️⃣ CHATS - Messages in chat rooms
   int chatId = 1;
   for (int roomId = 1; roomId <= 10; roomId++) {
     for (int j = 0; j < 5; j++) {
       await db.insert('chats', {
         'id': chatId++,
-        'user_id': roomId,
+        'user_id': roomId, // Sender is the room creator
         'chat_room_id': roomId,
         'text': chatMessages[rand.nextInt(chatMessages.length)],
         'created_at': now,
@@ -394,17 +400,17 @@ Future<void> insertMockData(Database db) async {
     }
   }
 
-  // 9️⃣ REVIEWS
+  // 9️⃣ REVIEWS - One review per user pair (unique constraint)
   int reviewId = 1;
   for (int target = 1; target <= 10; target++) {
-    for (int reviewer = 1; reviewer <= 10; reviewer++) {
-      if (reviewer == target) continue;
+    for (int reviewer = 11; reviewer <= 20; reviewer++) {
+      // Different users to avoid self-review
       await db.insert('reviews', {
         'id': reviewId++,
         'user_id': reviewer,
         'target_user_id': target,
         'text': reviewMessages[rand.nextInt(reviewMessages.length)],
-        'rating': (rand.nextDouble() * 2) + 3.0,
+        'rating': (rand.nextDouble() * 2) + 3.0, // 3.0 to 5.0 rating
         'created_at': now,
         'updated_at': now,
       });
@@ -424,14 +430,25 @@ Future<void> insertMockData(Database db) async {
     });
   }
 
-  // 1️⃣1️⃣ CARTS
+  // 1️⃣1️⃣ CARTS - Unique user-product pairs
   int cartId = 1;
   for (int userId = 1; userId <= 20; userId++) {
+    // Create a set to track products already in cart for this user
+    final productsInCart = <int>{};
     for (int j = 0; j < 3; j++) {
+      int productId;
+      do {
+        productId = rand.nextInt(50) + 1;
+      } while (productsInCart.contains(
+        productId,
+      )); // Ensure unique product per user
+
+      productsInCart.add(productId);
+
       await db.insert('carts', {
         'id': cartId++,
         'user_id': userId,
-        'product_id': rand.nextInt(50) + 1,
+        'product_id': productId,
         'quantity': rand.nextInt(3) + 1,
         'created_at': now,
         'updated_at': now,

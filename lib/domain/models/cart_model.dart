@@ -5,8 +5,8 @@ class CartModel extends Cacheable {
   final int userId;
   final int productId;
   final int quantity;
-  final String updatedAt;
-  final String createdAt;
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
   final UserModel? user;
   final ProductModel? product;
