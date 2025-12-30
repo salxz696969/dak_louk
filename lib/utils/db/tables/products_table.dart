@@ -16,7 +16,6 @@ class ProductsCols extends BaseCols {
   static const String categoryCol = 'category';
   static const String priceCol = 'price';
   static const String quantityCol = 'quantity';
-  static const String liveStreamIdCol = 'live_stream_id';
   static const String imageCol = 'image_url';
 
   String get userId => userIdCol;
@@ -25,6 +24,5 @@ class ProductsCols extends BaseCols {
   String get category => categoryCol;
   String get price => priceCol;
   String get quantity => quantityCol;
-  String get liveStreamId => liveStreamIdCol;
   String get image => imageCol;
 }

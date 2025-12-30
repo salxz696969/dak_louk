@@ -79,7 +79,6 @@ abstract class BaseRepository<T extends Cacheable>
     try {
       final cacheKey = '${_getBaseCacheKey()}:$id';
       if (_cache.exists(cacheKey)) {
-        _cache.flushAll();
         final cached = _cache.get(cacheKey);
         return _expectSingle(cached);
       }
