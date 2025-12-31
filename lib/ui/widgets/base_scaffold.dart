@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:dak_louk/ui/screens/home_screen.dart';
-import 'package:dak_louk/ui/screens/chat_screen.dart';
+import 'package:dak_louk/ui/screens/chat_room_screen_.dart';
 import 'package:dak_louk/ui/screens/live_stream_screen.dart';
 import 'package:dak_louk/ui/screens/setting_screen.dart';
 import 'package:dak_louk/ui/screens/cart_screen.dart';
@@ -20,7 +20,7 @@ class BaseScaffold extends StatefulWidget {
 class _BaseScaffoldState extends State<BaseScaffold> {
   static const List<Widget> _tabs = [
     HomeScreen(),
-    ChatScreen(),
+    ChatRoomScreen(),
     LiveStreamScreen(),
     SettingScreen(),
   ];

@@ -13,8 +13,8 @@ class ChatRepository extends BaseRepository<ChatModel> {
       userId: map[Tables.chats.cols.userId] as int,
       text: map[Tables.chats.cols.text] as String,
       chatRoomId: map[Tables.chats.cols.chatRoomId] as int,
-      createdAt: map[Tables.chats.cols.createdAt] as DateTime,
-      updatedAt: map[Tables.chats.cols.updatedAt] as DateTime,
+      createdAt: DateTime.parse(map[Tables.chats.cols.createdAt] as String),
+      updatedAt: DateTime.parse(map[Tables.chats.cols.updatedAt] as String),
     );
   }
 
@@ -25,8 +25,8 @@ class ChatRepository extends BaseRepository<ChatModel> {
       Tables.chats.cols.userId: model.userId,
       Tables.chats.cols.text: model.text,
       Tables.chats.cols.chatRoomId: model.chatRoomId,
-      Tables.chats.cols.createdAt: model.createdAt,
-      Tables.chats.cols.updatedAt: model.updatedAt,
+      Tables.chats.cols.createdAt: model.createdAt.toIso8601String(),
+      Tables.chats.cols.updatedAt: model.updatedAt.toIso8601String(),
     };
   }
 }

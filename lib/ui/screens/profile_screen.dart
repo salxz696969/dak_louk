@@ -1,7 +1,7 @@
 import 'package:dak_louk/domain/domain.dart';
 import 'package:dak_louk/services/live_stream_service.dart';
 import 'package:dak_louk/services/post_service.dart';
-import 'package:dak_louk/ui/screens/chat_screen.dart';
+import 'package:dak_louk/ui/screens/chat_room_screen_.dart';
 import 'package:dak_louk/ui/screens/product_info_screen.dart';
 import 'package:dak_louk/ui/widgets/appbar.dart';
 import 'package:dak_louk/ui/screens/fullscreen_video_screen.dart';
@@ -98,7 +98,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => ChatScreen()),
+                        MaterialPageRoute(
+                          builder: (context) => ChatRoomScreen(),
+                        ),
                       );
                     },
                     child: Icon(
