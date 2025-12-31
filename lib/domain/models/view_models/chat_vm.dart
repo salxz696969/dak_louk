@@ -8,13 +8,9 @@ class ChatVM extends Cacheable {
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  // Related data
-  final UserVM? sender;
-
-  // UI-specific computed properties
-  final String displaySenderName;
-  final String displayProfileImage;
-  final String timeAgo;
+  // Related primitive data
+  final String? senderName;
+  final String? senderProfileImage;
   final bool isFromCurrentUser;
 
   ChatVM({
@@ -24,17 +20,16 @@ class ChatVM extends Cacheable {
     required this.text,
     required this.createdAt,
     required this.updatedAt,
-    this.sender,
-    int? currentUserId,
-  })  : displaySenderName = sender?.username ?? 'Unknown',
-        displayProfileImage = sender?.displayProfileImage ?? 'assets/profiles/profile1.png',
-        timeAgo = _timeAgo(createdAt),
-        isFromCurrentUser = currentUserId != null && senderId == currentUserId;
+    this.senderName,
+    this.senderProfileImage,
+    this.isFromCurrentUser = false,
+  });
 
   factory ChatVM.fromRaw(
     ChatModel raw, {
-    UserVM? sender,
-    int? currentUserId,
+    String? senderName,
+    String? senderProfileImage,
+    bool isFromCurrentUser = false,
   }) {
     return ChatVM(
       id: raw.id,
@@ -43,32 +38,9 @@ class ChatVM extends Cacheable {
       text: raw.text,
       createdAt: raw.createdAt,
       updatedAt: raw.updatedAt,
-      sender: sender,
-      currentUserId: currentUserId,
+      senderName: senderName,
+      senderProfileImage: senderProfileImage,
+      isFromCurrentUser: isFromCurrentUser,
     );
-  }
-
-  static String _timeAgo(DateTime date) {
-    final now = DateTime.now();
-    final difference = now.difference(date);
-
-    if (difference.inSeconds < 60) {
-      return '${difference.inSeconds}s ago';
-    } else if (difference.inMinutes < 60) {
-      return '${difference.inMinutes}m ago';
-    } else if (difference.inHours < 24) {
-      return '${difference.inHours}h ago';
-    } else if (difference.inDays < 7) {
-      return '${difference.inDays}d ago';
-    } else if (difference.inDays < 30) {
-      final weeks = (difference.inDays / 7).floor();
-      return '${weeks}w ago';
-    } else if (difference.inDays < 365) {
-      final months = (difference.inDays / 30).floor();
-      return '${months}mo ago';
-    } else {
-      final years = (difference.inDays / 365).floor();
-      return '${years}y ago';
-    }
   }
 }

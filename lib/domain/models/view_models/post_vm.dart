@@ -7,20 +7,15 @@ class PostVM extends Cacheable {
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  // Related data
-  final UserVM? merchant;
-  final List<ProductVM>? products;
-  final List<PromoMediaVM>? medias;
-  final int? likesCount;
-  final int? savesCount;
-  final bool? isLiked;
-  final bool? isSaved;
-
-  // UI-specific computed properties
-  final String displayCaption;
-  final String timeAgo;
-  final List<String> displayImages;
-  final String primaryImage;
+  // Related primitive data
+  final String? merchantName;
+  final String? merchantProfileImage;
+  final List<String>? mediaUrls;
+  final List<String>? productNames;
+  final int likesCount;
+  final int savesCount;
+  final bool isLiked;
+  final bool isSaved;
 
   PostVM({
     required this.id,
@@ -28,30 +23,26 @@ class PostVM extends Cacheable {
     this.caption,
     required this.createdAt,
     required this.updatedAt,
-    this.merchant,
-    this.products,
-    this.medias,
-    this.likesCount,
-    this.savesCount,
-    this.isLiked,
-    this.isSaved,
-  }) : displayCaption = caption ?? '',
-       timeAgo = _timeAgo(createdAt),
-       displayImages =
-           medias?.map((m) => m.url).toList() ?? ['assets/promo/coffee1.jpg'],
-       primaryImage = medias?.isNotEmpty == true
-           ? medias!.first.url
-           : 'assets/promo/coffee1.jpg';
+    this.merchantName,
+    this.merchantProfileImage,
+    this.mediaUrls,
+    this.productNames,
+    this.likesCount = 0,
+    this.savesCount = 0,
+    this.isLiked = false,
+    this.isSaved = false,
+  });
 
   factory PostVM.fromRaw(
     PostModel raw, {
-    UserVM? merchant,
-    List<ProductVM>? products,
-    List<PromoMediaVM>? medias,
-    int? likesCount,
-    int? savesCount,
-    bool? isLiked,
-    bool? isSaved,
+    String? merchantName,
+    String? merchantProfileImage,
+    List<String>? mediaUrls,
+    List<String>? productNames,
+    int likesCount = 0,
+    int savesCount = 0,
+    bool isLiked = false,
+    bool isSaved = false,
   }) {
     return PostVM(
       id: raw.id,
@@ -59,9 +50,10 @@ class PostVM extends Cacheable {
       caption: raw.caption,
       createdAt: raw.createdAt,
       updatedAt: raw.updatedAt,
-      merchant: merchant,
-      products: products,
-      medias: medias,
+      merchantName: merchantName,
+      merchantProfileImage: merchantProfileImage,
+      mediaUrls: mediaUrls,
+      productNames: productNames,
       likesCount: likesCount,
       savesCount: savesCount,
       isLiked: isLiked,
@@ -69,32 +61,6 @@ class PostVM extends Cacheable {
     );
   }
 
-  static String _timeAgo(DateTime date) {
-    final now = DateTime.now();
-    final difference = now.difference(date);
-
-    if (difference.inSeconds < 60) {
-      return '${difference.inSeconds}s ago';
-    } else if (difference.inMinutes < 60) {
-      return '${difference.inMinutes}m ago';
-    } else if (difference.inHours < 24) {
-      return '${difference.inHours}h ago';
-    } else if (difference.inDays < 7) {
-      return '${difference.inDays}d ago';
-    } else if (difference.inDays < 30) {
-      final weeks = (difference.inDays / 7).floor();
-      return '${weeks}w ago';
-    } else if (difference.inDays < 365) {
-      final months = (difference.inDays / 30).floor();
-      return '${months}mo ago';
-    } else {
-      final years = (difference.inDays / 365).floor();
-      return '${years}y ago';
-    }
-  }
-
-  String get displayLikesCount => likesCount?.toString() ?? '0';
-  String get displaySavesCount => savesCount?.toString() ?? '0';
-  ProductVM? get primaryProduct =>
-      products?.isNotEmpty == true ? products!.first : null;
+  // Simple getters
+  String? get primaryMediaUrl => mediaUrls?.isNotEmpty == true ? mediaUrls!.first : null;
 }

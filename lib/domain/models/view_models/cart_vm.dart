@@ -8,18 +8,12 @@ class CartVM extends Cacheable {
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  // Related data
-  final UserVM? user;
-  final ProductVM? product;
-
-  // UI-specific computed properties
-  final String displayProductName;
-  final String displayPrice;
-  final String displayTotalPrice;
-  final String displayQuantity;
-  final String displayMerchantName;
-  final String displayMerchantRating;
-  final String displayProductImage;
+  // Related primitive data
+  final String? productName;
+  final double? productPrice;
+  final String? productImageUrl;
+  final String? merchantName;
+  final int? productQuantityAvailable;
 
   CartVM({
     required this.id,
@@ -28,21 +22,21 @@ class CartVM extends Cacheable {
     required this.quantity,
     required this.createdAt,
     required this.updatedAt,
-    this.user,
-    this.product,
-  }) : displayProductName = product?.name ?? 'Unknown Product',
-       displayPrice = product?.displayPrice ?? '\$0.00',
-       displayTotalPrice = _calculateTotalPrice(
-         product?.price ?? 0.0,
-         quantity,
-       ),
-       displayQuantity = quantity.toString(),
-       displayMerchantName = product?.merchant?.username ?? 'Unknown Merchant',
-       displayMerchantRating = product?.merchant?.displayRating ?? '0.00',
-       displayProductImage =
-           product?.primaryImage ?? 'assets/images/coffee1.png';
+    this.productName,
+    this.productPrice,
+    this.productImageUrl,
+    this.merchantName,
+    this.productQuantityAvailable,
+  });
 
-  factory CartVM.fromRaw(CartModel raw, {UserVM? user, ProductVM? product}) {
+  factory CartVM.fromRaw(
+    CartModel raw, {
+    String? productName,
+    double? productPrice,
+    String? productImageUrl,
+    String? merchantName,
+    int? productQuantityAvailable,
+  }) {
     return CartVM(
       id: raw.id,
       userId: raw.userId,
@@ -50,19 +44,14 @@ class CartVM extends Cacheable {
       quantity: raw.quantity,
       createdAt: raw.createdAt,
       updatedAt: raw.updatedAt,
-      user: user,
-      product: product,
+      productName: productName,
+      productPrice: productPrice,
+      productImageUrl: productImageUrl,
+      merchantName: merchantName,
+      productQuantityAvailable: productQuantityAvailable,
     );
   }
 
-  static String _calculateTotalPrice(double unitPrice, int quantity) {
-    final total = unitPrice * quantity;
-    return '\$${total.toStringAsFixed(2)}';
-  }
-
-  double get totalPrice => (product?.price ?? 0.0) * quantity;
-
-  bool get isAvailable => product?.isInStock ?? false;
-
-  String get availabilityStatus => isAvailable ? 'Available' : 'Out of Stock';
+  // Simple getters
+  double get totalPrice => (productPrice ?? 0.0) * quantity;
 }

@@ -10,17 +10,11 @@ class ProductVM extends Cacheable {
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  // Related data
-  final UserVM? merchant;
-  final List<ProductMediaVM>? medias;
+  // Related primitive data
+  final String? merchantName;
+  final String? merchantProfileImage;
+  final List<String>? mediaUrls;
   final List<String>? categories;
-
-  // UI-specific computed properties
-  final String displayPrice;
-  final String displayQuantity;
-  final String displayDescription;
-  final List<String> displayImages;
-  final String primaryImage;
 
   ProductVM({
     required this.id,
@@ -31,19 +25,17 @@ class ProductVM extends Cacheable {
     required this.quantity,
     required this.createdAt,
     required this.updatedAt,
-    this.merchant,
-    this.medias,
+    this.merchantName,
+    this.merchantProfileImage,
+    this.mediaUrls,
     this.categories,
-  })  : displayPrice = '\$${price.toStringAsFixed(2)}',
-        displayQuantity = quantity.toString(),
-        displayDescription = description ?? '',
-        displayImages = medias?.map((m) => m.url).toList() ?? ['assets/images/coffee1.png'],
-        primaryImage = medias?.isNotEmpty == true ? medias!.first.url : 'assets/images/coffee1.png';
+  });
 
   factory ProductVM.fromRaw(
     ProductModel raw, {
-    UserVM? merchant,
-    List<ProductMediaVM>? medias,
+    String? merchantName,
+    String? merchantProfileImage,
+    List<String>? mediaUrls,
     List<String>? categories,
   }) {
     return ProductVM(
@@ -55,15 +47,14 @@ class ProductVM extends Cacheable {
       quantity: raw.quantity,
       createdAt: raw.createdAt,
       updatedAt: raw.updatedAt,
-      merchant: merchant,
-      medias: medias,
+      merchantName: merchantName,
+      merchantProfileImage: merchantProfileImage,
+      mediaUrls: mediaUrls,
       categories: categories,
     );
   }
 
-  String get categoriesDisplay => categories?.join(', ') ?? '';
-  
-  bool get isInStock => quantity > 0;
-  
-  String get stockStatus => isInStock ? 'In Stock' : 'Out of Stock';
+  // Simple getters
+  String? get primaryImageUrl =>
+      mediaUrls?.isNotEmpty == true ? mediaUrls!.first : null;
 }

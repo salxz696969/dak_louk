@@ -26,7 +26,7 @@ class ChatRoomService {
         userId,
       );
       final targetStatement1 = Clauses.where.eq(
-        Tables.chatRooms.cols.targetUserId,
+        Tables.chatRooms.cols.merchantId,
         targetUserId,
       );
       final orStatement1 = Clauses.where.and([
@@ -39,7 +39,7 @@ class ChatRoomService {
         targetUserId,
       );
       final targetStatement2 = Clauses.where.eq(
-        Tables.chatRooms.cols.targetUserId,
+        Tables.chatRooms.cols.merchantId,
         userId,
       );
       final orStatement2 = Clauses.where.and([
@@ -89,19 +89,12 @@ class ChatRoomService {
         // Populate relations like in the original DAO
         final enrichedChatRooms = await Future.wait(
           result.map((chatRoom) async {
-            final user = await _userRepository.getById(userId);
-            final targetUser = await _userRepository.getById(
-              chatRoom.targetUserId,
-            );
-
             return ChatRoomModel(
               id: chatRoom.id,
               userId: chatRoom.userId,
-              targetUserId: chatRoom.targetUserId,
+              merchantId: chatRoom.merchantId,
               createdAt: chatRoom.createdAt,
               updatedAt: chatRoom.updatedAt,
-              user: user,
-              targetUser: targetUser,
             );
           }),
         );

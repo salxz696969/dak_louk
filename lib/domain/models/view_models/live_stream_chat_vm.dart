@@ -8,13 +8,9 @@ class LiveStreamChatVM extends Cacheable {
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  // Related data
-  final UserVM? user;
-
-  // UI-specific computed properties
-  final String displayUsername;
-  final String displayProfileImage;
-  final String timeAgo;
+  // Related primitive data
+  final String? userName;
+  final String? userProfileImage;
 
   LiveStreamChatVM({
     required this.id,
@@ -23,14 +19,14 @@ class LiveStreamChatVM extends Cacheable {
     required this.text,
     required this.createdAt,
     required this.updatedAt,
-    this.user,
-  })  : displayUsername = user?.username ?? 'Unknown',
-        displayProfileImage = user?.displayProfileImage ?? 'assets/profiles/profile1.png',
-        timeAgo = _timeAgo(createdAt);
+    this.userName,
+    this.userProfileImage,
+  });
 
   factory LiveStreamChatVM.fromRaw(
     LiveStreamChatModel raw, {
-    UserVM? user,
+    String? userName,
+    String? userProfileImage,
   }) {
     return LiveStreamChatVM(
       id: raw.id,
@@ -39,31 +35,8 @@ class LiveStreamChatVM extends Cacheable {
       text: raw.text,
       createdAt: raw.createdAt,
       updatedAt: raw.updatedAt,
-      user: user,
+      userName: userName,
+      userProfileImage: userProfileImage,
     );
-  }
-
-  static String _timeAgo(DateTime date) {
-    final now = DateTime.now();
-    final difference = now.difference(date);
-
-    if (difference.inSeconds < 60) {
-      return '${difference.inSeconds}s ago';
-    } else if (difference.inMinutes < 60) {
-      return '${difference.inMinutes}m ago';
-    } else if (difference.inHours < 24) {
-      return '${difference.inHours}h ago';
-    } else if (difference.inDays < 7) {
-      return '${difference.inDays}d ago';
-    } else if (difference.inDays < 30) {
-      final weeks = (difference.inDays / 7).floor();
-      return '${weeks}w ago';
-    } else if (difference.inDays < 365) {
-      final months = (difference.inDays / 30).floor();
-      return '${months}mo ago';
-    } else {
-      final years = (difference.inDays / 365).floor();
-      return '${years}y ago';
-    }
   }
 }

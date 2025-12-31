@@ -8,10 +8,6 @@ class ProductMediaVM extends Cacheable {
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  // UI-specific computed properties
-  final bool isVideo;
-  final bool isImage;
-
   ProductMediaVM({
     required this.id,
     required this.productId,
@@ -19,8 +15,7 @@ class ProductMediaVM extends Cacheable {
     this.mediaType,
     required this.createdAt,
     required this.updatedAt,
-  })  : isVideo = mediaType == 'video',
-        isImage = mediaType == 'image' || mediaType == null;
+  });
 
   factory ProductMediaVM.fromRaw(ProductMediaModel raw) {
     return ProductMediaVM(
@@ -32,4 +27,8 @@ class ProductMediaVM extends Cacheable {
       updatedAt: raw.updatedAt,
     );
   }
+
+  // Simple getters
+  bool get isVideo => mediaType == 'video';
+  bool get isImage => mediaType == 'image' || mediaType == null;
 }

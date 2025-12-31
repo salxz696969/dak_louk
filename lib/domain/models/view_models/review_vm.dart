@@ -9,18 +9,10 @@ class ReviewVM extends Cacheable {
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  // Related data
-  final UserVM? user;
-  final UserVM? merchant;
-
-  // UI-specific computed properties
-  final String displayText;
-  final String displayRating;
-  final String displayUserName;
-  final String displayUserImage;
-  final String displayMerchantName;
-  final String timeAgo;
-  final int starRating;
+  // Related primitive data
+  final String? userName;
+  final String? userProfileImage;
+  final String? merchantName;
 
   ReviewVM({
     required this.id,
@@ -30,20 +22,16 @@ class ReviewVM extends Cacheable {
     this.rating,
     required this.createdAt,
     required this.updatedAt,
-    this.user,
-    this.merchant,
-  })  : displayText = text ?? '',
-        displayRating = rating?.toStringAsFixed(1) ?? '0.0',
-        displayUserName = user?.username ?? 'Anonymous',
-        displayUserImage = user?.displayProfileImage ?? 'assets/profiles/profile1.png',
-        displayMerchantName = merchant?.username ?? 'Unknown Merchant',
-        timeAgo = _timeAgo(createdAt),
-        starRating = (rating?.round() ?? 0).clamp(0, 5);
+    this.userName,
+    this.userProfileImage,
+    this.merchantName,
+  });
 
   factory ReviewVM.fromRaw(
     ReviewModel raw, {
-    UserVM? user,
-    UserVM? merchant,
+    String? userName,
+    String? userProfileImage,
+    String? merchantName,
   }) {
     return ReviewVM(
       id: raw.id,
@@ -53,37 +41,12 @@ class ReviewVM extends Cacheable {
       rating: raw.rating,
       createdAt: raw.createdAt,
       updatedAt: raw.updatedAt,
-      user: user,
-      merchant: merchant,
+      userName: userName,
+      userProfileImage: userProfileImage,
+      merchantName: merchantName,
     );
   }
 
-  static String _timeAgo(DateTime date) {
-    final now = DateTime.now();
-    final difference = now.difference(date);
-
-    if (difference.inSeconds < 60) {
-      return '${difference.inSeconds}s ago';
-    } else if (difference.inMinutes < 60) {
-      return '${difference.inMinutes}m ago';
-    } else if (difference.inHours < 24) {
-      return '${difference.inHours}h ago';
-    } else if (difference.inDays < 7) {
-      return '${difference.inDays}d ago';
-    } else if (difference.inDays < 30) {
-      final weeks = (difference.inDays / 7).floor();
-      return '${weeks}w ago';
-    } else if (difference.inDays < 365) {
-      final months = (difference.inDays / 30).floor();
-      return '${months}mo ago';
-    } else {
-      final years = (difference.inDays / 365).floor();
-      return '${years}y ago';
-    }
-  }
-
-  bool get hasText => text != null && text!.isNotEmpty;
-  bool get hasRating => rating != null && rating! > 0;
-  bool get isPositive => rating != null && rating! >= 4.0;
-  bool get isNegative => rating != null && rating! <= 2.0;
+  // Simple getters
+  int get starRating => (rating?.round() ?? 0).clamp(0, 5);
 }
