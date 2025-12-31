@@ -1,6 +1,6 @@
 import 'package:dak_louk/data/repositories/base_repo.dart';
 import 'package:dak_louk/data/tables/tables.dart';
-import 'package:dak_louk/domain/models/index.dart';
+import 'package:dak_louk/domain/models/models.dart';
 
 class ReviewRepository extends BaseRepository<ReviewModel> {
   @override

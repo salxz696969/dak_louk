@@ -1,15 +1,11 @@
 import 'package:dak_louk/data/repositories/live_stream_repo.dart';
-import 'package:dak_louk/data/repositories/user_repo.dart';
-import 'package:dak_louk/data/repositories/product_repo.dart';
 import 'package:dak_louk/data/repositories/live_stream_chat_repo.dart';
-import 'package:dak_louk/domain/models/index.dart';
+import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/core/utils/orm.dart';
 import 'package:dak_louk/data/tables/tables.dart';
 
 class LiveStreamService {
   final LiveStreamRepository _liveStreamRepository = LiveStreamRepository();
-  final UserRepository _userRepository = UserRepository();
-  final ProductRepository _productRepository = ProductRepository();
   final LiveStreamChatRepository _liveStreamChatRepository =
       LiveStreamChatRepository();
 
@@ -20,7 +16,7 @@ class LiveStreamService {
   ) async {
     try {
       final statement = Clauses.where.eq(
-        Tables.liveStreams.cols.userId,
+        Tables.liveStreams.cols.merchantId,
         userId,
       );
       final liveStreams = await _liveStreamRepository.queryThisTable(
@@ -33,29 +29,15 @@ class LiveStreamService {
         // Populate relations like in the original DAO
         final enrichedLiveStreams = await Future.wait(
           liveStreams.map((liveStream) async {
-            final user = await _userRepository.getById(liveStream.userId);
-
-            // Get products associated with this live stream
-            final productStatement = Clauses.where.eq(
-              Tables.products.cols.userId,
-              liveStream.id,
-            );
-            final products = await _productRepository.queryThisTable(
-              where: productStatement.clause,
-              args: productStatement.args,
-            );
-
             return LiveStreamModel(
               id: liveStream.id,
-              url: liveStream.url,
-              userId: liveStream.userId,
+              streamUrl: liveStream.streamUrl,
+              merchantId: liveStream.merchantId,
               title: liveStream.title,
               thumbnailUrl: liveStream.thumbnailUrl,
-              view: liveStream.view,
+              viewCount: liveStream.viewCount,
               createdAt: liveStream.createdAt,
               updatedAt: liveStream.updatedAt,
-              user: user,
-              products: products,
             );
           }),
         );
@@ -105,29 +87,15 @@ class LiveStreamService {
         // Populate relations like in the original DAO
         final enrichedLiveStreams = await Future.wait(
           liveStreams.map((liveStream) async {
-            final user = await _userRepository.getById(liveStream.userId);
-
-            // Get products associated with this live stream
-            final productStatement = Clauses.where.eq(
-              Tables.products.cols.userId,
-              liveStream.id,
-            );
-            final products = await _productRepository.queryThisTable(
-              where: productStatement.clause,
-              args: productStatement.args,
-            );
-
             return LiveStreamModel(
               id: liveStream.id,
-              url: liveStream.url,
-              userId: liveStream.userId,
+              streamUrl: liveStream.streamUrl,
+              merchantId: liveStream.merchantId,
               title: liveStream.title,
               thumbnailUrl: liveStream.thumbnailUrl,
-              view: liveStream.view,
+              viewCount: liveStream.viewCount,
               createdAt: liveStream.createdAt,
               updatedAt: liveStream.updatedAt,
-              user: user,
-              products: products,
             );
           }),
         );

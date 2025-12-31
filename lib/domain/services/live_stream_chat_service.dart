@@ -1,6 +1,6 @@
 import 'package:dak_louk/data/repositories/live_stream_chat_repo.dart';
 import 'package:dak_louk/data/repositories/user_repo.dart';
-import 'package:dak_louk/domain/models/index.dart';
+import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/core/utils/orm.dart';
 import 'package:dak_louk/data/tables/tables.dart';
 
@@ -27,7 +27,6 @@ class LiveStreamChatService {
         // Populate user relations like in the original DAO
         final enrichedChats = await Future.wait(
           chats.map((chat) async {
-            final user = await _userRepository.getById(chat.userId);
             return LiveStreamChatModel(
               id: chat.id,
               text: chat.text,
@@ -35,7 +34,6 @@ class LiveStreamChatService {
               liveStreamId: chat.liveStreamId,
               createdAt: chat.createdAt,
               updatedAt: chat.updatedAt,
-              user: user,
             );
           }),
         );
@@ -106,7 +104,6 @@ class LiveStreamChatService {
       // Populate user information for each chat
       final enrichedChats = await Future.wait(
         chats.map((chat) async {
-          final user = await _userRepository.getById(chat.userId);
           return LiveStreamChatModel(
             id: chat.id,
             text: chat.text,
@@ -114,7 +111,6 @@ class LiveStreamChatService {
             liveStreamId: chat.liveStreamId,
             createdAt: chat.createdAt,
             updatedAt: chat.updatedAt,
-            user: user,
           );
         }),
       );

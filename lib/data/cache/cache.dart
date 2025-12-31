@@ -1,4 +1,4 @@
-import 'package:dak_louk/domain/models/index.dart';
+import 'package:dak_louk/domain/models/models.dart';
 
 // cache value is a wrapper class to wrap single and many, it has methods like single and many for the usage of the result of the get method
 // example: final cacheValue = cache.get<PostModel>('post:1');

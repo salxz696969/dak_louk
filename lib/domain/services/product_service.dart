@@ -1,5 +1,5 @@
 import 'package:dak_louk/data/repositories/product_repo.dart';
-import 'package:dak_louk/domain/models/index.dart';
+import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/core/utils/orm.dart';
 import 'package:dak_louk/data/tables/tables.dart';
 
@@ -31,7 +31,7 @@ class ProductService {
   ) async {
     try {
       final statement = Clauses.where.eq(
-        Tables.products.cols.userId,
+        Tables.liveStreamProducts.cols.liveStreamId,
         liveStreamId,
       );
       final result = await _productRepository.queryThisTable(
@@ -50,7 +50,7 @@ class ProductService {
   Future<List<ProductModel>> getProductsByCategory(String category) async {
     try {
       final statement = Clauses.where.eq(
-        Tables.products.cols.category,
+        Tables.productCategories.cols.name,
         category,
       );
       return await _productRepository.queryThisTable(
@@ -64,7 +64,10 @@ class ProductService {
 
   Future<List<ProductModel>> getProductsByUserId(int userId) async {
     try {
-      final statement = Clauses.where.eq(Tables.products.cols.userId, userId);
+      final statement = Clauses.where.eq(
+        Tables.products.cols.merchantId,
+        userId,
+      );
       return await _productRepository.queryThisTable(
         where: statement.clause,
         args: statement.args,
@@ -83,7 +86,7 @@ class ProductService {
         return await _productRepository.queryThisTable(limit: limit);
       } else {
         final statement = Clauses.where.eq(
-          Tables.products.cols.category,
+          Tables.productCategories.cols.name,
           category,
         );
         return await _productRepository.queryThisTable(
@@ -101,7 +104,7 @@ class ProductService {
   Future<List<ProductModel>> searchProducts(String searchTerm) async {
     try {
       final titleStatement = Clauses.like.like(
-        Tables.products.cols.title,
+        Tables.products.cols.name,
         searchTerm,
       );
       final descStatement = Clauses.like.like(
@@ -191,15 +194,13 @@ class ProductService {
       }
       final updatedProduct = ProductModel(
         id: product.id,
-        userId: product.userId,
-        title: product.title,
+        merchantId: product.merchantId,
+        name: product.name,
         description: product.description,
-        category: product.category,
         price: product.price,
         quantity: newQuantity,
         createdAt: product.createdAt,
         updatedAt: DateTime.now(),
-        image: product.image,
       );
 
       await _productRepository.update(updatedProduct);

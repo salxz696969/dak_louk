@@ -1,48 +1,31 @@
-import 'package:dak_louk/data/repositories/product_progress_dao.dart';
-import 'package:dak_louk/data/repositories/product_repo.dart';
-import 'package:dak_louk/data/repositories/user_repo.dart';
-import 'package:dak_louk/domain/models/index.dart';
+import 'package:dak_louk/data/repositories/order_repo.dart';
+import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/core/utils/orm.dart';
 import 'package:dak_louk/data/tables/tables.dart';
 
 class ProductProgressService {
-  final ProductProgressRepository _productProgressRepository =
-      ProductProgressRepository();
-  final ProductRepository _productRepository = ProductRepository();
-  final UserRepository _userRepository = UserRepository();
+  final OrderRepository _orderRepository = OrderRepository();
 
   // Business logic methods migrated from ProductProgressRepository
-  Future<List<ProductProgressModel>> getProductProgressesByUserId(
-    int userId,
-  ) async {
+  Future<List<OrderModel>> getProductProgressesByUserId(int userId) async {
     try {
-      final statement = Clauses.where.eq(
-        Tables.productProgress.cols.userId,
-        userId,
-      );
-      final progresses = await _productProgressRepository.queryThisTable(
+      final statement = Clauses.where.eq(Tables.orders.cols.userId, userId);
+      final progresses = await _orderRepository.queryThisTable(
         where: statement.clause,
         args: statement.args,
-        orderBy: Clauses.orderBy
-            .desc(Tables.productProgress.cols.createdAt)
-            .clause,
+        orderBy: Clauses.orderBy.desc(Tables.orders.cols.createdAt).clause,
       );
 
       // Populate relations
       final enrichedProgresses = await Future.wait(
         progresses.map((progress) async {
-          final product = await _productRepository.getById(progress.productId);
-          final user = await _userRepository.getById(progress.userId);
-
-          return ProductProgressModel(
+          return OrderModel(
             id: progress.id,
             userId: progress.userId,
-            productId: progress.productId,
+            merchantId: progress.merchantId,
             status: progress.status,
             createdAt: progress.createdAt,
             updatedAt: progress.updatedAt,
-            user: user,
-            product: product,
           );
         }),
       );

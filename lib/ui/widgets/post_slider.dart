@@ -1,4 +1,4 @@
-import 'package:dak_louk/domain/models/index.dart';
+import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/ui/screens/product_info_screen.dart';
 import 'package:dak_louk/ui/widgets/add_and_remove_button.dart';
 import 'package:flutter/cupertino.dart';

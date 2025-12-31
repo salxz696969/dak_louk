@@ -1,6 +1,6 @@
 import 'package:dak_louk/data/repositories/review_repo.dart';
 import 'package:dak_louk/data/repositories/user_repo.dart';
-import 'package:dak_louk/domain/models/index.dart';
+import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/core/utils/orm.dart';
 import 'package:dak_louk/data/tables/tables.dart';
 
@@ -14,7 +14,7 @@ class ReviewService {
   ) async {
     try {
       final statement = Clauses.where.eq(
-        Tables.reviews.cols.targetUserId,
+        Tables.reviews.cols.merchantId,
         targetUser.id,
       );
       final reviews = await _reviewRepository.queryThisTable(
@@ -48,7 +48,7 @@ class ReviewService {
   Future<double> getAverageRatingForUser(int targetUserId) async {
     try {
       final statement = Clauses.where.eq(
-        Tables.reviews.cols.targetUserId,
+        Tables.reviews.cols.merchantId,
         targetUserId,
       );
       final reviews = await _reviewRepository.queryThisTable(
@@ -60,9 +60,9 @@ class ReviewService {
         return 0.0;
       }
 
-      final totalRating = reviews.fold<double>(
+      final totalRating = reviews.fold<num>(
         0.0,
-        (sum, review) => sum + review.rating,
+        (sum, review) => sum + (review.rating ?? 0),
       );
       return totalRating / reviews.length;
     } catch (e) {
@@ -73,7 +73,7 @@ class ReviewService {
   Future<int> getReviewCountForUser(int targetUserId) async {
     try {
       final statement = Clauses.where.eq(
-        Tables.reviews.cols.targetUserId,
+        Tables.reviews.cols.merchantId,
         targetUserId,
       );
       final reviews = await _reviewRepository.queryThisTable(
@@ -156,20 +156,18 @@ class ReviewService {
       final enrichedReviews = await Future.wait(
         reviews.map((review) async {
           final user = await _userRepository.getById(review.userId);
-          final targetUser = await _userRepository.getById(review.targetUserId);
+          final targetUser = await _userRepository.getById(review.merchantId);
           if (user == null || targetUser == null) {
             return null;
           }
           return ReviewModel(
             id: review.id,
             userId: review.userId,
-            targetUserId: review.targetUserId,
+            merchantId: review.merchantId,
             rating: review.rating,
             text: review.text,
             createdAt: review.createdAt,
             updatedAt: review.updatedAt,
-            user: user,
-            targetUser: targetUser,
           );
         }),
       );
@@ -187,7 +185,7 @@ class ReviewService {
         userId,
       );
       final targetStatement = Clauses.where.eq(
-        Tables.reviews.cols.targetUserId,
+        Tables.reviews.cols.merchantId,
         targetUserId,
       );
       final combinedStatement = Clauses.where.and([
@@ -208,7 +206,7 @@ class ReviewService {
 
   Future<ReviewModel?> getUserReviewForTarget(
     int userId,
-    int targetUserId,
+    int merchantId,
   ) async {
     try {
       final userStatement = Clauses.where.eq(
@@ -216,8 +214,8 @@ class ReviewService {
         userId,
       );
       final targetStatement = Clauses.where.eq(
-        Tables.reviews.cols.targetUserId,
-        targetUserId,
+        Tables.reviews.cols.merchantId,
+        merchantId,
       );
       final combinedStatement = Clauses.where.and([
         userStatement,
@@ -236,23 +234,23 @@ class ReviewService {
   }
 
   // Update user's overall rating after review changes
-  Future<void> updateUserRating(int targetUserId) async {
+  Future<void> updateUserRating(int merchantId) async {
     try {
-      final averageRating = await getAverageRatingForUser(targetUserId);
-      final targetUser = await _userRepository.getById(targetUserId);
-      if (targetUser == null) {
+      final averageRating = await getAverageRatingForUser(merchantId);
+      final merchant = await _userRepository.getById(merchantId);
+      if (merchant == null) {
         return;
       }
 
       final updatedUser = UserModel(
-        id: targetUser.id,
-        username: targetUser.username,
-        passwordHash: targetUser.passwordHash,
-        profileImageUrl: targetUser.profileImageUrl,
+        id: merchant.id,
+        username: merchant.username,
+        passwordHash: merchant.passwordHash,
+        profileImageUrl: merchant.profileImageUrl,
         rating: averageRating,
-        role: targetUser.role,
-        bio: targetUser.bio,
-        createdAt: targetUser.createdAt,
+        role: merchant.role,
+        bio: merchant.bio,
+        createdAt: merchant.createdAt,
         updatedAt: DateTime.now(),
       );
 
@@ -268,7 +266,7 @@ class ReviewService {
       // Check if user has already reviewed this target
       final existingReview = await getUserReviewForTarget(
         review.userId,
-        review.targetUserId,
+        review.merchantId,
       );
       if (existingReview != null) {
         throw Exception('User has already reviewed this target');
@@ -278,7 +276,7 @@ class ReviewService {
       final createdReview = await _reviewRepository.getById(id);
 
       // Update target user's rating
-      await updateUserRating(review.targetUserId);
+      await updateUserRating(review.merchantId);
 
       if (createdReview != null) {
         return createdReview;
@@ -307,7 +305,7 @@ class ReviewService {
       final updatedReview = await _reviewRepository.getById(review.id);
 
       // Update target user's rating
-      await updateUserRating(review.targetUserId);
+      await updateUserRating(review.merchantId);
 
       if (updatedReview != null) {
         return updatedReview;
@@ -324,7 +322,7 @@ class ReviewService {
       await _reviewRepository.delete(reviewId);
 
       // Update target user's rating
-      await updateUserRating(review!.targetUserId);
+      await updateUserRating(review!.merchantId);
     } catch (e) {
       rethrow;
     }

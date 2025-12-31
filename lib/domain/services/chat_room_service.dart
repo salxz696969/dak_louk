@@ -1,6 +1,6 @@
 import 'package:dak_louk/data/repositories/chat_room_repo.dart';
 import 'package:dak_louk/data/repositories/user_repo.dart';
-import 'package:dak_louk/domain/models/index.dart';
+import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/core/utils/orm.dart';
 import 'package:dak_louk/data/tables/tables.dart';
 

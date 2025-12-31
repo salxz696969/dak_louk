@@ -1,7 +1,7 @@
 import 'package:dak_louk/domain/services/post_service.dart';
 import 'package:dak_louk/ui/widgets/category_bar.dart';
 import 'package:dak_louk/ui/widgets/post_block.dart';
-import 'package:dak_louk/domain/models/index.dart';
+import 'package:dak_louk/domain/models/models.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {

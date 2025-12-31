@@ -1,4 +1,4 @@
-import 'package:dak_louk/domain/models/index.dart';
+import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/domain/services/live_stream_service.dart';
 import 'package:dak_louk/domain/services/post_service.dart';
 import 'package:dak_louk/ui/screens/chat_room_screen_.dart';

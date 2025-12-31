@@ -1,14 +1,12 @@
 import 'package:dak_louk/data/repositories/chat_repo.dart';
 import 'package:dak_louk/data/repositories/chat_room_repo.dart';
-import 'package:dak_louk/data/repositories/user_repo.dart';
-import 'package:dak_louk/domain/models/index.dart';
+import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/core/utils/orm.dart';
 import 'package:dak_louk/data/tables/tables.dart';
 
 class ChatService {
   final ChatRepository _chatRepository = ChatRepository();
   final ChatRoomRepository _chatRoomRepository = ChatRoomRepository();
-  final UserRepository _userRepository = UserRepository();
 
   // Migrated from ChatDao.insertChat
   Future<int> insertChat(ChatModel chat) async {
@@ -31,7 +29,7 @@ class ChatService {
         userId,
       );
       final targetStatement1 = Clauses.where.eq(
-        Tables.chatRooms.cols.targetUserId,
+        Tables.chatRooms.cols.merchantId,
         targetUserId,
       );
       final orStatement1 = Clauses.where.and([
@@ -44,7 +42,7 @@ class ChatService {
         targetUserId,
       );
       final targetStatement2 = Clauses.where.eq(
-        Tables.chatRooms.cols.targetUserId,
+        Tables.chatRooms.cols.merchantId,
         userId,
       );
       final orStatement2 = Clauses.where.and([
@@ -93,15 +91,13 @@ class ChatService {
         // Populate user information for each chat
         final enrichedChats = await Future.wait(
           result.map((chat) async {
-            final user = await _userRepository.getById(chat.userId);
             return ChatModel(
               id: chat.id,
-              userId: chat.userId,
+              senderId: chat.senderId,
               text: chat.text,
               chatRoomId: chat.chatRoomId,
               createdAt: chat.createdAt,
               updatedAt: chat.updatedAt,
-              user: user,
             );
           }),
         );
@@ -112,7 +108,7 @@ class ChatService {
       return [
         ChatModel(
           id: 0,
-          userId: 0,
+          senderId: 0,
           text: '',
           chatRoomId: chatRoomId,
           createdAt: DateTime.now(),
@@ -160,15 +156,13 @@ class ChatService {
 
       if (result.isNotEmpty) {
         final chat = result.first;
-        final user = await _userRepository.getById(chat.userId);
         return ChatModel(
           id: chat.id,
-          userId: chat.userId,
+          senderId: chat.senderId,
           text: chat.text,
           chatRoomId: chat.chatRoomId,
           createdAt: chat.createdAt,
           updatedAt: chat.updatedAt,
-          user: user,
         );
       }
       throw Exception('Chat not found');
