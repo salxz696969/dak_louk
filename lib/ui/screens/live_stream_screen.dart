@@ -1,5 +1,5 @@
 import 'package:dak_louk/domain/domain.dart';
-import 'package:dak_louk/services/live_stream_service.dart';
+import 'package:dak_louk/domain/services/live_stream_service.dart';
 import 'package:dak_louk/ui/widgets/live_stream.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';

@@ -1,6 +1,6 @@
 import 'package:dak_louk/domain/domain.dart';
-import 'package:dak_louk/services/live_stream_service.dart';
-import 'package:dak_louk/services/post_service.dart';
+import 'package:dak_louk/domain/services/live_stream_service.dart';
+import 'package:dak_louk/domain/services/post_service.dart';
 import 'package:dak_louk/ui/screens/chat_room_screen_.dart';
 import 'package:dak_louk/ui/screens/product_info_screen.dart';
 import 'package:dak_louk/ui/widgets/appbar.dart';

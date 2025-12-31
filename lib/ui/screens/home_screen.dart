@@ -1,4 +1,4 @@
-import 'package:dak_louk/services/post_service.dart';
+import 'package:dak_louk/domain/services/post_service.dart';
 import 'package:dak_louk/ui/widgets/category_bar.dart';
 import 'package:dak_louk/ui/widgets/post_block.dart';
 import 'package:dak_louk/domain/domain.dart';

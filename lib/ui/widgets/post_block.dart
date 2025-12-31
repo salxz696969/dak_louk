@@ -1,5 +1,5 @@
 import 'package:dak_louk/domain/domain.dart';
-import 'package:dak_louk/services/cart_service.dart';
+import 'package:dak_louk/domain/services/cart_service.dart';
 import 'package:dak_louk/ui/widgets/add_and_remove_button.dart';
 import 'package:dak_louk/ui/screens/product_info_screen.dart';
 import 'package:dak_louk/ui/widgets/photo_slider.dart';
