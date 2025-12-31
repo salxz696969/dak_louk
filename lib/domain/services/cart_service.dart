@@ -1,3 +1,4 @@
+import 'package:dak_louk/core/auth/app_session.dart';
 import 'package:dak_louk/data/repositories/cart_repo.dart';
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/core/utils/orm.dart';
@@ -6,18 +7,23 @@ import 'package:dak_louk/core/utils/error.dart';
 
 class CartService {
   final CartRepository _cartRepository = CartRepository();
+  late final currentUserId;
 
-  // Custom methods using queryThisTable
-  Future<List<CartModel>> getCartsByUserId(int userId) async {
+  CartService() {
+    if (AppSession.instance.isLoggedIn) {
+      currentUserId = AppSession.instance.userId;
+    } else {
+      throw AppError(type: ErrorType.UNAUTHORIZED, message: 'Unauthorized');
+    }
+  }
+
+  Future<List<CartVM>> getCarts() async {
     try {
-      final statement = Clauses.where.eq(Tables.carts.cols.userId, userId);
       final carts = await _cartRepository.queryThisTable(
-        where: statement.clause,
-        args: statement.args,
+        where: Clauses.where.eq(Tables.carts.cols.userId, currentUserId).clause,
       );
-
       if (carts.isNotEmpty) {
-        return carts;
+        return carts.map((cart) => CartVM.fromRaw(cart)).toList();
       }
       throw AppError(type: ErrorType.NOT_FOUND, message: 'No carts found');
     } catch (e) {
@@ -30,6 +36,13 @@ class CartService {
 
   Future<void> deleteCart(int id) async {
     try {
+      final cart = await _cartRepository.getById(id);
+      if (cart == null) {
+        throw AppError(type: ErrorType.NOT_FOUND, message: 'Cart not found');
+      }
+      if (cart.userId != currentUserId) {
+        throw AppError(type: ErrorType.UNAUTHORIZED, message: 'Unauthorized');
+      }
       await _cartRepository.delete(id);
     } catch (e) {
       if (e is AppError) {
@@ -42,14 +55,28 @@ class CartService {
     }
   }
 
-  Future<CartModel?> createCart(CartModel cart) async {
+  Future<CartVM?> createCart(CreateCartDTO dto) async {
     try {
-      final id = await _cartRepository.insert(cart);
-      final newCart = await _cartRepository.getById(id);
-      if (newCart != null) {
-        return newCart;
+      final cartModel = CartModel(
+        id: 0,
+        userId: currentUserId,
+        productId: dto.productId,
+        quantity: dto.quantity,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+      final id = await _cartRepository.insert(cartModel);
+      if (id > 0) {
+        final newCart = await _cartRepository.getById(id);
+        if (newCart != null) {
+          return CartVM.fromRaw(newCart);
+        }
+        throw AppError(type: ErrorType.NOT_FOUND, message: 'Cart not found');
       }
-      return null;
+      throw AppError(
+        type: ErrorType.DB_ERROR,
+        message: 'Failed to create cart',
+      );
     } catch (e) {
       if (e is AppError) {
         rethrow;
@@ -61,12 +88,27 @@ class CartService {
     }
   }
 
-  Future<CartModel?> updateCart(CartModel cart) async {
+  Future<CartVM?> updateCart(int id, UpdateCartDTO dto) async {
     try {
-      await _cartRepository.update(cart);
-      final newCart = await _cartRepository.getById(cart.id);
+      final cart = await _cartRepository.getById(id);
+      if (cart == null) {
+        throw AppError(type: ErrorType.NOT_FOUND, message: 'Cart not found');
+      }
+      if (cart.userId != currentUserId) {
+        throw AppError(type: ErrorType.UNAUTHORIZED, message: 'Unauthorized');
+      }
+      final cartModel = CartModel(
+        id: id,
+        userId: currentUserId,
+        productId: cart.productId,
+        quantity: dto.quantity ?? cart.quantity,
+        createdAt: cart.createdAt,
+        updatedAt: DateTime.now(),
+      );
+      await _cartRepository.update(cartModel);
+      final newCart = await _cartRepository.getById(id);
       if (newCart != null) {
-        return newCart;
+        return CartVM.fromRaw(newCart);
       }
       return null;
     } catch (e) {

@@ -1,29 +1,50 @@
+import 'package:dak_louk/core/auth/app_session.dart';
+import 'package:dak_louk/core/utils/error.dart';
 import 'package:dak_louk/data/repositories/chat_room_repo.dart';
-import 'package:dak_louk/data/repositories/user_repo.dart';
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/core/utils/orm.dart';
 import 'package:dak_louk/data/tables/tables.dart';
 
 class ChatRoomService {
+  late final currentUserId;
   final ChatRoomRepository _chatRoomRepository = ChatRoomRepository();
-  final UserRepository _userRepository = UserRepository();
+  ChatRoomService() {
+    if (AppSession.instance.isLoggedIn) {
+      currentUserId = AppSession.instance.userId;
+    } else {
+      throw AppError(type: ErrorType.UNAUTHORIZED, message: 'Unauthorized');
+    }
+  }
 
   // Migrated from ChatRoomDao.insertChatRoom
-  Future<int> insertChatRoom(ChatRoomModel chatRoom) async {
+  Future<int> createChatRoom(CreateChatRoomDTO dto) async {
     try {
-      return await _chatRoomRepository.insert(chatRoom);
+      final chatRoomModel = ChatRoomModel(
+        id: 0,
+        userId: currentUserId,
+        merchantId: dto.merchantId,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+      return await _chatRoomRepository.insert(chatRoomModel);
     } catch (e) {
-      rethrow;
+      if (e is AppError) {
+        rethrow;
+      }
+      throw AppError(
+        type: ErrorType.DB_ERROR,
+        message: 'Failed to create chat room',
+      );
     }
   }
 
   // Migrated from ChatRoomDao.getChatRoomId
-  Future<int> getChatRoomId(int userId, int targetUserId) async {
+  Future<int> getChatRoomId(int targetUserId) async {
     try {
       // Check both directions of the relationship
       final userStatement1 = Clauses.where.eq(
         Tables.chatRooms.cols.userId,
-        userId,
+        currentUserId,
       );
       final targetStatement1 = Clauses.where.eq(
         Tables.chatRooms.cols.merchantId,
@@ -40,7 +61,7 @@ class ChatRoomService {
       );
       final targetStatement2 = Clauses.where.eq(
         Tables.chatRooms.cols.merchantId,
-        userId,
+        currentUserId,
       );
       final orStatement2 = Clauses.where.and([
         userStatement2,
@@ -71,14 +92,23 @@ class ChatRoomService {
 
       return -1; // Not found
     } catch (e) {
-      rethrow;
+      if (e is AppError) {
+        rethrow;
+      }
+      throw AppError(
+        type: ErrorType.DB_ERROR,
+        message: 'Failed to get chat room id',
+      );
     }
   }
 
   // Migrated from ChatRoomDao.getAllChatRoomsByUserId
-  Future<List<ChatRoomModel>> getAllChatRoomsByUserId(int userId) async {
+  Future<List<ChatRoomVM>> getAllChatRooms() async {
     try {
-      final statement = Clauses.where.eq(Tables.chatRooms.cols.userId, userId);
+      final statement = Clauses.where.eq(
+        Tables.chatRooms.cols.userId,
+        currentUserId,
+      );
       final result = await _chatRoomRepository.queryThisTable(
         where: statement.clause,
         args: statement.args,
@@ -89,13 +119,7 @@ class ChatRoomService {
         // Populate relations like in the original DAO
         final enrichedChatRooms = await Future.wait(
           result.map((chatRoom) async {
-            return ChatRoomModel(
-              id: chatRoom.id,
-              userId: chatRoom.userId,
-              merchantId: chatRoom.merchantId,
-              createdAt: chatRoom.createdAt,
-              updatedAt: chatRoom.updatedAt,
-            );
+            return ChatRoomVM.fromRaw(chatRoom);
           }),
         );
         return enrichedChatRooms;

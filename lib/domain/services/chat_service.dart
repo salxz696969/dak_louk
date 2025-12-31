@@ -1,4 +1,6 @@
 import 'package:dak_louk/data/repositories/chat_repo.dart';
+import 'package:dak_louk/core/auth/app_session.dart';
+import 'package:dak_louk/core/utils/error.dart';
 import 'package:dak_louk/data/repositories/chat_room_repo.dart';
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/core/utils/orm.dart';
@@ -7,30 +9,48 @@ import 'package:dak_louk/data/tables/tables.dart';
 class ChatService {
   final ChatRepository _chatRepository = ChatRepository();
   final ChatRoomRepository _chatRoomRepository = ChatRoomRepository();
-
+  late final currentUserId;
+  ChatService() {
+    if (AppSession.instance.isLoggedIn) {
+      currentUserId = AppSession.instance.userId;
+    } else {
+      throw AppError(type: ErrorType.UNAUTHORIZED, message: 'Unauthorized');
+    }
+  }
   // Migrated from ChatDao.insertChat
-  Future<int> insertChat(ChatModel chat) async {
+  Future<int> createChat(CreateChatDTO dto) async {
     try {
-      return await _chatRepository.insert(chat);
+      final chatModel = ChatModel(
+        id: 0,
+        senderId: currentUserId,
+        text: dto.text,
+        chatRoomId: dto.chatRoomId,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+      return await _chatRepository.insert(chatModel);
     } catch (e) {
-      rethrow;
+      if (e is AppError) {
+        rethrow;
+      }
+      throw AppError(
+        type: ErrorType.DB_ERROR,
+        message: 'Failed to create chat',
+      );
     }
   }
 
   // Migrated from ChatDao.getChatsByUserIdAndTargetUserId
-  Future<List<ChatModel>> getChatsByUserIdAndTargetUserId(
-    int userId,
-    int targetUserId,
-  ) async {
+  Future<List<ChatModel>> getChatWithMerchant(int merchantId) async {
     try {
       // Find chat room between the two users
       final userStatement1 = Clauses.where.eq(
         Tables.chatRooms.cols.userId,
-        userId,
+        merchantId,
       );
       final targetStatement1 = Clauses.where.eq(
         Tables.chatRooms.cols.merchantId,
-        targetUserId,
+        merchantId,
       );
       final orStatement1 = Clauses.where.and([
         userStatement1,
@@ -39,11 +59,11 @@ class ChatService {
 
       final userStatement2 = Clauses.where.eq(
         Tables.chatRooms.cols.userId,
-        targetUserId,
+        merchantId,
       );
       final targetStatement2 = Clauses.where.eq(
         Tables.chatRooms.cols.merchantId,
-        userId,
+        currentUserId,
       );
       final orStatement2 = Clauses.where.and([
         userStatement2,
@@ -121,20 +141,54 @@ class ChatService {
   }
 
   // Migrated from ChatDao.updateChat
-  Future<int> updateChat(ChatModel chat) async {
+  Future<int> updateChat(int id, UpdateChatDTO dto) async {
     try {
-      return await _chatRepository.update(chat);
+      final chat = await _chatRepository.getById(id);
+      if (chat == null) {
+        throw AppError(type: ErrorType.NOT_FOUND, message: 'Chat not found');
+      }
+      if (chat.senderId != currentUserId) {
+        throw AppError(type: ErrorType.UNAUTHORIZED, message: 'Unauthorized');
+      }
+      final chatModel = ChatModel(
+        id: id,
+        senderId: currentUserId,
+        text: dto.text ?? chat.text,
+        chatRoomId: chat.chatRoomId,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+      return await _chatRepository.update(chatModel);
     } catch (e) {
-      rethrow;
+      if (e is AppError) {
+        rethrow;
+      }
+      throw AppError(
+        type: ErrorType.DB_ERROR,
+        message: 'Failed to update chat',
+      );
     }
   }
 
   // Migrated from ChatDao.deleteChat
   Future<int> deleteChat(int id) async {
     try {
+      final chat = await _chatRepository.getById(id);
+      if (chat == null) {
+        throw AppError(type: ErrorType.NOT_FOUND, message: 'Chat not found');
+      }
+      if (chat.senderId != currentUserId) {
+        throw AppError(type: ErrorType.UNAUTHORIZED, message: 'Unauthorized');
+      }
       return await _chatRepository.delete(id);
     } catch (e) {
-      rethrow;
+      if (e is AppError) {
+        rethrow;
+      }
+      throw AppError(
+        type: ErrorType.DB_ERROR,
+        message: 'Failed to delete chat',
+      );
     }
   }
 

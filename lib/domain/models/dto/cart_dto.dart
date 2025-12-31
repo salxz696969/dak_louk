@@ -15,7 +15,5 @@ class CreateCartDTO {
 class UpdateCartDTO {
   final int? quantity;
 
-  UpdateCartDTO({
-    this.quantity,
-  });
+  UpdateCartDTO({this.quantity});
 }

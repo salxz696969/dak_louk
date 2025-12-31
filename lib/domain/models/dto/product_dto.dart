@@ -22,10 +22,5 @@ class UpdateProductDTO {
   final double? price;
   final int? quantity;
 
-  UpdateProductDTO({
-    this.name,
-    this.description,
-    this.price,
-    this.quantity,
-  });
+  UpdateProductDTO({this.name, this.description, this.price, this.quantity});
 }

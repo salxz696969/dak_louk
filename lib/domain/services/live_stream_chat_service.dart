@@ -1,13 +1,21 @@
 import 'package:dak_louk/data/repositories/live_stream_chat_repo.dart';
-import 'package:dak_louk/data/repositories/user_repo.dart';
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/core/utils/orm.dart';
 import 'package:dak_louk/data/tables/tables.dart';
+import 'package:dak_louk/core/auth/app_session.dart';
+import 'package:dak_louk/core/utils/error.dart';
 
 class LiveStreamChatService {
+  late final currentUserId;
   final LiveStreamChatRepository _liveStreamChatRepository =
       LiveStreamChatRepository();
-  final UserRepository _userRepository = UserRepository();
+  LiveStreamChatService() {
+    if (AppSession.instance.isLoggedIn) {
+      currentUserId = AppSession.instance.userId;
+    } else {
+      throw AppError(type: ErrorType.UNAUTHORIZED, message: 'Unauthorized');
+    }
+  }
 
   // Business logic methods migrated from LiveStreamChatRepository
   Future<List<LiveStreamChatModel>> getAllLiveStreamChatByLiveStreamId(
@@ -206,57 +214,129 @@ class LiveStreamChatService {
   }
 
   // Basic CRUD operations
-  Future<LiveStreamChatModel?> sendMessage(LiveStreamChatModel chat) async {
+  Future<LiveStreamChatVM?> createLiveStreamChat(
+    CreateLiveStreamChatDTO dto,
+  ) async {
     try {
-      final id = await _liveStreamChatRepository.insert(chat);
+      final chatModel = LiveStreamChatModel(
+        id: 0,
+        text: dto.text,
+        userId: currentUserId,
+        liveStreamId: dto.liveStreamId,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+      final id = await _liveStreamChatRepository.insert(chatModel);
+      if (id > 0) {
+        final newChat = await _liveStreamChatRepository.getById(id);
+        if (newChat != null) {
+          return LiveStreamChatVM.fromRaw(newChat);
+        }
+        throw AppError(
+          type: ErrorType.NOT_FOUND,
+          message: 'Live stream chat not found',
+        );
+      }
+      throw AppError(
+        type: ErrorType.DB_ERROR,
+        message: 'Failed to create live stream chat',
+      );
+    } catch (e) {
+      if (e is AppError) {
+        rethrow;
+      }
+      throw AppError(
+        type: ErrorType.DB_ERROR,
+        message: 'Failed to create live stream chat',
+      );
+    }
+  }
+
+  Future<LiveStreamChatVM?> getLiveStreamChatById(int id) async {
+    try {
+      final chat = await _liveStreamChatRepository.getById(id);
+      if (chat != null) {
+        return LiveStreamChatVM.fromRaw(chat);
+      }
+      throw AppError(
+        type: ErrorType.NOT_FOUND,
+        message: 'Live stream chat not found',
+      );
+    } catch (e) {
+      if (e is AppError) {
+        rethrow;
+      }
+      throw AppError(
+        type: ErrorType.DB_ERROR,
+        message: 'Failed to get live stream chat',
+      );
+    }
+  }
+
+  Future<LiveStreamChatVM?> updateLiveStreamChat(
+    int id,
+    UpdateLiveStreamChatDTO dto,
+  ) async {
+    try {
+      final chat = await _liveStreamChatRepository.getById(id);
+      if (chat == null) {
+        throw AppError(
+          type: ErrorType.NOT_FOUND,
+          message: 'Live stream chat not found',
+        );
+      }
+      if (chat.userId != currentUserId) {
+        throw AppError(type: ErrorType.UNAUTHORIZED, message: 'Unauthorized');
+      }
+      final chatModel = LiveStreamChatModel(
+        id: id,
+        text: dto.text ?? chat.text,
+        userId: chat.userId,
+        liveStreamId: chat.liveStreamId,
+        createdAt: chat.createdAt,
+        updatedAt: DateTime.now(),
+      );
+      await _liveStreamChatRepository.update(chatModel);
       final newChat = await _liveStreamChatRepository.getById(id);
       if (newChat != null) {
-        return newChat;
+        return LiveStreamChatVM.fromRaw(newChat);
       }
-      return null;
+      throw AppError(
+        type: ErrorType.NOT_FOUND,
+        message: 'Live stream chat not found',
+      );
     } catch (e) {
-      rethrow;
-    }
-  }
-
-  Future<LiveStreamChatModel?> getChatById(int id) async {
-    try {
-      final newChat = await _liveStreamChatRepository.getById(id);
-      if (newChat != null) {
-        return newChat;
+      if (e is AppError) {
+        rethrow;
       }
-      return null;
-    } catch (e) {
-      rethrow;
+      throw AppError(
+        type: ErrorType.DB_ERROR,
+        message: 'Failed to update live stream chat',
+      );
     }
   }
 
-  Future<LiveStreamChatModel?> updateChat(LiveStreamChatModel chat) async {
+  Future<void> deleteLiveStreamChat(int id) async {
     try {
-      await _liveStreamChatRepository.update(chat);
-      final newChat = await _liveStreamChatRepository.getById(chat.id);
-      if (newChat != null) {
-        return newChat;
+      final chat = await _liveStreamChatRepository.getById(id);
+      if (chat == null) {
+        throw AppError(
+          type: ErrorType.NOT_FOUND,
+          message: 'Live stream chat not found',
+        );
       }
-      return null;
+      if (chat.userId != currentUserId) {
+        throw AppError(type: ErrorType.UNAUTHORIZED, message: 'Unauthorized');
+      }
+      await _liveStreamChatRepository.delete(id);
     } catch (e) {
-      rethrow;
-    }
-  }
-
-  Future<void> deleteChat(int chatId) async {
-    try {
-      await _liveStreamChatRepository.delete(chatId);
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  Future<List<LiveStreamChatModel>> getAllChats() async {
-    try {
-      return await _liveStreamChatRepository.getAll();
-    } catch (e) {
-      rethrow;
+      if (e is AppError) {
+        rethrow;
+      }
+      throw AppError(
+        type: ErrorType.DB_ERROR,
+        message: 'Failed to delete live stream chat',
+      );
     }
   }
 }

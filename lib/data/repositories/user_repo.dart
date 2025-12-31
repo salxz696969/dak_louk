@@ -13,10 +13,8 @@ class UserRepository extends BaseRepository<UserModel> {
       id: user[Tables.users.cols.id] as int,
       username: user[Tables.users.cols.username] as String,
       passwordHash: user[Tables.users.cols.passwordHash] as String,
-      profileImageUrl: user[Tables.users.cols.profileImageUrl] as String,
-      rating: user[Tables.users.cols.rating] as double,
-      role: user[Tables.users.cols.role] as String,
-      bio: user[Tables.users.cols.bio] as String,
+      profileImageUrl: user[Tables.users.cols.profileImageUrl] as String?,
+      bio: user[Tables.users.cols.bio] as String?,
       createdAt: DateTime.parse(user[Tables.users.cols.createdAt] as String),
       updatedAt: DateTime.parse(user[Tables.users.cols.updatedAt] as String),
     );
@@ -30,11 +28,9 @@ class UserRepository extends BaseRepository<UserModel> {
       Tables.users.cols.username: user.username,
       Tables.users.cols.passwordHash: user.passwordHash,
       Tables.users.cols.profileImageUrl: user.profileImageUrl,
-      Tables.users.cols.rating: user.rating,
-      Tables.users.cols.role: user.role,
       Tables.users.cols.bio: user.bio,
-      Tables.users.cols.createdAt: user.createdAt,
-      Tables.users.cols.updatedAt: user.updatedAt,
+      Tables.users.cols.createdAt: user.createdAt.toIso8601String(),
+      Tables.users.cols.updatedAt: user.updatedAt.toIso8601String(),
     };
   }
 }

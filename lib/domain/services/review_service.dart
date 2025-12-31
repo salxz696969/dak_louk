@@ -1,3 +1,5 @@
+import 'package:dak_louk/core/auth/app_session.dart';
+import 'package:dak_louk/core/utils/error.dart';
 import 'package:dak_louk/data/repositories/review_repo.dart';
 import 'package:dak_louk/data/repositories/user_repo.dart';
 import 'package:dak_louk/domain/models/models.dart';
@@ -5,17 +7,34 @@ import 'package:dak_louk/core/utils/orm.dart';
 import 'package:dak_louk/data/tables/tables.dart';
 
 class ReviewService {
+  late final currentUserId;
   final ReviewRepository _reviewRepository = ReviewRepository();
   final UserRepository _userRepository = UserRepository();
 
+  ReviewService() {
+    if (AppSession.instance.isLoggedIn) {
+      currentUserId = AppSession.instance.userId;
+    } else {
+      throw AppError(type: ErrorType.UNAUTHORIZED, message: 'Unauthorized');
+    }
+  }
+
   // Business logic methods migrated from ReviewRepository
-  Future<List<ReviewModel>> getReviewsByTargetUserId(
-    UserModel targetUser,
-  ) async {
+  Future<List<ReviewVM>> getReviewsByMerchantId(int merchantId) async {
     try {
+      final merchant = await _userRepository.getById(merchantId);
+      if (merchant == null) {
+        throw AppError(
+          type: ErrorType.NOT_FOUND,
+          message: 'Merchant not found',
+        );
+      }
+      if (merchant.id != merchantId) {
+        throw AppError(type: ErrorType.FORBIDDEN, message: 'Forbidden');
+      }
       final statement = Clauses.where.eq(
         Tables.reviews.cols.merchantId,
-        targetUser.id,
+        merchantId,
       );
       final reviews = await _reviewRepository.queryThisTable(
         where: statement.clause,
@@ -23,33 +42,49 @@ class ReviewService {
         orderBy: Clauses.orderBy.desc(Tables.reviews.cols.createdAt).clause,
       );
       if (reviews.isNotEmpty) {
-        return reviews;
+        return reviews.map((review) => ReviewVM.fromRaw(review)).toList();
       }
-      throw Exception('Reviews not found');
+      throw AppError(type: ErrorType.NOT_FOUND, message: 'Reviews not found');
     } catch (e) {
-      rethrow;
+      if (e is AppError) {
+        rethrow;
+      }
+      throw AppError(
+        type: ErrorType.DB_ERROR,
+        message: 'Failed to get reviews',
+      );
     }
   }
 
   // Additional business logic methods
-  Future<List<ReviewModel>> getReviewsByUserId(int userId) async {
+  Future<List<ReviewVM>> getReviewsByUserId(int userId) async {
     try {
       final statement = Clauses.where.eq(Tables.reviews.cols.userId, userId);
-      return await _reviewRepository.queryThisTable(
+      final reviews = await _reviewRepository.queryThisTable(
         where: statement.clause,
         args: statement.args,
         orderBy: Clauses.orderBy.desc(Tables.reviews.cols.createdAt).clause,
       );
+      if (reviews.isNotEmpty) {
+        return reviews.map((review) => ReviewVM.fromRaw(review)).toList();
+      }
+      throw AppError(type: ErrorType.NOT_FOUND, message: 'Reviews not found');
     } catch (e) {
-      rethrow;
+      if (e is AppError) {
+        rethrow;
+      }
+      throw AppError(
+        type: ErrorType.DB_ERROR,
+        message: 'Failed to get reviews',
+      );
     }
   }
 
-  Future<double> getAverageRatingForUser(int targetUserId) async {
+  Future<double> getAverageRatingForMerchant(int merchantId) async {
     try {
       final statement = Clauses.where.eq(
         Tables.reviews.cols.merchantId,
-        targetUserId,
+        merchantId,
       );
       final reviews = await _reviewRepository.queryThisTable(
         where: statement.clause,
@@ -70,269 +105,74 @@ class ReviewService {
     }
   }
 
-  Future<int> getReviewCountForUser(int targetUserId) async {
-    try {
-      final statement = Clauses.where.eq(
-        Tables.reviews.cols.merchantId,
-        targetUserId,
-      );
-      final reviews = await _reviewRepository.queryThisTable(
-        where: statement.clause,
-        args: statement.args,
-      );
-      return reviews.length;
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  Future<List<ReviewModel>> getReviewsByRating(double rating) async {
-    try {
-      final statement = Clauses.where.eq(Tables.reviews.cols.rating, rating);
-      return await _reviewRepository.queryThisTable(
-        where: statement.clause,
-        args: statement.args,
-        orderBy: Clauses.orderBy.desc(Tables.reviews.cols.createdAt).clause,
-      );
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  Future<List<ReviewModel>> getReviewsByRatingRange(
-    double minRating,
-    double maxRating,
-  ) async {
-    try {
-      final statement = Clauses.where.between(
-        Tables.reviews.cols.rating,
-        minRating,
-        maxRating,
-      );
-      return await _reviewRepository.queryThisTable(
-        where: statement.clause,
-        args: statement.args,
-        orderBy: Clauses.orderBy.desc(Tables.reviews.cols.createdAt).clause,
-      );
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  Future<List<ReviewModel>> getRecentReviews({int limit = 20}) async {
-    try {
-      final orderByStmt = Clauses.orderBy.desc(Tables.reviews.cols.createdAt);
-      return await _reviewRepository.queryThisTable(
-        orderBy: orderByStmt.clause,
-        limit: limit,
-      );
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  Future<List<ReviewModel>> searchReviews(String searchTerm) async {
-    try {
-      final statement = Clauses.like.like(Tables.reviews.cols.text, searchTerm);
-      return await _reviewRepository.queryThisTable(
-        where: statement.clause,
-        args: statement.args,
-        orderBy: Clauses.orderBy.desc(Tables.reviews.cols.createdAt).clause,
-      );
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  Future<List<ReviewModel?>> getReviewsWithUserInfo(int targetUserId) async {
-    try {
-      final targetUser = await _userRepository.getById(targetUserId);
-      if (targetUser == null) {
-        return [];
-      }
-      final reviews = await getReviewsByTargetUserId(targetUser);
-
-      // Populate user information for each review
-      final enrichedReviews = await Future.wait(
-        reviews.map((review) async {
-          final user = await _userRepository.getById(review.userId);
-          final targetUser = await _userRepository.getById(review.merchantId);
-          if (user == null || targetUser == null) {
-            return null;
-          }
-          return ReviewModel(
-            id: review.id,
-            userId: review.userId,
-            merchantId: review.merchantId,
-            rating: review.rating,
-            text: review.text,
-            createdAt: review.createdAt,
-            updatedAt: review.updatedAt,
-          );
-        }),
-      );
-
-      return enrichedReviews;
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  Future<bool> hasUserReviewedTarget(int userId, int targetUserId) async {
-    try {
-      final userStatement = Clauses.where.eq(
-        Tables.reviews.cols.userId,
-        userId,
-      );
-      final targetStatement = Clauses.where.eq(
-        Tables.reviews.cols.merchantId,
-        targetUserId,
-      );
-      final combinedStatement = Clauses.where.and([
-        userStatement,
-        targetStatement,
-      ]);
-
-      final reviews = await _reviewRepository.queryThisTable(
-        where: combinedStatement.clause,
-        args: combinedStatement.args,
-      );
-
-      return reviews.isNotEmpty;
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  Future<ReviewModel?> getUserReviewForTarget(
-    int userId,
-    int merchantId,
-  ) async {
-    try {
-      final userStatement = Clauses.where.eq(
-        Tables.reviews.cols.userId,
-        userId,
-      );
-      final targetStatement = Clauses.where.eq(
-        Tables.reviews.cols.merchantId,
-        merchantId,
-      );
-      final combinedStatement = Clauses.where.and([
-        userStatement,
-        targetStatement,
-      ]);
-
-      final reviews = await _reviewRepository.queryThisTable(
-        where: combinedStatement.clause,
-        args: combinedStatement.args,
-      );
-
-      return reviews.isNotEmpty ? reviews.first : null;
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  // Update user's overall rating after review changes
-  Future<void> updateUserRating(int merchantId) async {
-    try {
-      final averageRating = await getAverageRatingForUser(merchantId);
-      final merchant = await _userRepository.getById(merchantId);
-      if (merchant == null) {
-        return;
-      }
-
-      final updatedUser = UserModel(
-        id: merchant.id,
-        username: merchant.username,
-        passwordHash: merchant.passwordHash,
-        profileImageUrl: merchant.profileImageUrl,
-        rating: averageRating,
-        role: merchant.role,
-        bio: merchant.bio,
-        createdAt: merchant.createdAt,
-        updatedAt: DateTime.now(),
-      );
-
-      await _userRepository.update(updatedUser);
-    } catch (e) {
-      rethrow;
-    }
-  }
-
   // Basic CRUD operations with rating updates
-  Future<ReviewModel?> createReview(ReviewModel review) async {
+  Future<ReviewVM?> createReview(CreateReviewDTO dto) async {
     try {
       // Check if user has already reviewed this target
-      final existingReview = await getUserReviewForTarget(
-        review.userId,
-        review.merchantId,
+      final reviewModel = ReviewModel(
+        id: 0,
+        userId: currentUserId,
+        merchantId: dto.merchantId,
+        text: dto.text,
+        rating: dto.rating,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
       );
-      if (existingReview != null) {
-        throw Exception('User has already reviewed this target');
+      final id = await _reviewRepository.insert(reviewModel);
+      if (id > 0) {
+        final newReview = await _reviewRepository.getById(id);
+        if (newReview != null) {
+          return ReviewVM.fromRaw(newReview);
+        }
+        throw AppError(type: ErrorType.NOT_FOUND, message: 'Review not found');
       }
-
-      final id = await _reviewRepository.insert(review);
-      final createdReview = await _reviewRepository.getById(id);
-
-      // Update target user's rating
-      await updateUserRating(review.merchantId);
-
-      if (createdReview != null) {
-        return createdReview;
-      }
-      return null;
+      throw AppError(
+        type: ErrorType.DB_ERROR,
+        message: 'Failed to create review',
+      );
     } catch (e) {
-      rethrow;
+      if (e is AppError) {
+        rethrow;
+      }
+      throw AppError(
+        type: ErrorType.DB_ERROR,
+        message: 'Failed to create review',
+      );
     }
   }
 
-  Future<ReviewModel?> getReviewById(int id) async {
+  Future<ReviewVM?> updateReview(int id, UpdateReviewDTO dto) async {
     try {
+      final review = await _reviewRepository.getById(id);
+      if (review == null) {
+        throw AppError(type: ErrorType.NOT_FOUND, message: 'Review not found');
+      }
+      if (review.userId != currentUserId) {
+        throw AppError(type: ErrorType.UNAUTHORIZED, message: 'Unauthorized');
+      }
+      final reviewModel = ReviewModel(
+        id: id,
+        userId: currentUserId,
+        merchantId: review.merchantId,
+        text: dto.text ?? review.text,
+        rating: dto.rating ?? review.rating,
+        createdAt: review.createdAt,
+        updatedAt: DateTime.now(),
+      );
+      await _reviewRepository.update(reviewModel);
       final newReview = await _reviewRepository.getById(id);
       if (newReview != null) {
-        return newReview;
+        return ReviewVM.fromRaw(newReview);
       }
-      return null;
+      throw AppError(type: ErrorType.NOT_FOUND, message: 'Review not found');
     } catch (e) {
-      rethrow;
-    }
-  }
-
-  Future<ReviewModel?> updateReview(ReviewModel review) async {
-    try {
-      await _reviewRepository.update(review);
-      final updatedReview = await _reviewRepository.getById(review.id);
-
-      // Update target user's rating
-      await updateUserRating(review.merchantId);
-
-      if (updatedReview != null) {
-        return updatedReview;
+      if (e is AppError) {
+        rethrow;
       }
-      return null;
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  Future<void> deleteReview(int reviewId) async {
-    try {
-      final review = await _reviewRepository.getById(reviewId);
-      await _reviewRepository.delete(reviewId);
-
-      // Update target user's rating
-      await updateUserRating(review!.merchantId);
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  Future<List<ReviewModel>> getAllReviews() async {
-    try {
-      return await _reviewRepository.getAll();
-    } catch (e) {
-      rethrow;
+      throw AppError(
+        type: ErrorType.DB_ERROR,
+        message: 'Failed to update review',
+      );
     }
   }
 }

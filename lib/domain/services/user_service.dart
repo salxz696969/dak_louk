@@ -1,10 +1,20 @@
+import 'package:dak_louk/core/auth/app_session.dart';
+import 'package:dak_louk/core/utils/error.dart';
 import 'package:dak_louk/data/repositories/user_repo.dart';
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/core/utils/orm.dart';
 import 'package:dak_louk/data/tables/tables.dart';
 
 class UserService {
+  late final currentUserId;
   final UserRepository _userRepository = UserRepository();
+  UserService() {
+    if (AppSession.instance.isLoggedIn) {
+      currentUserId = AppSession.instance.userId;
+    } else {
+      throw AppError(type: ErrorType.UNAUTHORIZED, message: 'Unauthorized');
+    }
+  }
 
   // Business logic methods migrated from UserRepository
   Future<UserModel?> getUserByUsername(String username) async {
@@ -17,94 +27,52 @@ class UserService {
       if (result.isNotEmpty) {
         return result.first;
       }
-      return null;
+      throw AppError(type: ErrorType.NOT_FOUND, message: 'User not found');
     } catch (e) {
-      rethrow;
-    }
-  }
-
-  Future<List<UserModel>> getUsersByRole(String role) async {
-    try {
-      final statement = Clauses.where.eq(Tables.users.cols.role, role);
-      final orderByStmt = Clauses.orderBy.desc(Tables.users.cols.createdAt);
-      final result = await _userRepository.queryThisTable(
-        where: statement.clause,
-        args: statement.args,
-        orderBy: orderByStmt.clause,
+      if (e is AppError) {
+        rethrow;
+      }
+      throw AppError(
+        type: ErrorType.DB_ERROR,
+        message: 'Failed to get user by username',
       );
-      return result;
-    } catch (e) {
-      rethrow;
     }
   }
 
-  Future<List<UserModel>> getTopRatedUsers({int limit = 10}) async {
+  Future<UserVM?> createUser(CreateUserDTO dto) async {
     try {
-      final orderByStmt = Clauses.orderBy.desc(Tables.users.cols.rating);
-      final result = await _userRepository.queryThisTable(
-        orderBy: orderByStmt.clause,
-        limit: limit,
+      final isAvailable = await getUserByUsername(dto.username);
+      if (isAvailable != null) {
+        throw AppError(
+          type: ErrorType.ALREADY_EXISTS,
+          message: 'Username already exists',
+        );
+      }
+      final userModel = UserModel(
+        id: 0,
+        username: dto.username,
+        passwordHash: dto.passwordHash,
+        profileImageUrl: dto.profileImageUrl,
+        bio: dto.bio,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
       );
-      return result;
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  // Authentication related business logic
-  Future<UserModel?> authenticateUser(
-    String username,
-    String passwordHash,
-  ) async {
-    try {
-      final user = await getUserByUsername(username);
-      if (user != null && user.passwordHash == passwordHash) {
-        return user;
+      final id = await _userRepository.insert(userModel);
+      if (id > 0) {
+        final newUser = await _userRepository.getById(id);
+        if (newUser != null) {
+          return UserVM.fromRaw(newUser);
+        }
       }
-      return null;
+      throw AppError(type: ErrorType.NOT_FOUND, message: 'User not found');
     } catch (e) {
-      rethrow;
-    }
-  }
-
-  // User management business logic
-  Future<bool> isUsernameAvailable(String username) async {
-    try {
-      final user = await getUserByUsername(username);
-      return user == null;
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  Future<UserModel?> createUser(UserModel user) async {
-    try {
-      final isAvailable = await isUsernameAvailable(user.username);
-      if (!isAvailable) {
-        throw Exception('Username already exists');
+      if (e is AppError) {
+        rethrow;
       }
-
-      final id = await _userRepository.insert(user);
-      final newUser = await _userRepository.getById(id);
-      if (newUser != null) {
-        return newUser;
-      }
-      return null;
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  Future<UserModel?> updateUserProfile(UserModel user) async {
-    try {
-      await _userRepository.update(user);
-      final newUser = await _userRepository.getById(user.id);
-      if (newUser != null) {
-        return newUser;
-      }
-      return null;
-    } catch (e) {
-      rethrow;
+      throw AppError(
+        type: ErrorType.DB_ERROR,
+        message: 'Failed to create user',
+      );
     }
   }
 

@@ -1,4 +1,5 @@
 import 'package:dak_louk/data/tables/users_table.dart';
+import 'package:dak_louk/data/tables/merchants_table.dart';
 import 'package:dak_louk/data/tables/product_categories_table.dart';
 import 'package:dak_louk/data/tables/products_table.dart';
 import 'package:dak_louk/data/tables/product_category_maps_table.dart';
@@ -27,6 +28,7 @@ class Tables {
 
   // all tables
   static const users = UsersTable();
+  static const merchants = MerchantsTable();
   static const productCategories = ProductCategoriesTable();
   static const products = ProductsTable();
   static const productCategoryMaps = ProductCategoryMapsTable();

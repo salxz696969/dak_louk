@@ -10,15 +10,27 @@ Future<void> initDb(Database db) async {
         ${Tables.users.cols.username} TEXT UNIQUE NOT NULL,
         ${Tables.users.cols.passwordHash} TEXT NOT NULL,
         ${Tables.users.cols.profileImageUrl} TEXT,
-        ${Tables.users.cols.rating} REAL DEFAULT 0.0,
         ${Tables.users.cols.bio} TEXT,
-        ${Tables.users.cols.role} TEXT CHECK(${Tables.users.cols.role} IN ('user', 'merchant')) DEFAULT 'user',
         ${Tables.users.cols.createdAt} TEXT NOT NULL,
         ${Tables.users.cols.updatedAt} TEXT NOT NULL
       )
     ''');
 
-  // 2️⃣ PRODUCT_CATEGORIES - Independent lookup table
+  // 2️⃣ MERCHANTS - Depends on users
+  await db.execute('''
+      CREATE TABLE ${Tables.merchants.tableName} (
+        ${Tables.merchants.cols.id} INTEGER PRIMARY KEY AUTOINCREMENT,
+        ${Tables.merchants.cols.userId} INTEGER NOT NULL,
+        ${Tables.merchants.cols.rating} REAL DEFAULT 0.0,
+        ${Tables.merchants.cols.businessName} TEXT,
+        ${Tables.merchants.cols.businessDescription} TEXT,
+        ${Tables.merchants.cols.createdAt} TEXT NOT NULL,
+        ${Tables.merchants.cols.updatedAt} TEXT NOT NULL,
+        FOREIGN KEY (${Tables.merchants.cols.userId}) REFERENCES ${Tables.users.tableName}(${Tables.users.cols.id}) ON DELETE CASCADE
+      )
+    ''');
+
+  // 3️⃣ PRODUCT_CATEGORIES - Independent lookup table
   await db.execute('''
       CREATE TABLE ${Tables.productCategories.tableName} (
         ${Tables.productCategories.cols.id} INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -26,7 +38,7 @@ Future<void> initDb(Database db) async {
       )
     ''');
 
-  // 3️⃣ PRODUCTS - Depends on users (merchants)
+  // 4️⃣ PRODUCTS - Depends on merchants
   await db.execute('''
       CREATE TABLE ${Tables.products.tableName} (
         ${Tables.products.cols.id} INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -37,11 +49,11 @@ Future<void> initDb(Database db) async {
         ${Tables.products.cols.quantity} INTEGER DEFAULT 1,
         ${Tables.products.cols.createdAt} TEXT NOT NULL,
         ${Tables.products.cols.updatedAt} TEXT NOT NULL,
-        FOREIGN KEY (${Tables.products.cols.merchantId}) REFERENCES ${Tables.users.tableName}(${Tables.users.cols.id}) ON DELETE CASCADE
+        FOREIGN KEY (${Tables.products.cols.merchantId}) REFERENCES ${Tables.merchants.tableName}(${Tables.merchants.cols.id}) ON DELETE CASCADE
       )
     ''');
 
-  // 4️⃣ PRODUCT_CATEGORY_MAPS - Many-to-many between products and categories
+  // 5️⃣ PRODUCT_CATEGORY_MAPS - Many-to-many between products and categories
   await db.execute('''
       CREATE TABLE ${Tables.productCategoryMaps.tableName} (
         ${Tables.productCategoryMaps.cols.id} INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -53,7 +65,7 @@ Future<void> initDb(Database db) async {
       )
     ''');
 
-  // 5️⃣ PRODUCT_MEDIAS - Product images/videos
+  // 6️⃣ PRODUCT_MEDIAS - Product images/videos
   await db.execute('''
       CREATE TABLE ${Tables.productMedias.tableName} (
         ${Tables.productMedias.cols.id} INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -66,7 +78,7 @@ Future<void> initDb(Database db) async {
       )
     ''');
 
-  // 6️⃣ POSTS - Merchant promotional posts
+  // 7️⃣ POSTS - Merchant promotional posts
   await db.execute('''
       CREATE TABLE ${Tables.posts.tableName} (
         ${Tables.posts.cols.id} INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -74,11 +86,11 @@ Future<void> initDb(Database db) async {
         ${Tables.posts.cols.caption} TEXT,
         ${Tables.posts.cols.createdAt} TEXT NOT NULL,
         ${Tables.posts.cols.updatedAt} TEXT NOT NULL,
-        FOREIGN KEY (${Tables.posts.cols.merchantId}) REFERENCES ${Tables.users.tableName}(${Tables.users.cols.id}) ON DELETE CASCADE
+        FOREIGN KEY (${Tables.posts.cols.merchantId}) REFERENCES ${Tables.merchants.tableName}(${Tables.merchants.cols.id}) ON DELETE CASCADE
       )
     ''');
 
-  // 7️⃣ POST_PRODUCTS - Many-to-many between posts and products
+  // 8️⃣ POST_PRODUCTS - Many-to-many between posts and products
   await db.execute('''
       CREATE TABLE ${Tables.postProducts.tableName} (
         ${Tables.postProducts.cols.id} INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -90,7 +102,7 @@ Future<void> initDb(Database db) async {
       )
     ''');
 
-  // 8️⃣ PROMO_MEDIAS - Post promotional media
+  // 9️⃣ PROMO_MEDIAS - Post promotional media
   await db.execute('''
       CREATE TABLE ${Tables.promoMedias.tableName} (
         ${Tables.promoMedias.cols.id} INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -103,7 +115,7 @@ Future<void> initDb(Database db) async {
       )
     ''');
 
-  // 9️⃣ POST_LIKES - User likes on posts
+  // 🔟 POST_LIKES - User likes on posts
   await db.execute('''
       CREATE TABLE ${Tables.postLikes.tableName} (
         ${Tables.postLikes.cols.id} INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -117,7 +129,7 @@ Future<void> initDb(Database db) async {
       )
     ''');
 
-  // 🔟 POST_SAVES - User saves on posts
+  // 1️⃣1️⃣ POST_SAVES - User saves on posts
   await db.execute('''
       CREATE TABLE ${Tables.postSaves.tableName} (
         ${Tables.postSaves.cols.id} INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -131,7 +143,7 @@ Future<void> initDb(Database db) async {
       )
     ''');
 
-  // 1️⃣1️⃣ LIVE_STREAMS - Merchant live streaming
+  // 1️⃣2️⃣ LIVE_STREAMS - Merchant live streaming
   await db.execute('''
       CREATE TABLE ${Tables.liveStreams.tableName} (
         ${Tables.liveStreams.cols.id} INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -142,11 +154,11 @@ Future<void> initDb(Database db) async {
         ${Tables.liveStreams.cols.viewCount} INTEGER DEFAULT 0,
         ${Tables.liveStreams.cols.createdAt} TEXT NOT NULL,
         ${Tables.liveStreams.cols.updatedAt} TEXT NOT NULL,
-        FOREIGN KEY (${Tables.liveStreams.cols.merchantId}) REFERENCES ${Tables.users.tableName}(${Tables.users.cols.id}) ON DELETE CASCADE
+        FOREIGN KEY (${Tables.liveStreams.cols.merchantId}) REFERENCES ${Tables.merchants.tableName}(${Tables.merchants.cols.id}) ON DELETE CASCADE
       )
     ''');
 
-  // 1️⃣2️⃣ LIVE_STREAM_PRODUCTS - Products featured in live streams
+  // 1️⃣3️⃣ LIVE_STREAM_PRODUCTS - Products featured in live streams
   await db.execute('''
       CREATE TABLE ${Tables.liveStreamProducts.tableName} (
         ${Tables.liveStreamProducts.cols.id} INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -158,7 +170,7 @@ Future<void> initDb(Database db) async {
       )
     ''');
 
-  // 1️⃣3️⃣ LIVE_STREAM_CHATS - Chat messages in live streams
+  // 1️⃣4️⃣ LIVE_STREAM_CHATS - Chat messages in live streams
   await db.execute('''
       CREATE TABLE ${Tables.liveStreamChats.tableName} (
         ${Tables.liveStreamChats.cols.id} INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -172,7 +184,7 @@ Future<void> initDb(Database db) async {
       )
     ''');
 
-  // 1️⃣4️⃣ CHAT_ROOMS - Private conversations between users and merchants
+  // 1️⃣5️⃣ CHAT_ROOMS - Private conversations between users and merchants
   await db.execute('''
       CREATE TABLE ${Tables.chatRooms.tableName} (
         ${Tables.chatRooms.cols.id} INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -181,12 +193,12 @@ Future<void> initDb(Database db) async {
         ${Tables.chatRooms.cols.createdAt} TEXT NOT NULL,
         ${Tables.chatRooms.cols.updatedAt} TEXT NOT NULL,
         FOREIGN KEY (${Tables.chatRooms.cols.userId}) REFERENCES ${Tables.users.tableName}(${Tables.users.cols.id}) ON DELETE CASCADE,
-        FOREIGN KEY (${Tables.chatRooms.cols.merchantId}) REFERENCES ${Tables.users.tableName}(${Tables.users.cols.id}) ON DELETE CASCADE,
+        FOREIGN KEY (${Tables.chatRooms.cols.merchantId}) REFERENCES ${Tables.merchants.tableName}(${Tables.merchants.cols.id}) ON DELETE CASCADE,
         UNIQUE(${Tables.chatRooms.cols.userId}, ${Tables.chatRooms.cols.merchantId})
       )
     ''');
 
-  // 1️⃣5️⃣ CHATS - Messages in chat rooms
+  // 1️⃣6️⃣ CHATS - Messages in chat rooms
   await db.execute('''
       CREATE TABLE ${Tables.chats.tableName} (
         ${Tables.chats.cols.id} INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -200,7 +212,7 @@ Future<void> initDb(Database db) async {
       )
     ''');
 
-  // 1️⃣6️⃣ CARTS - User shopping carts
+  // 1️⃣7️⃣ CARTS - User shopping carts
   await db.execute('''
       CREATE TABLE ${Tables.carts.tableName} (
         ${Tables.carts.cols.id} INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -215,7 +227,7 @@ Future<void> initDb(Database db) async {
       )
     ''');
 
-  // 1️⃣7️⃣ ORDERS - Purchase orders
+  // 1️⃣8️⃣ ORDERS - Purchase orders
   await db.execute('''
       CREATE TABLE ${Tables.orders.tableName} (
         ${Tables.orders.cols.id} INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -225,11 +237,11 @@ Future<void> initDb(Database db) async {
         ${Tables.orders.cols.createdAt} TEXT NOT NULL,
         ${Tables.orders.cols.updatedAt} TEXT NOT NULL,
         FOREIGN KEY (${Tables.orders.cols.userId}) REFERENCES ${Tables.users.tableName}(${Tables.users.cols.id}) ON DELETE CASCADE,
-        FOREIGN KEY (${Tables.orders.cols.merchantId}) REFERENCES ${Tables.users.tableName}(${Tables.users.cols.id}) ON DELETE CASCADE
+        FOREIGN KEY (${Tables.orders.cols.merchantId}) REFERENCES ${Tables.merchants.tableName}(${Tables.merchants.cols.id}) ON DELETE CASCADE
       )
     ''');
 
-  // 1️⃣8️⃣ ORDER_PRODUCTS - Products in orders with price snapshots
+  // 1️⃣9️⃣ ORDER_PRODUCTS - Products in orders with price snapshots
   await db.execute('''
       CREATE TABLE ${Tables.orderProducts.tableName} (
         ${Tables.orderProducts.cols.id} INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -242,7 +254,7 @@ Future<void> initDb(Database db) async {
       )
     ''');
 
-  // 1️⃣9️⃣ REVIEWS - User reviews for merchants
+  // 2️⃣0️⃣ REVIEWS - User reviews for merchants
   await db.execute('''
       CREATE TABLE ${Tables.reviews.tableName} (
         ${Tables.reviews.cols.id} INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -253,12 +265,12 @@ Future<void> initDb(Database db) async {
         ${Tables.reviews.cols.createdAt} TEXT NOT NULL,
         ${Tables.reviews.cols.updatedAt} TEXT NOT NULL,
         FOREIGN KEY (${Tables.reviews.cols.userId}) REFERENCES ${Tables.users.tableName}(${Tables.users.cols.id}) ON DELETE CASCADE,
-        FOREIGN KEY (${Tables.reviews.cols.merchantId}) REFERENCES ${Tables.users.tableName}(${Tables.users.cols.id}) ON DELETE CASCADE,
+        FOREIGN KEY (${Tables.reviews.cols.merchantId}) REFERENCES ${Tables.merchants.tableName}(${Tables.merchants.cols.id}) ON DELETE CASCADE,
         UNIQUE(${Tables.reviews.cols.userId}, ${Tables.reviews.cols.merchantId})
       )
     ''');
 
-  // 2️⃣0️⃣ FOLLOWERS - User following system
+  // 2️⃣1️⃣ FOLLOWERS - User following system
   await db.execute('''
       CREATE TABLE ${Tables.followers.tableName} (
         ${Tables.followers.cols.id} INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -441,11 +453,7 @@ Future<void> insertMockData(Database db) async {
       Tables.users.cols.username: randomName(rand, i),
       Tables.users.cols.passwordHash: 'hash_user$i',
       Tables.users.cols.profileImageUrl: profileImage,
-      Tables.users.cols.rating: (rand.nextDouble() * 2) + 3.0,
       Tables.users.cols.bio: bio[rand.nextInt(bio.length)],
-      Tables.users.cols.role: i <= 50
-          ? 'merchant'
-          : 'user', // First 50 are merchants
       Tables.users.cols.createdAt: now,
       Tables.users.cols.updatedAt: now,
     });
