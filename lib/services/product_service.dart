@@ -5,14 +5,33 @@ import 'package:dak_louk/utils/db/tables/tables.dart';
 
 class ProductService {
   final ProductRepository _productRepository = ProductRepository();
-
+  //  Future<List<ProductModel>> getAllProductsByLiveStreamId(
+  //     int liveStreamId,
+  //   ) async {
+  //     try {
+  //       final db = await _appDatabase.database;
+  //       final result = await db.query(
+  //         'products',
+  //         where: 'live_stream_id = ?',
+  //         whereArgs: [liveStreamId],
+  //       );
+  //       if (result.isNotEmpty) {
+  //         return result
+  //             .map((map) => ProductModel.fromMap(map, map['image_url'] as String))
+  //             .toList();
+  //       }
+  //       throw Exception('No Products found');
+  //     } catch (e) {
+  //       rethrow;
+  //     }
+  //   }
   // Business logic methods migrated from ProductRepository
   Future<List<ProductModel>> getAllProductsByLiveStreamId(
     int liveStreamId,
   ) async {
     try {
       final statement = Clauses.where.eq(
-        Tables.products.cols.liveStreamId,
+        Tables.products.cols.userId,
         liveStreamId,
       );
       final result = await _productRepository.queryThisTable(

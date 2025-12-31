@@ -37,7 +37,7 @@ class LiveStreamService {
 
             // Get products associated with this live stream
             final productStatement = Clauses.where.eq(
-              Tables.products.cols.liveStreamId,
+              Tables.products.cols.userId,
               liveStream.id,
             );
             final products = await _productRepository.queryThisTable(
@@ -68,8 +68,34 @@ class LiveStreamService {
     }
   }
 
+  // Future<List<LiveStreamModel>> getAllLiveStreams(int limit) async {
+  //   try {
+  //     final db = await _appDatabase.database;
+  //     final result = await db.query('live_streams', limit: limit);
+  //     if (result.isNotEmpty) {
+  //       final List<LiveStreamModel> liveStreams = [];
+  //       final UserDao userDao = UserDao();
+  //       final PostDao postDao = PostDao();
+  //       final LiveStreamChatDao liveStreamChatDao = LiveStreamChatDao();
+  //       for (var map in result) {
+  //         final user = await userDao.getUserById(map['user_id'] as int);
+  //         final posts = await postDao.getPostsByLiveStreamId(map['id'] as int);
+  //         final liveStreamChats = await liveStreamChatDao
+  //             .getAllLiveStreamChatByLiveStreamId(map['id'] as int);
+  //         liveStreams.add(
+  //           LiveStreamModel.fromMap(map, user, posts, liveStreamChats),
+  //         );
+  //       }
+  //       return liveStreams;
+  //     }
+  //     throw Exception('No LiveStreams found');
+  //   } catch (e) {
+  //     rethrow;
+  //   }
+  // }
+
   // Migrated from LiveStreamDao
-  Future<List<LiveStreamModel>> getAllLiveStreams(int limit) async {
+  Future<List<LiveStreamModel>> getAllLiveStreamsWithProducts(int limit) async {
     try {
       final liveStreams = await _liveStreamRepository.queryThisTable(
         limit: limit,
@@ -83,7 +109,7 @@ class LiveStreamService {
 
             // Get products associated with this live stream
             final productStatement = Clauses.where.eq(
-              Tables.products.cols.liveStreamId,
+              Tables.products.cols.userId,
               liveStream.id,
             );
             final products = await _productRepository.queryThisTable(
@@ -109,128 +135,6 @@ class LiveStreamService {
         return enrichedLiveStreams;
       }
       throw Exception('No LiveStreams found');
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  // Additional business logic methods
-  Future<List<LiveStreamModel>> getActiveLiveStreams() async {
-    try {
-      // Assuming active streams are those created recently
-      final statement = Clauses.where.gte(
-        Tables.liveStreams.cols.createdAt,
-        DateTime.now().subtract(const Duration(hours: 24)).toIso8601String(),
-      );
-      final orderByStmt = Clauses.orderBy.desc(Tables.liveStreams.cols.view);
-
-      return await _liveStreamRepository.queryThisTable(
-        where: statement.clause,
-        args: statement.args,
-        orderBy: orderByStmt.clause,
-      );
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  Future<List<LiveStreamModel>> getPopularLiveStreams({int limit = 10}) async {
-    try {
-      final orderByStmt = Clauses.orderBy.desc(Tables.liveStreams.cols.view);
-      return await _liveStreamRepository.queryThisTable(
-        orderBy: orderByStmt.clause,
-        limit: limit,
-      );
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  Future<List<LiveStreamModel>> searchLiveStreams(String searchTerm) async {
-    try {
-      final statement = Clauses.like.like(
-        Tables.liveStreams.cols.title,
-        searchTerm,
-      );
-      return await _liveStreamRepository.queryThisTable(
-        where: statement.clause,
-        args: statement.args,
-      );
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  Future<LiveStreamModel?> incrementViewCount(int liveStreamId) async {
-    try {
-      final liveStream = await _liveStreamRepository.getById(liveStreamId);
-      if (liveStream == null) {
-        return null;
-      }
-      final updatedLiveStream = LiveStreamModel(
-        id: liveStream.id,
-        url: liveStream.url,
-        userId: liveStream.userId,
-        title: liveStream.title,
-        thumbnailUrl: liveStream.thumbnailUrl,
-        view: liveStream.view + 1,
-        createdAt: liveStream.createdAt,
-        updatedAt: DateTime.now(),
-      );
-
-      await _liveStreamRepository.update(updatedLiveStream);
-      return updatedLiveStream;
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  // Get live stream with all relations populated
-  Future<LiveStreamModel?> getLiveStreamWithRelations(int liveStreamId) async {
-    try {
-      final liveStream = await _liveStreamRepository.getById(liveStreamId);
-      if (liveStream == null) {
-        return null;
-      }
-      final user = await _userRepository.getById(liveStream.userId);
-
-      // Get products associated with this live stream
-      final productStatement = Clauses.where.eq(
-        Tables.products.cols.liveStreamId,
-        liveStreamId,
-      );
-      final products = await _productRepository.queryThisTable(
-        where: productStatement.clause,
-        args: productStatement.args,
-      );
-
-      // Get live stream chats
-      return LiveStreamModel(
-        id: liveStream.id,
-        url: liveStream.url,
-        userId: liveStream.userId,
-        title: liveStream.title,
-        thumbnailUrl: liveStream.thumbnailUrl,
-        view: liveStream.view,
-        createdAt: liveStream.createdAt,
-        updatedAt: liveStream.updatedAt,
-        user: user,
-        products: products,
-      );
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  Future<List<LiveStreamModel>> getRecentLiveStreams({int limit = 20}) async {
-    try {
-      final orderByStmt = Clauses.orderBy.desc(
-        Tables.liveStreams.cols.createdAt,
-      );
-      return await _liveStreamRepository.queryThisTable(
-        orderBy: orderByStmt.clause,
-        limit: limit,
-      );
     } catch (e) {
       rethrow;
     }

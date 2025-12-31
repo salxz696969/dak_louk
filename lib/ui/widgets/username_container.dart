@@ -1,3 +1,6 @@
+import 'package:dak_louk/services/chat_service.dart';
+import 'package:dak_louk/services/chat_room_service.dart';
+import 'package:dak_louk/ui/screens/chat_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:dak_louk/ui/screens/profile_screen.dart';
 import 'package:flutter/material.dart';
@@ -73,7 +76,34 @@ class UsernameContainer extends StatelessWidget {
           ),
           InkWell(
             child: const Icon(CupertinoIcons.chat_bubble, size: 36),
-            onTap: () {},
+            onTap: () async {
+              final chatRoomId = await ChatRoomService().getChatRoomId(
+                1,
+                userId,
+              );
+              if (chatRoomId != -1) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ChatScreen(
+                      targetUserName: username,
+                      chatService: ChatService()
+                          .getChatsByUserIdAndTargetUserId(1, userId),
+                    ),
+                  ),
+                );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ChatScreen(
+                      targetUserName: username,
+                      chatService: ChatService()
+                          .getChatsByUserIdAndTargetUserId(1, userId),
+                    ),
+                  ),
+                );
+              }
+            },
           ),
         ],
       ),
