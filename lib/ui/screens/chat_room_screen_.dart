@@ -1,6 +1,6 @@
 import 'package:dak_louk/domain/services/chat_room_service.dart';
 import 'package:dak_louk/domain/services/chat_service.dart';
-import 'package:dak_louk/domain/domain.dart';
+import 'package:dak_louk/domain/models/index.dart';
 import 'package:dak_louk/ui/screens/chat_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

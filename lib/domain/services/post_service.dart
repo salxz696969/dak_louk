@@ -2,7 +2,7 @@ import 'package:dak_louk/data/repositories/media_repo.dart';
 import 'package:dak_louk/data/repositories/post_repo.dart';
 import 'package:dak_louk/data/repositories/product_repo.dart';
 import 'package:dak_louk/data/repositories/user_repo.dart';
-import 'package:dak_louk/domain/domain.dart';
+import 'package:dak_louk/domain/models/index.dart';
 import 'package:dak_louk/core/utils/orm.dart';
 import 'package:dak_louk/data/tables/tables.dart';
 

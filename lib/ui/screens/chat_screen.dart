@@ -1,4 +1,4 @@
-import 'package:dak_louk/domain/domain.dart';
+import 'package:dak_louk/domain/models/index.dart';
 import 'package:dak_louk/ui/widgets/appbar.dart';
 import 'package:dak_louk/ui/widgets/chat.dart';
 import 'package:flutter/material.dart';

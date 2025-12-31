@@ -1,5 +1,5 @@
 import 'package:dak_louk/data/repositories/cart_repo.dart';
-import 'package:dak_louk/domain/domain.dart';
+import 'package:dak_louk/domain/models/index.dart';
 import 'package:dak_louk/core/utils/orm.dart';
 import 'package:dak_louk/data/tables/tables.dart';
 import 'package:dak_louk/core/utils/error.dart';

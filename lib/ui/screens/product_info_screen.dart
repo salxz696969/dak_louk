@@ -1,4 +1,4 @@
-import 'package:dak_louk/domain/domain.dart';
+import 'package:dak_louk/domain/models/index.dart';
 import 'package:dak_louk/domain/services/post_service.dart';
 import 'package:dak_louk/ui/widgets/add_and_remove_button.dart';
 import 'package:dak_louk/ui/widgets/appbar.dart';

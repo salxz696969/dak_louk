@@ -1,6 +1,6 @@
 import 'package:dak_louk/data/repositories/base_repo.dart';
 import 'package:dak_louk/data/tables/tables.dart';
-import 'package:dak_louk/domain/domain.dart';
+import 'package:dak_louk/domain/models/index.dart';
 
 class ReviewRepository extends BaseRepository<ReviewModel> {
   @override
@@ -11,7 +11,7 @@ class ReviewRepository extends BaseRepository<ReviewModel> {
     return ReviewModel(
       id: map[Tables.reviews.cols.id] as int,
       userId: map[Tables.reviews.cols.userId] as int,
-      targetUserId: map[Tables.reviews.cols.targetUserId] as int,
+      merchantId: map[Tables.reviews.cols.merchantId] as int,
       text: map[Tables.reviews.cols.text] as String,
       rating: map[Tables.reviews.cols.rating] as double,
       createdAt: DateTime.parse(map[Tables.reviews.cols.createdAt] as String),
@@ -24,7 +24,7 @@ class ReviewRepository extends BaseRepository<ReviewModel> {
     return {
       Tables.reviews.cols.id: model.id,
       Tables.reviews.cols.userId: model.userId,
-      Tables.reviews.cols.targetUserId: model.targetUserId,
+      Tables.reviews.cols.merchantId: model.merchantId,
       Tables.reviews.cols.text: model.text,
       Tables.reviews.cols.rating: model.rating,
     };

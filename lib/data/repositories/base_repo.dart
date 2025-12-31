@@ -1,5 +1,5 @@
 import 'package:dak_louk/data/cache/cache.dart';
-import 'package:dak_louk/domain/domain.dart';
+import 'package:dak_louk/domain/models/index.dart';
 import 'package:dak_louk/data/tables/tables.dart';
 import 'package:dak_louk/data/database/app_database.dart';
 import 'package:dak_louk/core/utils/orm.dart';
@@ -144,6 +144,7 @@ abstract class BaseRepository<T extends Cacheable>
   @override
   Future<int> update(T model) async {
     try {
+      if (T is CartModel) {}
       final db = await database;
       final cacheKey = _getBaseCacheKey();
       final map = toMap(model);

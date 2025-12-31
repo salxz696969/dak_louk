@@ -1,5 +1,5 @@
 import 'package:dak_louk/data/repositories/base_repo.dart';
-import 'package:dak_louk/domain/domain.dart';
+import 'package:dak_louk/domain/models/index.dart';
 import 'package:dak_louk/data/tables/tables.dart';
 
 class ChatRoomRepository extends BaseRepository<ChatRoomModel> {
@@ -11,11 +11,9 @@ class ChatRoomRepository extends BaseRepository<ChatRoomModel> {
     return ChatRoomModel(
       id: map[Tables.chatRooms.cols.id] as int,
       userId: map[Tables.chatRooms.cols.userId] as int,
-      targetUserId: map[Tables.chatRooms.cols.merchantId] as int,
+      merchantId: map[Tables.chatRooms.cols.merchantId] as int,
       createdAt: DateTime.parse(map[Tables.chatRooms.cols.createdAt] as String),
       updatedAt: DateTime.parse(map[Tables.chatRooms.cols.updatedAt] as String),
-      user: null,
-      targetUser: null,
     );
   }
 
@@ -24,7 +22,7 @@ class ChatRoomRepository extends BaseRepository<ChatRoomModel> {
     return {
       Tables.chatRooms.cols.id: model.id,
       Tables.chatRooms.cols.userId: model.userId,
-      Tables.chatRooms.cols.merchantId: model.targetUserId,
+      Tables.chatRooms.cols.merchantId: model.merchantId,
       Tables.chatRooms.cols.createdAt: model.createdAt.toIso8601String(),
       Tables.chatRooms.cols.updatedAt: model.updatedAt.toIso8601String(),
     };
