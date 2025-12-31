@@ -1,11 +1,11 @@
-import 'package:dak_louk/domain/domain.dart';
+import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/ui/widgets/appbar.dart';
 import 'package:dak_louk/ui/widgets/chat.dart';
 import 'package:flutter/material.dart';
 
 class ChatScreen extends StatelessWidget {
   final String targetUserName;
-  final Future<List<ChatModel>> chatService;
+  final Future<List<ChatVM>> chatService;
   ChatScreen({
     super.key,
     required this.targetUserName,

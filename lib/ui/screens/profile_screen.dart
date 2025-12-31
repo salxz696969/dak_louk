@@ -1,6 +1,6 @@
-import 'package:dak_louk/domain/domain.dart';
-import 'package:dak_louk/services/live_stream_service.dart';
-import 'package:dak_louk/services/post_service.dart';
+import 'package:dak_louk/domain/models/models.dart';
+import 'package:dak_louk/domain/services/live_stream_service.dart';
+import 'package:dak_louk/domain/services/post_service.dart';
 import 'package:dak_louk/ui/screens/chat_room_screen_.dart';
 import 'package:dak_louk/ui/screens/product_info_screen.dart';
 import 'package:dak_louk/ui/widgets/appbar.dart';
@@ -124,8 +124,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const SizedBox(height: 16),
             _selectedIndex == 'photos'
-                ? _PostGrid(userId: widget.userId)
-                : _LiveStreamGrid(userId: widget.userId),
+                ? _PostGrid(merchantId: widget.userId)
+                : _LiveStreamGrid(merchantId: widget.userId),
           ],
         ),
       ),
@@ -223,15 +223,14 @@ class _TabButton extends StatelessWidget {
 }
 
 class _PostGrid extends StatelessWidget {
-  final int userId;
   final PostService _postService = PostService();
-
-  _PostGrid({required this.userId});
+  final int merchantId;
+  _PostGrid({required this.merchantId});
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<PostModel>>(
-      future: _postService.getPostsByUserId(userId, 20),
+    return FutureBuilder<List<PostVM>>(
+      future: _postService.getMerchantPosts(merchantId),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Padding(
@@ -268,14 +267,14 @@ class _PostGrid extends StatelessWidget {
 }
 
 class _LiveStreamGrid extends StatelessWidget {
-  final int userId;
   final LiveStreamService _liveStreamService = LiveStreamService();
-  _LiveStreamGrid({required this.userId});
+  final int merchantId;
+  _LiveStreamGrid({required this.merchantId});
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<LiveStreamModel>>(
-      future: _liveStreamService.getAllLiveStreamsByUserId(userId, 20),
+    return FutureBuilder<List<LiveStreamVM>>(
+      future: _liveStreamService.getAllLiveStreamsWithProducts(merchantId),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Padding(
@@ -313,7 +312,7 @@ class _LiveStreamGrid extends StatelessWidget {
 }
 
 class _VideoContainer extends StatelessWidget {
-  final LiveStreamModel livestream;
+  final LiveStreamVM livestream;
 
   const _VideoContainer({required this.livestream});
   @override
@@ -331,7 +330,7 @@ class _VideoContainer extends StatelessWidget {
         children: [
           Positioned.fill(
             child: Image(
-              image: AssetImage(livestream.ui().thumbnail),
+              image: AssetImage(livestream.thumbnailUrl ?? ''),
               fit: BoxFit.cover,
             ),
           ),
@@ -345,7 +344,7 @@ class _VideoContainer extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                '${livestream.view} views',
+                '${livestream.viewCount} views',
                 style: const TextStyle(color: Colors.white, fontSize: 12),
               ),
             ),
@@ -357,7 +356,7 @@ class _VideoContainer extends StatelessWidget {
 }
 
 class _PhotoContainer extends StatelessWidget {
-  final PostModel post;
+  final PostVM post;
 
   const _PhotoContainer({required this.post});
 
@@ -376,11 +375,11 @@ class _PhotoContainer extends StatelessWidget {
         children: [
           Positioned.fill(
             child: Image(
-              image: AssetImage(post.ui().images[0]),
+              image: AssetImage(post.mediaUrls?.first ?? ''),
               fit: BoxFit.cover,
             ),
           ),
-          if (post.ui().images.length > 1)
+          if (post.mediaUrls?.isNotEmpty ?? false)
             Positioned(
               top: 8,
               right: 8,

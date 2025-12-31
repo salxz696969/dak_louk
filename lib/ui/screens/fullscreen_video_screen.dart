@@ -1,9 +1,9 @@
-import 'package:dak_louk/domain/domain.dart';
+import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/ui/widgets/live_stream.dart';
 import 'package:flutter/material.dart';
 
 class FullScreenVideoScreen extends StatefulWidget {
-  final LiveStreamModel livestream;
+  final LiveStreamVM livestream;
 
   const FullScreenVideoScreen({super.key, required this.livestream});
 

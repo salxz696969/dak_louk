@@ -1,5 +1,5 @@
-import 'package:dak_louk/domain/domain.dart';
-import 'package:dak_louk/services/live_stream_service.dart';
+import 'package:dak_louk/domain/models/models.dart';
+import 'package:dak_louk/domain/services/live_stream_service.dart';
 import 'package:dak_louk/ui/widgets/live_stream.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -15,7 +15,7 @@ class _LiveStreamScreenState extends State<LiveStreamScreen> {
   final LiveStreamService _liveStreamService = LiveStreamService();
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<LiveStreamModel>>(
+    return FutureBuilder<List<LiveStreamVM>>(
       future: _liveStreamService.getAllLiveStreamsWithProducts(20),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {

@@ -1,7 +1,7 @@
-import 'package:dak_louk/services/post_service.dart';
+import 'package:dak_louk/domain/services/post_service.dart';
 import 'package:dak_louk/ui/widgets/category_bar.dart';
 import 'package:dak_louk/ui/widgets/post_block.dart';
-import 'package:dak_louk/domain/domain.dart';
+import 'package:dak_louk/domain/models/models.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -29,8 +29,8 @@ class _HomeScreenState extends State<HomeScreen> {
         CategoryBar(onCategorySelected: onCategorySelected),
         const SizedBox(height: 20.0),
         Expanded(
-          child: FutureBuilder<List<PostModel>>(
-            future: _postService.getAllPosts(selectedCategory, 100),
+          child: FutureBuilder<List<PostVM>>(
+            future: _postService.getAllPosts(100),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());

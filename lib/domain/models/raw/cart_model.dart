@@ -1,0 +1,19 @@
+part of domain;
+
+class CartModel extends Cacheable {
+  final int id;
+  final int userId;
+  final int productId;
+  final int quantity;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+
+  CartModel({
+    required this.id,
+    required this.userId,
+    required this.productId,
+    required this.quantity,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+}

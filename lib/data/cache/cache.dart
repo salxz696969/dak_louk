@@ -1,0 +1,95 @@
+import 'package:dak_louk/domain/models/models.dart';
+
+// cache value is a wrapper class to wrap single and many, it has methods like single and many for the usage of the result of the get method
+// example: final cacheValue = cache.get<PostModel>('post:1');
+// then you can use cacheValue.single or cacheValue.many to get the data (careful usage depending on the type of the cache value, using wrong method can cause null)
+// basically CacheValue<T> = Single<T> | Many<T> in typescript
+
+// NOTE:
+// CacheValue is non-generic, so from a type-system perspective a Many cache
+// could theoretically contain mixed Cacheable instances.
+// However, cache keys are repository-scoped and owned exclusively by this
+// BaseRepository<T>, which guarantees by architecture and data flow that
+// all cached values under this key are of type T.
+// Therefore, the cast here is safe by construction.
+sealed class CacheValue {
+  Cacheable? get single => this is Single ? (this as Single).data : null;
+  List<Cacheable>? get many => this is Many ? (this as Many).data : null;
+}
+
+class Single extends CacheValue {
+  final Cacheable data;
+  Single(this.data);
+  @override
+  Cacheable? get single => data;
+}
+
+class Many extends CacheValue {
+  final List<Cacheable> data;
+  Many(this.data);
+  @override
+  List<Cacheable>? get many => data;
+}
+
+abstract class CacheInterface {
+  // // ! note: current implementation with setList and getList is a bit redundant and not redis style
+  // // ! in typescript i would do a simple type union
+  // // ! to solve we can use a sealed wrapper class like CacheValue with Single and Many but overkill for now
+  /// Set a value in the cache
+  void set(String key, CacheValue data);
+
+  /// Get a value from the cache
+  CacheValue? get(String key);
+
+  /// Delete a value from the cache
+  void del(String key);
+
+  /// Check if a value exists in the cache
+  bool exists(String key);
+
+  /// Flush all values from the cache
+  void flushAll();
+
+  /// Get the cache size
+  int getSize();
+}
+
+class Cache implements CacheInterface {
+  // singleton
+  Cache._internal();
+  static final Cache _instance = Cache._internal();
+  factory Cache() => _instance;
+
+  // change from cacheble to allow for lists of cacheable objects
+  final Map<String, CacheValue> _cache = {};
+
+  @override
+  void set(String key, CacheValue data) {
+    _cache[key] = data;
+  }
+
+  @override
+  CacheValue? get(String key) {
+    return _cache[key];
+  }
+
+  @override
+  void del(String key) {
+    _cache.remove(key);
+  }
+
+  @override
+  bool exists(String key) {
+    return _cache.containsKey(key);
+  }
+
+  @override
+  void flushAll() {
+    _cache.clear();
+  }
+
+  @override
+  int getSize() {
+    return _cache.length;
+  }
+}

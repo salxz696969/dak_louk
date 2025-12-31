@@ -1,10 +1,10 @@
-import 'package:dak_louk/domain/domain.dart';
+import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/ui/widgets/add_and_remove_button.dart';
 import 'package:dak_louk/ui/widgets/appbar.dart';
 import 'package:flutter/material.dart';
 
 class CheckoutScreen extends StatefulWidget {
-  final CartModel cart;
+  final CartVM cart;
   const CheckoutScreen({super.key, required this.cart});
 
   @override
@@ -40,13 +40,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 }
 
 class _ProductSection extends StatelessWidget {
-  final CartModel cart;
+  final CartVM cart;
   const _ProductSection({required this.cart});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final ui = cart.ui();
 
     return Container(
       padding: const EdgeInsets.all(12),
@@ -60,14 +59,14 @@ class _ProductSection extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(10),
             child: Image(
-              image: AssetImage(ui.image[0]),
+              image: AssetImage(cart.productImageUrl ?? ''),
               fit: BoxFit.cover,
               width: double.infinity,
             ),
           ),
           const SizedBox(height: 12),
           Text(
-            ui.title,
+            cart.productName ?? '',
             style: theme.textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.bold,
             ),
@@ -76,23 +75,23 @@ class _ProductSection extends StatelessWidget {
           Row(
             children: [
               Text(
-                ui.sellerName,
+                cart.merchantName ?? '',
                 style: const TextStyle(
                   fontWeight: FontWeight.w500,
                   fontSize: 16,
                 ),
               ),
               const SizedBox(width: 8),
-              Text(
-                ui.sellerRating.toString(),
-                style: TextStyle(fontSize: 12, color: Colors.grey[700]),
-              ),
+              // Text(
+              //   cart.merchantRating.toString(),
+              //   style: TextStyle(fontSize: 12, color: Colors.grey[700]),
+              // ),
               const Icon(Icons.star, size: 12, color: Colors.amber),
             ],
           ),
           const SizedBox(height: 8),
           Text(
-            ui.price,
+            cart.productPrice.toString(),
             style: TextStyle(
               color: theme.colorScheme.primary,
               fontSize: 20,
@@ -204,14 +203,15 @@ class _DeliveryInformationSection extends StatelessWidget {
 }
 
 class _OrderSummarySection extends StatelessWidget {
-  final CartModel cart;
+  final CartVM cart;
   const _OrderSummarySection({required this.cart});
 
   @override
   Widget build(BuildContext context) {
     double deliveryFee = 5.00;
-    double price = double.tryParse(cart.ui().price.replaceAll('\$', '')) ?? 0.0;
-    final ui = cart.ui();
+    double price =
+        double.tryParse(cart.productPrice.toString().replaceAll('\$', '')) ??
+        0.0;
     return Padding(
       padding: const EdgeInsets.all(12),
       child: Column(
@@ -224,14 +224,17 @@ class _OrderSummarySection extends StatelessWidget {
           const SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [const Text("Subtotal:"), Text(ui.price)],
+            children: [
+              const Text("Subtotal:"),
+              Text(cart.productPrice.toString()),
+            ],
           ),
           const SizedBox(height: 6),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text("Delivery Fee:"),
-              Text("\$${deliveryFee.toStringAsFixed(2)}"),
+              Text("\$${deliveryFee.toString()}"),
             ],
           ),
           const Divider(height: 24),
@@ -243,7 +246,7 @@ class _OrderSummarySection extends StatelessWidget {
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
               Text(
-                "\$${(price + deliveryFee).toStringAsFixed(2)}",
+                "\$${(price + deliveryFee).toString()}",
                 style: TextStyle(
                   fontSize: 30,
                   color: Theme.of(context).colorScheme.primary,

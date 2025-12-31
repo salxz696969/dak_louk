@@ -1,4 +1,4 @@
-import 'package:dak_louk/services/cart_service.dart';
+import 'package:dak_louk/domain/services/cart_service.dart';
 import 'package:dak_louk/ui/widgets/appbar.dart';
 import 'package:dak_louk/ui/screens/checkout_screen.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +20,7 @@ class _CartScreenState extends State<CartScreen> {
         child: Appbar(title: 'Cart'),
       ),
       body: FutureBuilder(
-        future: _cartService.getCartsByUserId(1),
+        future: _cartService.getCarts(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -34,7 +34,6 @@ class _CartScreenState extends State<CartScreen> {
             itemCount: carts.length,
             itemBuilder: (context, index) {
               final cart = carts[index];
-              final cartUI = cart.ui();
               return InkWell(
                 onTap: () {
                   Navigator.push(
@@ -72,13 +71,13 @@ class _CartScreenState extends State<CartScreen> {
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(8.0),
                             child: Image(
-                              image: AssetImage(cartUI.image[0]),
+                              image: AssetImage(cart.productImageUrl ?? ''),
                               fit: BoxFit.cover,
                             ),
                           ),
                         ),
                         title: Text(
-                          cartUI.title,
+                          cart.productName ?? '',
                           style: const TextStyle(
                             overflow: TextOverflow.ellipsis,
                             fontSize: 16,
@@ -86,7 +85,7 @@ class _CartScreenState extends State<CartScreen> {
                           ),
                         ),
                         subtitle: Text(
-                          cartUI.price,
+                          cart.productPrice.toString(),
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.secondary,
                             fontSize: 14,

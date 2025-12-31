@@ -1,6 +1,6 @@
-import 'package:dak_louk/services/chat_room_service.dart';
-import 'package:dak_louk/services/chat_service.dart';
-import 'package:dak_louk/domain/domain.dart';
+import 'package:dak_louk/domain/services/chat_room_service.dart';
+import 'package:dak_louk/domain/services/chat_service.dart';
+import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/ui/screens/chat_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -10,8 +10,8 @@ class ChatRoomScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<ChatRoomModel>>(
-      future: ChatRoomService().getAllChatRoomsByUserId(1),
+    return FutureBuilder<List<ChatRoomVM>>(
+      future: ChatRoomService().getAllChatRooms(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -25,7 +25,6 @@ class ChatRoomScreen extends StatelessWidget {
           itemCount: chatRooms.length,
           itemBuilder: (context, index) {
             final chatRoom = chatRooms[index];
-            final chatRoomUI = chatRoom.ui();
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12.0),
               child: Container(
@@ -36,29 +35,31 @@ class ChatRoomScreen extends StatelessWidget {
                 ),
                 child: ListTile(
                   leading: CircleAvatar(
-                    backgroundImage: AssetImage(chatRoomUI.targetUserAvatarUrl),
+                    backgroundImage: AssetImage(
+                      chatRoom.targetUserProfileImage ?? '',
+                    ),
                   ),
                   title: Text(
-                    chatRoomUI.targetUserName,
+                    chatRoom.targetUserName ?? '',
                     style: TextStyle(
-                      fontWeight: chatRoomUI.areYouLatestToChat
+                      fontWeight: chatRoom.hasUnreadMessages
                           ? FontWeight.normal
                           : FontWeight.bold,
                     ),
                   ),
-                  subtitle: chatRoomUI.areYouLatestToChat
+                  subtitle: chatRoom.hasUnreadMessages
                       ? Text(
-                          'You: ${chatRoomUI.latestChat}',
+                          'You: ${chatRoom.lastMessage}',
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
                         )
                       : Text(
-                          chatRoomUI.latestChat,
+                          chatRoom.lastMessage ?? '',
                           style: TextStyle(fontWeight: FontWeight.bold),
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
                         ),
-                  trailing: chatRoomUI.areYouLatestToChat
+                  trailing: chatRoom.hasUnreadMessages
                       ? null
                       : Icon(
                           Icons.circle,
@@ -70,12 +71,10 @@ class ChatRoomScreen extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                         builder: (context) => ChatScreen(
-                          targetUserName: chatRoom.ui().targetUserName,
-                          chatService: ChatService()
-                              .getChatsByUserIdAndTargetUserId(
-                                1,
-                                chatRoom.targetUserId,
-                              ),
+                          targetUserName: chatRoom.targetUserName ?? '',
+                          chatService: ChatService().getChatsByChatRoomId(
+                            chatRoom.id,
+                          ),
                         ),
                       ),
                     );

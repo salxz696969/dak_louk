@@ -1,4 +1,4 @@
-import 'package:dak_louk/domain/domain.dart';
+import 'package:dak_louk/domain/models/models.dart';
 import 'package:flutter/material.dart';
 
 // Extension to add capitalize method to String
