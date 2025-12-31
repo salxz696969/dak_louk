@@ -18,13 +18,15 @@ class PostService {
       throw AppError(type: ErrorType.UNAUTHORIZED, message: 'Unauthorized');
     }
   }
-  Future<List<PostVM>> getPostsByUserId(int userId, int limit) async {
+  Future<List<PostVM>> getMerchantPosts(int merchantId) async {
     try {
-      final statement = Clauses.where.eq(Tables.posts.cols.merchantId, userId);
+      final statement = Clauses.where.eq(
+        Tables.posts.cols.merchantId,
+        merchantId,
+      );
       final posts = await _postRepository.queryThisTable(
         where: statement.clause,
         args: statement.args,
-        limit: limit > 0 ? limit : 20,
       );
 
       // Populate relations

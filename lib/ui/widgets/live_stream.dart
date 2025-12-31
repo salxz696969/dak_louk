@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
 class LiveStream extends StatefulWidget {
-  final LiveStreamModel livestream;
+  final LiveStreamVM livestream;
   const LiveStream({super.key, required this.livestream});
 
   @override
@@ -19,7 +19,7 @@ class _LiveStreamState extends State<LiveStream> {
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.asset(widget.livestream.url)
+    _controller = VideoPlayerController.asset(widget.livestream.streamUrl)
       ..initialize().then((_) {
         if (!mounted) return;
         setState(() {});
@@ -57,7 +57,7 @@ class _LiveStreamState extends State<LiveStream> {
           bottom: 16,
           left: 16,
           child: _LiveStreamChatBox(
-            liveStreamChats: widget.livestream.liveStreamChats ?? [],
+            liveStreamChats: List<LiveStreamChatVM>.empty(), // to change
           ),
         ),
         Positioned(
@@ -106,7 +106,7 @@ class _LiveStreamState extends State<LiveStream> {
 }
 
 class _LiveStreamChatBox extends StatefulWidget {
-  final List<LiveStreamChatModel> liveStreamChats;
+  final List<LiveStreamChatVM> liveStreamChats;
 
   const _LiveStreamChatBox({required this.liveStreamChats});
 
@@ -116,7 +116,7 @@ class _LiveStreamChatBox extends StatefulWidget {
 
 class _LiveStreamChatBoxState extends State<_LiveStreamChatBox> {
   final GlobalKey<AnimatedListState> _listKey = GlobalKey();
-  final List<LiveStreamChatModel> _visibleChats = [];
+  final List<LiveStreamChatVM> _visibleChats = [];
 
   Timer? _timer;
   int _index = 0;
@@ -178,14 +178,14 @@ class _LiveStreamChatBoxState extends State<_LiveStreamChatBox> {
                 text: TextSpan(
                   children: [
                     TextSpan(
-                      text: '${chat.ui().username}: ',
+                      text: '${chat.userName}: ',
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.greenAccent,
                       ),
                     ),
                     TextSpan(
-                      text: chat.ui().text,
+                      text: chat.text,
                       style: const TextStyle(color: Colors.white),
                     ),
                   ],
@@ -206,7 +206,7 @@ class _FeaturedProduct extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<PostModel>>(
+    return FutureBuilder<List<PostVM>>(
       future: _postService.getPostsByLiveStreamId(liveStreamId),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {

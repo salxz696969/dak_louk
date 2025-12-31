@@ -9,12 +9,12 @@ class UsernameContainer extends StatelessWidget {
   final ImageProvider profile;
   final String username;
   final String rating;
-  final int userId;
+  final int merchantId;
   final String bio;
   const UsernameContainer({
     super.key,
     required this.rating,
-    required this.userId,
+    required this.merchantId,
     required this.bio,
     required this.profile,
     required this.username,
@@ -78,8 +78,7 @@ class UsernameContainer extends StatelessWidget {
             child: const Icon(CupertinoIcons.chat_bubble, size: 36),
             onTap: () async {
               final chatRoomId = await ChatRoomService().getChatRoomId(
-                1,
-                userId,
+                merchantId,
               );
               if (chatRoomId != -1) {
                 Navigator.push(
@@ -87,8 +86,9 @@ class UsernameContainer extends StatelessWidget {
                   MaterialPageRoute(
                     builder: (context) => ChatScreen(
                       targetUserName: username,
-                      chatService: ChatService()
-                          .getChatsByUserIdAndTargetUserId(1, userId),
+                      chatService: ChatService().getChatsByChatRoomId(
+                        chatRoomId,
+                      ),
                     ),
                   ),
                 );
@@ -97,8 +97,9 @@ class UsernameContainer extends StatelessWidget {
                   MaterialPageRoute(
                     builder: (context) => ChatScreen(
                       targetUserName: username,
-                      chatService: ChatService()
-                          .getChatsByUserIdAndTargetUserId(1, userId),
+                      chatService: ChatService().getChatsByChatRoomId(
+                        chatRoomId,
+                      ),
                     ),
                   ),
                 );

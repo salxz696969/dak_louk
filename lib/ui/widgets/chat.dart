@@ -41,8 +41,8 @@ class _ChatState extends State<Chat> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<ChatModel>>(
-      future: _chatService.getChatsByUserIdAndTargetUserId(1, 2),
+    return FutureBuilder<List<ChatVM>>(
+      future: _chatService.getChatsByChatRoomId(1),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -74,7 +74,7 @@ class _ChatState extends State<Chat> {
                   itemCount: chats.length,
                   itemBuilder: (context, index) {
                     final chat = chats[index];
-                    final isMe = chat.userId == 1;
+                    final isMe = chat.senderId == 1;
 
                     return Align(
                       alignment: isMe
@@ -139,15 +139,11 @@ class _ChatState extends State<Chat> {
                     InkWell(
                       borderRadius: BorderRadius.circular(24),
                       onTap: () async {
-                        final ChatModel newChat = ChatModel(
-                          id: 1,
-                          userId: 1,
-                          text: _controller.text,
+                        final CreateChatDTO newChat = CreateChatDTO(
                           chatRoomId: chats.first.chatRoomId,
-                          createdAt: DateTime.now(),
-                          updatedAt: DateTime.now(),
+                          text: _controller.text,
                         );
-                        await _chatService.insertChat(newChat);
+                        await _chatService.createChat(newChat);
                         setState(() {
                           _controller.clear();
                         });

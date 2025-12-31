@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 class AddAndRemoveButton extends StatefulWidget {
   final double size;
-  final CartModel cart;
+  final CartVM cart;
   final int baseQuantity;
 
   const AddAndRemoveButton({
@@ -46,14 +46,8 @@ class _AddAndRemoveButtonState extends State<AddAndRemoveButton> {
                 currentQuantity = currentQuantity - 1;
               });
               await _cartService.updateCart(
-                CartModel(
-                  id: widget.cart.id,
-                  userId: widget.cart.userId,
-                  productId: widget.cart.productId,
-                  quantity: currentQuantity,
-                  createdAt: widget.cart.createdAt,
-                  updatedAt: DateTime.now(),
-                ),
+                widget.cart.id,
+                UpdateCartDTO(quantity: currentQuantity),
               );
             }
           },
@@ -80,14 +74,8 @@ class _AddAndRemoveButtonState extends State<AddAndRemoveButton> {
                 currentQuantity = currentQuantity + 1;
               });
               await _cartService.updateCart(
-                CartModel(
-                  id: widget.cart.id,
-                  userId: widget.cart.userId,
-                  productId: widget.cart.productId,
-                  quantity: currentQuantity,
-                  createdAt: widget.cart.createdAt,
-                  updatedAt: DateTime.now(),
-                ),
+                widget.cart.id,
+                UpdateCartDTO(quantity: currentQuantity),
               );
             }
           },

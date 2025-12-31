@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 class ChatScreen extends StatelessWidget {
   final String targetUserName;
-  final Future<List<ChatModel>> chatService;
+  final Future<List<ChatVM>> chatService;
   ChatScreen({
     super.key,
     required this.targetUserName,

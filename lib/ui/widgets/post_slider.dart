@@ -5,7 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class PostSlider extends StatefulWidget {
-  final List<PostModel> posts;
+  final List<PostVM> posts;
 
   const PostSlider({super.key, required this.posts});
 
@@ -52,7 +52,7 @@ class _PostSliderState extends State<PostSlider> {
 }
 
 class _SimilarItemCard extends StatefulWidget {
-  final PostModel post;
+  final PostVM post;
 
   const _SimilarItemCard({required this.post});
 
@@ -64,7 +64,6 @@ class _SimilarItemCardState extends State<_SimilarItemCard> {
   bool isAdded = false;
   @override
   Widget build(BuildContext context) {
-    final ui = widget.post.ui();
     return InkWell(
       onTap: () {
         Navigator.push(
@@ -89,7 +88,7 @@ class _SimilarItemCardState extends State<_SimilarItemCard> {
                   AspectRatio(
                     aspectRatio: 4 / 3,
                     child: Image(
-                      image: AssetImage(ui.images[0]),
+                      image: AssetImage(widget.post.mediaUrls?.first ?? ''),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -107,7 +106,7 @@ class _SimilarItemCardState extends State<_SimilarItemCard> {
                           vertical: 4.0,
                         ),
                         child: Text(
-                          '${ui.quantity} left',
+                          '${widget.post.productNames?.first ?? '0'} left', // to change
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
@@ -136,14 +135,16 @@ class _SimilarItemCardState extends State<_SimilarItemCard> {
                     children: [
                       CircleAvatar(
                         radius: 18,
-                        backgroundImage: AssetImage(ui.profileImage),
+                        backgroundImage: AssetImage(
+                          widget.post.merchantProfileImage ?? '',
+                        ),
                       ),
                       const SizedBox(width: 6),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            ui.username,
+                            widget.post.merchantName ?? '',
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
@@ -154,7 +155,7 @@ class _SimilarItemCardState extends State<_SimilarItemCard> {
                           Row(
                             children: [
                               Text(
-                                ui.rating,
+                                widget.post.merchantName ?? '', // to change
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: Colors.grey[200],
@@ -175,7 +176,7 @@ class _SimilarItemCardState extends State<_SimilarItemCard> {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            "\$${ui.price}",
+                            "\$${widget.post.productNames?.first ?? '0'}", // to change
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
@@ -192,7 +193,7 @@ class _SimilarItemCardState extends State<_SimilarItemCard> {
                     children: [
                       Expanded(
                         child: Text(
-                          ui.title,
+                          widget.post.caption ?? '',
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
@@ -218,11 +219,11 @@ class _SimilarItemCardState extends State<_SimilarItemCard> {
                                 child: AddAndRemoveButton(
                                   baseQuantity: 1,
                                   size: 25.0,
-                                  cart: CartModel(
+                                  cart: CartVM(
                                     id: 0,
-                                    userId: 1,
-                                    productId: ui.productId,
-                                    quantity: int.parse(ui.quantity),
+                                    userId: widget.post.merchantId,
+                                    productId: widget.post.id,
+                                    quantity: 1,
                                     createdAt: DateTime.now(),
                                     updatedAt: DateTime.now(),
                                   ),

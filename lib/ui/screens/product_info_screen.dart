@@ -9,7 +9,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class ProductInfoScreen extends StatefulWidget {
-  final PostModel post;
+  final PostVM post;
   const ProductInfoScreen({super.key, required this.post});
 
   @override
@@ -26,7 +26,6 @@ class _ProductInfoScreenState extends State<ProductInfoScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final ui = widget.post.ui();
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(kToolbarHeight),
@@ -44,22 +43,26 @@ class _ProductInfoScreenState extends State<ProductInfoScreen> {
                 bottom: 2.0,
               ),
               child: UsernameContainer(
-                userId: ui.userId,
-                rating: ui.rating,
-                bio: ui.bio,
-                profile: AssetImage(ui.profileImage),
-                username: ui.username,
+                merchantId: widget.post.merchantId,
+                rating: "0.0", // to change
+                bio: "", // to change
+                profile: AssetImage(widget.post.merchantProfileImage ?? ''),
+                username: widget.post.merchantName ?? '',
               ),
             ),
             PhotoSlider(
-              quantity: ui.quantity,
-              images: ui.images.map((image) => AssetImage(image)).toList(),
+              quantity: "0", // to change
+              images:
+                  widget.post.mediaUrls
+                      ?.map((image) => AssetImage(image))
+                      .toList() ??
+                  [],
             ),
             const SizedBox(height: 10),
             Padding(
               padding: const EdgeInsets.all(12.0),
               child: Text(
-                ui.title,
+                widget.post.caption ?? '',
                 style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.w600,
@@ -69,7 +72,7 @@ class _ProductInfoScreenState extends State<ProductInfoScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12.0),
               child: Text(
-                "\$${ui.price}",
+                "\$${widget.post.productNames?.first ?? '0'}", // to change
                 style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.w600,
@@ -80,7 +83,7 @@ class _ProductInfoScreenState extends State<ProductInfoScreen> {
             Padding(
               padding: const EdgeInsets.only(left: 12.0),
               child: Text(
-                ui.date,
+                widget.post.createdAt.toLocal().toString(),
                 style: const TextStyle(fontSize: 13, color: Color(0xFF777777)),
               ),
             ),
@@ -96,7 +99,7 @@ class _ProductInfoScreenState extends State<ProductInfoScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12.0),
               child: Text(
-                ui.description,
+                widget.post.caption ?? '',
                 style: const TextStyle(
                   fontSize: 13,
                   height: 1.4,
@@ -110,13 +113,13 @@ class _ProductInfoScreenState extends State<ProductInfoScreen> {
               child: AddAndRemoveButton(
                 baseQuantity: 1,
                 size: 30.0,
-                cart: CartModel(
+                cart: CartVM(
                   id: 0,
-                  userId: 1,
-                  productId: ui.productId,
+                  userId: widget.post.merchantId,
+                  productId: widget.post.id,
                   quantity: quantity,
-                  createdAt: DateTime.now(),
-                  updatedAt: DateTime.now(),
+                  createdAt: DateTime.now(), // to change
+                  updatedAt: DateTime.now(), // to change
                 ),
               ),
             ),
@@ -128,7 +131,9 @@ class _ProductInfoScreenState extends State<ProductInfoScreen> {
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
               ),
             ),
-            _SimilarItems(category: ui.category ?? ''),
+            _SimilarItems(
+              category: widget.post.productNames?.first ?? '',
+            ), // to change
           ],
         ),
       ),
@@ -142,8 +147,8 @@ class _SimilarItems extends StatelessWidget {
   _SimilarItems({required this.category});
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<PostModel>>(
-      future: _postService.getAllPosts(category, 10),
+    return FutureBuilder<List<PostVM>>(
+      future: _postService.getAllPosts(10),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -153,7 +158,7 @@ class _SimilarItems extends StatelessWidget {
           return const Center(child: Text('No similar items found.'));
         } else {
           final posts = snapshot.data!;
-          return PostSlider(posts: posts);
+          return PostSlider(posts: List<PostVM>.empty()); // to change
         }
       },
     );

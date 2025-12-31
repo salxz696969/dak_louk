@@ -15,7 +15,7 @@ class _LiveStreamScreenState extends State<LiveStreamScreen> {
   final LiveStreamService _liveStreamService = LiveStreamService();
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<LiveStreamModel>>(
+    return FutureBuilder<List<LiveStreamVM>>(
       future: _liveStreamService.getAllLiveStreamsWithProducts(20),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {

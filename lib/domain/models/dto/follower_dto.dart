@@ -1,13 +1,9 @@
 part of domain;
 
 class CreateFollowerDTO {
-  final int followerId;
   final int followedId;
 
-  CreateFollowerDTO({
-    required this.followerId,
-    required this.followedId,
-  });
+  CreateFollowerDTO({required this.followedId});
 }
 
 class UpdateFollowerDTO {

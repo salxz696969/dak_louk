@@ -1,14 +1,12 @@
 part of domain;
 
 class CreateProductDTO {
-  final int merchantId;
   final String name;
   final String? description;
   final double price;
   final int quantity;
 
   CreateProductDTO({
-    required this.merchantId,
     required this.name,
     this.description,
     required this.price,

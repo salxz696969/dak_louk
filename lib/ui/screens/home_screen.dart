@@ -29,8 +29,8 @@ class _HomeScreenState extends State<HomeScreen> {
         CategoryBar(onCategorySelected: onCategorySelected),
         const SizedBox(height: 20.0),
         Expanded(
-          child: FutureBuilder<List<PostModel>>(
-            future: _postService.getAllPosts(selectedCategory, 100),
+          child: FutureBuilder<List<PostVM>>(
+            future: _postService.getAllPosts(100),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());

@@ -40,63 +40,63 @@ class ChatService {
     }
   }
 
-  // Migrated from ChatDao.getChatsByUserIdAndTargetUserId
-  Future<List<ChatModel>> getChatWithMerchant(int merchantId) async {
-    try {
-      // Find chat room between the two users
-      final userStatement1 = Clauses.where.eq(
-        Tables.chatRooms.cols.userId,
-        merchantId,
-      );
-      final targetStatement1 = Clauses.where.eq(
-        Tables.chatRooms.cols.merchantId,
-        merchantId,
-      );
-      final orStatement1 = Clauses.where.and([
-        userStatement1,
-        targetStatement1,
-      ]);
+  // // Migrated from ChatDao.getChatsByUserIdAndTargetUserId
+  // Future<List<ChatModel>> getChatWithMerchant(int merchantId) async {
+  //   try {
+  //     // Find chat room between the two users
+  //     final userStatement1 = Clauses.where.eq(
+  //       Tables.chatRooms.cols.userId,
+  //       merchantId,
+  //     );
+  //     final targetStatement1 = Clauses.where.eq(
+  //       Tables.chatRooms.cols.merchantId,
+  //       merchantId,
+  //     );
+  //     final orStatement1 = Clauses.where.and([
+  //       userStatement1,
+  //       targetStatement1,
+  //     ]);
 
-      final userStatement2 = Clauses.where.eq(
-        Tables.chatRooms.cols.userId,
-        merchantId,
-      );
-      final targetStatement2 = Clauses.where.eq(
-        Tables.chatRooms.cols.merchantId,
-        currentUserId,
-      );
-      final orStatement2 = Clauses.where.and([
-        userStatement2,
-        targetStatement2,
-      ]);
+  //     final userStatement2 = Clauses.where.eq(
+  //       Tables.chatRooms.cols.userId,
+  //       merchantId,
+  //     );
+  //     final targetStatement2 = Clauses.where.eq(
+  //       Tables.chatRooms.cols.merchantId,
+  //       currentUserId,
+  //     );
+  //     final orStatement2 = Clauses.where.and([
+  //       userStatement2,
+  //       targetStatement2,
+  //     ]);
 
-      // Query for chat room with OR condition
-      final chatRooms1 = await _chatRoomRepository.queryThisTable(
-        where: orStatement1.clause,
-        args: orStatement1.args,
-        limit: 1,
-      );
+  //     // Query for chat room with OR condition
+  //     final chatRooms1 = await _chatRoomRepository.queryThisTable(
+  //       where: orStatement1.clause,
+  //       args: orStatement1.args,
+  //       limit: 1,
+  //     );
 
-      final chatRooms2 = await _chatRoomRepository.queryThisTable(
-        where: orStatement2.clause,
-        args: orStatement2.args,
-        limit: 1,
-      );
+  //     final chatRooms2 = await _chatRoomRepository.queryThisTable(
+  //       where: orStatement2.clause,
+  //       args: orStatement2.args,
+  //       limit: 1,
+  //     );
 
-      final chatRooms = [...chatRooms1, ...chatRooms2];
+  //     final chatRooms = [...chatRooms1, ...chatRooms2];
 
-      if (chatRooms.isNotEmpty) {
-        final chatRoomId = chatRooms.first.id;
-        return getChatByChatRoomId(chatRoomId);
-      }
-      return [];
-    } catch (e) {
-      rethrow;
-    }
-  }
+  //     if (chatRooms.isNotEmpty) {
+  //       final chatRoomId = chatRooms.first.id;
+  //       return getChatByChatRoomId(chatRoomId);
+  //     }
+  //     return [];
+  //   } catch (e) {
+  //     rethrow;
+  //   }
+  // }
 
   // Migrated from ChatDao.getChatByChatRoomId
-  Future<List<ChatModel>> getChatByChatRoomId(int chatRoomId) async {
+  Future<List<ChatVM>> getChatsByChatRoomId(int chatRoomId) async {
     try {
       final statement = Clauses.where.eq(
         Tables.chats.cols.chatRoomId,
@@ -111,13 +111,11 @@ class ChatService {
         // Populate user information for each chat
         final enrichedChats = await Future.wait(
           result.map((chat) async {
-            return ChatModel(
-              id: chat.id,
-              senderId: chat.senderId,
-              text: chat.text,
-              chatRoomId: chat.chatRoomId,
-              createdAt: chat.createdAt,
-              updatedAt: chat.updatedAt,
+            return ChatVM.fromRaw(
+              chat,
+              senderName: '',
+              senderProfileImage: '',
+              isFromCurrentUser: false,
             );
           }),
         );
@@ -126,13 +124,18 @@ class ChatService {
 
       // Return empty chat as in DAO
       return [
-        ChatModel(
-          id: 0,
-          senderId: 0,
-          text: '',
-          chatRoomId: chatRoomId,
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
+        ChatVM.fromRaw(
+          ChatModel(
+            id: 0,
+            chatRoomId: chatRoomId,
+            senderId: 0,
+            text: '',
+            createdAt: DateTime.now(),
+            updatedAt: DateTime.now(),
+          ),
+          senderName: '',
+          senderProfileImage: '',
+          isFromCurrentUser: false,
         ),
       ];
     } catch (e) {
@@ -193,7 +196,7 @@ class ChatService {
   }
 
   // Migrated from ChatDao.getLatestChatByChatRoomId
-  Future<ChatModel> getLatestChatByChatRoomId(int chatRoomId) async {
+  Future<ChatVM> getLatestChatByChatRoomId(int chatRoomId) async {
     try {
       final statement = Clauses.where.eq(
         Tables.chats.cols.chatRoomId,
@@ -210,13 +213,11 @@ class ChatService {
 
       if (result.isNotEmpty) {
         final chat = result.first;
-        return ChatModel(
-          id: chat.id,
-          senderId: chat.senderId,
-          text: chat.text,
-          chatRoomId: chat.chatRoomId,
-          createdAt: chat.createdAt,
-          updatedAt: chat.updatedAt,
+        return ChatVM.fromRaw(
+          chat,
+          senderName: '',
+          senderProfileImage: '',
+          isFromCurrentUser: false,
         );
       }
       throw Exception('Chat not found');

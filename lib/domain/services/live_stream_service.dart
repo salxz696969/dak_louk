@@ -80,7 +80,7 @@ class LiveStreamService {
     try {
       final liveStreamModel = LiveStreamModel(
         id: 0,
-        merchantId: dto.merchantId,
+        merchantId: currentUserId,
         title: dto.title,
         streamUrl: dto.streamUrl,
         thumbnailUrl: dto.thumbnailUrl,

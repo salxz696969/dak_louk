@@ -1,13 +1,9 @@
 part of domain;
 
 class CreatePostLikeDTO {
-  final int userId;
   final int postId;
 
-  CreatePostLikeDTO({
-    required this.userId,
-    required this.postId,
-  });
+  CreatePostLikeDTO({required this.postId});
 }
 
 class UpdatePostLikeDTO {

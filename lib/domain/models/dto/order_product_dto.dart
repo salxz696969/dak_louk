@@ -18,8 +18,5 @@ class UpdateOrderProductDTO {
   final int? quantity;
   final double? priceSnapshot;
 
-  UpdateOrderProductDTO({
-    this.quantity,
-    this.priceSnapshot,
-  });
+  UpdateOrderProductDTO({this.quantity, this.priceSnapshot});
 }
