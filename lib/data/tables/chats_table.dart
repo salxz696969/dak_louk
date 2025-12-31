@@ -9,7 +9,7 @@ class ChatsTable implements DbTable<ChatsCols> {
 }
 
 // Note: Chats table only has created_at, not updated_at
-class ChatsCols extends BaseColsCreatedOnly {
+class ChatsCols extends BaseCols {
   const ChatsCols();
   static const String chatRoomIdCol = 'chat_room_id';
   static const String senderIdCol = 'sender_id';

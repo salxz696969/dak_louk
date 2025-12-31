@@ -11,7 +11,7 @@ class ChatRoomRepository extends BaseRepository<ChatRoomModel> {
     return ChatRoomModel(
       id: map[Tables.chatRooms.cols.id] as int,
       userId: map[Tables.chatRooms.cols.userId] as int,
-      targetUserId: map[Tables.chatRooms.cols.targetUserId] as int,
+      targetUserId: map[Tables.chatRooms.cols.merchantId] as int,
       createdAt: DateTime.parse(map[Tables.chatRooms.cols.createdAt] as String),
       updatedAt: DateTime.parse(map[Tables.chatRooms.cols.updatedAt] as String),
       user: null,
@@ -24,7 +24,7 @@ class ChatRoomRepository extends BaseRepository<ChatRoomModel> {
     return {
       Tables.chatRooms.cols.id: model.id,
       Tables.chatRooms.cols.userId: model.userId,
-      Tables.chatRooms.cols.targetUserId: model.targetUserId,
+      Tables.chatRooms.cols.merchantId: model.targetUserId,
       Tables.chatRooms.cols.createdAt: model.createdAt.toIso8601String(),
       Tables.chatRooms.cols.updatedAt: model.updatedAt.toIso8601String(),
     };

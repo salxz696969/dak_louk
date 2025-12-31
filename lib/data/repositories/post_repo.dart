@@ -10,8 +10,8 @@ class PostRepository extends BaseRepository<PostModel> {
   PostModel fromMap(Map<String, dynamic> map) {
     return PostModel(
       id: map[Tables.posts.cols.id] as int,
-      userId: map[Tables.posts.cols.userId] as int,
-      title: map[Tables.posts.cols.title] as String,
+      userId: map[Tables.posts.cols.merchantId] as int,
+      caption: map[Tables.posts.cols.caption] as String,
       productId: map[Tables.posts.cols.productId] as int,
       createdAt: DateTime.parse(map[Tables.posts.cols.createdAt] as String),
       updatedAt: DateTime.parse(map[Tables.posts.cols.updatedAt] as String),

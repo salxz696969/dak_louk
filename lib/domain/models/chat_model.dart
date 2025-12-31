@@ -2,7 +2,7 @@ part of domain;
 
 class ChatModel extends Cacheable {
   final int id;
-  final int userId;
+  final int senderId;
   final String text;
   final int chatRoomId;
   final DateTime createdAt;
@@ -12,7 +12,7 @@ class ChatModel extends Cacheable {
 
   ChatModel({
     required this.id,
-    required this.userId,
+    required this.senderId,
     required this.text,
     required this.chatRoomId,
     required this.createdAt,

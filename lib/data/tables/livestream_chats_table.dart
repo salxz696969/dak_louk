@@ -9,7 +9,7 @@ class LiveStreamChatsTable implements DbTable<LiveStreamChatsCols> {
 }
 
 // Note: Live stream chats table only has created_at, not updated_at
-class LiveStreamChatsCols extends BaseColsCreatedOnly {
+class LiveStreamChatsCols extends BaseCols {
   const LiveStreamChatsCols();
   static const String liveStreamIdCol = 'live_stream_id';
   static const String userIdCol = 'user_id';

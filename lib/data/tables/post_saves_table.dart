@@ -9,7 +9,7 @@ class PostSavesTable implements DbTable<PostSavesCols> {
 }
 
 // Note: Post saves table only has created_at, not updated_at
-class PostSavesCols extends BaseColsCreatedOnly {
+class PostSavesCols extends BaseCols {
   const PostSavesCols();
   static const String userIdCol = 'user_id';
   static const String postIdCol = 'post_id';

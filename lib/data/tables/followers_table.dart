@@ -9,7 +9,7 @@ class FollowersTable implements DbTable<FollowersCols> {
 }
 
 // Note: Followers table only has created_at, not updated_at
-class FollowersCols extends BaseColsCreatedOnly {
+class FollowersCols extends BaseCols {
   const FollowersCols();
   static const String followerIdCol = 'follower_id';
   static const String followedIdCol = 'followed_id';

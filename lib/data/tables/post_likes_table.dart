@@ -9,7 +9,7 @@ class PostLikesTable implements DbTable<PostLikesCols> {
 }
 
 // Note: Post likes table only has created_at, not updated_at
-class PostLikesCols extends BaseColsCreatedOnly {
+class PostLikesCols extends BaseCols {
   const PostLikesCols();
   static const String userIdCol = 'user_id';
   static const String postIdCol = 'post_id';

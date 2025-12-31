@@ -1,267 +1,274 @@
 import 'dart:math';
+import 'package:dak_louk/data/tables/tables.dart';
 import 'package:sqflite/sqflite.dart';
 
 Future<void> initDb(Database db) async {
   // 1️⃣ USERS - Base table, no dependencies
   await db.execute('''
-      CREATE TABLE users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT UNIQUE NOT NULL,
-        password_hash TEXT NOT NULL,
-        profile_image_url TEXT,
-        rating REAL DEFAULT 0.0,
-        bio TEXT,
-        role TEXT CHECK(role IN ('user', 'merchant')) DEFAULT 'user',
-        created_at TEXT NOT NULL,
-        updated_at TEXT NOT NULL
+      CREATE TABLE ${Tables.users.tableName} (
+        ${Tables.users.cols.id} INTEGER PRIMARY KEY AUTOINCREMENT,
+        ${Tables.users.cols.username} TEXT UNIQUE NOT NULL,
+        ${Tables.users.cols.passwordHash} TEXT NOT NULL,
+        ${Tables.users.cols.profileImageUrl} TEXT,
+        ${Tables.users.cols.rating} REAL DEFAULT 0.0,
+        ${Tables.users.cols.bio} TEXT,
+        ${Tables.users.cols.role} TEXT CHECK(${Tables.users.cols.role} IN ('user', 'merchant')) DEFAULT 'user',
+        ${Tables.users.cols.createdAt} TEXT NOT NULL,
+        ${Tables.users.cols.updatedAt} TEXT NOT NULL
       )
     ''');
 
   // 2️⃣ PRODUCT_CATEGORIES - Independent lookup table
   await db.execute('''
-      CREATE TABLE product_categories (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT UNIQUE NOT NULL
+      CREATE TABLE ${Tables.productCategories.tableName} (
+        ${Tables.productCategories.cols.id} INTEGER PRIMARY KEY AUTOINCREMENT,
+        ${Tables.productCategories.cols.name} TEXT UNIQUE NOT NULL
       )
     ''');
 
   // 3️⃣ PRODUCTS - Depends on users (merchants)
   await db.execute('''
-      CREATE TABLE products (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        merchant_id INTEGER NOT NULL,
-        name TEXT NOT NULL,
-        description TEXT,
-        price REAL NOT NULL,
-        quantity INTEGER DEFAULT 1,
-        created_at TEXT NOT NULL,
-        updated_at TEXT NOT NULL,
-        FOREIGN KEY (merchant_id) REFERENCES users(id) ON DELETE CASCADE
+      CREATE TABLE ${Tables.products.tableName} (
+        ${Tables.products.cols.id} INTEGER PRIMARY KEY AUTOINCREMENT,
+        ${Tables.products.cols.merchantId} INTEGER NOT NULL,
+        ${Tables.products.cols.name} TEXT NOT NULL,
+        ${Tables.products.cols.description} TEXT,
+        ${Tables.products.cols.price} REAL NOT NULL,
+        ${Tables.products.cols.quantity} INTEGER DEFAULT 1,
+        ${Tables.products.cols.createdAt} TEXT NOT NULL,
+        ${Tables.products.cols.updatedAt} TEXT NOT NULL,
+        FOREIGN KEY (${Tables.products.cols.merchantId}) REFERENCES ${Tables.users.tableName}(${Tables.users.cols.id}) ON DELETE CASCADE
       )
     ''');
 
   // 4️⃣ PRODUCT_CATEGORY_MAPS - Many-to-many between products and categories
   await db.execute('''
-      CREATE TABLE product_category_maps (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        product_id INTEGER NOT NULL,
-        category_id INTEGER NOT NULL,
-        FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
-        FOREIGN KEY (category_id) REFERENCES product_categories(id) ON DELETE CASCADE,
-        UNIQUE(product_id, category_id)
+      CREATE TABLE ${Tables.productCategoryMaps.tableName} (
+        ${Tables.productCategoryMaps.cols.id} INTEGER PRIMARY KEY AUTOINCREMENT,
+        ${Tables.productCategoryMaps.cols.productId} INTEGER NOT NULL,
+        ${Tables.productCategoryMaps.cols.categoryId} INTEGER NOT NULL,
+        FOREIGN KEY (${Tables.productCategoryMaps.cols.productId}) REFERENCES ${Tables.products.tableName}(${Tables.products.cols.id}) ON DELETE CASCADE,
+        FOREIGN KEY (${Tables.productCategoryMaps.cols.categoryId}) REFERENCES ${Tables.productCategories.tableName}(${Tables.productCategories.cols.id}) ON DELETE CASCADE,
+        UNIQUE(${Tables.productCategoryMaps.cols.productId}, ${Tables.productCategoryMaps.cols.categoryId})
       )
     ''');
 
   // 5️⃣ PRODUCT_MEDIAS - Product images/videos
   await db.execute('''
-      CREATE TABLE product_medias (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        product_id INTEGER NOT NULL,
-        url TEXT NOT NULL,
-        media_type TEXT CHECK(media_type IN ('image', 'video')),
-        created_at TEXT NOT NULL,
-        updated_at TEXT NOT NULL,
-        FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+      CREATE TABLE ${Tables.productMedias.tableName} (
+        ${Tables.productMedias.cols.id} INTEGER PRIMARY KEY AUTOINCREMENT,
+        ${Tables.productMedias.cols.productId} INTEGER NOT NULL,
+        ${Tables.productMedias.cols.url} TEXT NOT NULL,
+        ${Tables.productMedias.cols.mediaType} TEXT CHECK(${Tables.productMedias.cols.mediaType} IN ('image', 'video')),
+        ${Tables.productMedias.cols.createdAt} TEXT NOT NULL,
+        ${Tables.productMedias.cols.updatedAt} TEXT NOT NULL,
+        FOREIGN KEY (${Tables.productMedias.cols.productId}) REFERENCES ${Tables.products.tableName}(${Tables.products.cols.id}) ON DELETE CASCADE
       )
     ''');
 
   // 6️⃣ POSTS - Merchant promotional posts
   await db.execute('''
-      CREATE TABLE posts (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        merchant_id INTEGER NOT NULL,
-        caption TEXT,
-        created_at TEXT NOT NULL,
-        updated_at TEXT NOT NULL,
-        FOREIGN KEY (merchant_id) REFERENCES users(id) ON DELETE CASCADE
+      CREATE TABLE ${Tables.posts.tableName} (
+        ${Tables.posts.cols.id} INTEGER PRIMARY KEY AUTOINCREMENT,
+        ${Tables.posts.cols.merchantId} INTEGER NOT NULL,
+        ${Tables.posts.cols.caption} TEXT,
+        ${Tables.posts.cols.createdAt} TEXT NOT NULL,
+        ${Tables.posts.cols.updatedAt} TEXT NOT NULL,
+        FOREIGN KEY (${Tables.posts.cols.merchantId}) REFERENCES ${Tables.users.tableName}(${Tables.users.cols.id}) ON DELETE CASCADE
       )
     ''');
 
   // 7️⃣ POST_PRODUCTS - Many-to-many between posts and products
   await db.execute('''
-      CREATE TABLE post_products (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        post_id INTEGER NOT NULL,
-        product_id INTEGER NOT NULL,
-        FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
-        FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
-        UNIQUE(post_id, product_id)
+      CREATE TABLE ${Tables.postProducts.tableName} (
+        ${Tables.postProducts.cols.id} INTEGER PRIMARY KEY AUTOINCREMENT,
+        ${Tables.postProducts.cols.postId} INTEGER NOT NULL,
+        ${Tables.postProducts.cols.productId} INTEGER NOT NULL,
+        FOREIGN KEY (${Tables.postProducts.cols.postId}) REFERENCES ${Tables.posts.tableName}(${Tables.posts.cols.id}) ON DELETE CASCADE,
+        FOREIGN KEY (${Tables.postProducts.cols.productId}) REFERENCES ${Tables.products.tableName}(${Tables.products.cols.id}) ON DELETE CASCADE,
+        UNIQUE(${Tables.postProducts.cols.postId}, ${Tables.postProducts.cols.productId})
       )
     ''');
 
   // 8️⃣ PROMO_MEDIAS - Post promotional media
   await db.execute('''
-      CREATE TABLE promo_medias (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        post_id INTEGER NOT NULL,
-        url TEXT NOT NULL,
-        media_type TEXT CHECK(media_type IN ('image', 'video')),
-        created_at TEXT NOT NULL,
-        updated_at TEXT NOT NULL,
-        FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE
+      CREATE TABLE ${Tables.promoMedias.tableName} (
+        ${Tables.promoMedias.cols.id} INTEGER PRIMARY KEY AUTOINCREMENT,
+        ${Tables.promoMedias.cols.postId} INTEGER NOT NULL,
+        ${Tables.promoMedias.cols.url} TEXT NOT NULL,
+        ${Tables.promoMedias.cols.mediaType} TEXT CHECK(${Tables.promoMedias.cols.mediaType} IN ('image', 'video')),
+        ${Tables.promoMedias.cols.createdAt} TEXT NOT NULL,
+        ${Tables.promoMedias.cols.updatedAt} TEXT NOT NULL,
+        FOREIGN KEY (${Tables.promoMedias.cols.postId}) REFERENCES ${Tables.posts.tableName}(${Tables.posts.cols.id}) ON DELETE CASCADE
       )
     ''');
 
   // 9️⃣ POST_LIKES - User likes on posts
   await db.execute('''
-      CREATE TABLE post_likes (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER NOT NULL,
-        post_id INTEGER NOT NULL,
-        created_at TEXT NOT NULL,
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-        FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
-        UNIQUE(user_id, post_id)
+      CREATE TABLE ${Tables.postLikes.tableName} (
+        ${Tables.postLikes.cols.id} INTEGER PRIMARY KEY AUTOINCREMENT,
+        ${Tables.postLikes.cols.userId} INTEGER NOT NULL,
+        ${Tables.postLikes.cols.postId} INTEGER NOT NULL,
+        ${Tables.postLikes.cols.createdAt} TEXT NOT NULL,
+        ${Tables.postLikes.cols.updatedAt} TEXT NOT NULL,
+        FOREIGN KEY (${Tables.postLikes.cols.userId}) REFERENCES ${Tables.users.tableName}(${Tables.users.cols.id}) ON DELETE CASCADE,
+        FOREIGN KEY (${Tables.postLikes.cols.postId}) REFERENCES ${Tables.posts.tableName}(${Tables.posts.cols.id}) ON DELETE CASCADE,
+        UNIQUE(${Tables.postLikes.cols.userId}, ${Tables.postLikes.cols.postId})
       )
     ''');
 
   // 🔟 POST_SAVES - User saves on posts
   await db.execute('''
-      CREATE TABLE post_saves (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER NOT NULL,
-        post_id INTEGER NOT NULL,
-        created_at TEXT NOT NULL,
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-        FOREIGN KEY (post_id) REFERENCES posts(id) ON DELETE CASCADE,
-        UNIQUE(user_id, post_id)
+      CREATE TABLE ${Tables.postSaves.tableName} (
+        ${Tables.postSaves.cols.id} INTEGER PRIMARY KEY AUTOINCREMENT,
+        ${Tables.postSaves.cols.userId} INTEGER NOT NULL,
+        ${Tables.postSaves.cols.postId} INTEGER NOT NULL,
+        ${Tables.postSaves.cols.createdAt} TEXT NOT NULL,
+        ${Tables.postSaves.cols.updatedAt} TEXT NOT NULL,
+        FOREIGN KEY (${Tables.postSaves.cols.userId}) REFERENCES ${Tables.users.tableName}(${Tables.users.cols.id}) ON DELETE CASCADE,
+        FOREIGN KEY (${Tables.postSaves.cols.postId}) REFERENCES ${Tables.posts.tableName}(${Tables.posts.cols.id}) ON DELETE CASCADE,
+        UNIQUE(${Tables.postSaves.cols.userId}, ${Tables.postSaves.cols.postId})
       )
     ''');
 
   // 1️⃣1️⃣ LIVE_STREAMS - Merchant live streaming
   await db.execute('''
-      CREATE TABLE live_streams (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        merchant_id INTEGER NOT NULL,
-        title TEXT NOT NULL,
-        stream_url TEXT NOT NULL,
-        thumbnail_url TEXT,
-        view_count INTEGER DEFAULT 0,
-        created_at TEXT NOT NULL,
-        updated_at TEXT NOT NULL,
-        FOREIGN KEY (merchant_id) REFERENCES users(id) ON DELETE CASCADE
+      CREATE TABLE ${Tables.liveStreams.tableName} (
+        ${Tables.liveStreams.cols.id} INTEGER PRIMARY KEY AUTOINCREMENT,
+        ${Tables.liveStreams.cols.merchantId} INTEGER NOT NULL,
+        ${Tables.liveStreams.cols.title} TEXT NOT NULL,
+        ${Tables.liveStreams.cols.streamUrl} TEXT NOT NULL,
+        ${Tables.liveStreams.cols.thumbnailUrl} TEXT,
+        ${Tables.liveStreams.cols.viewCount} INTEGER DEFAULT 0,
+        ${Tables.liveStreams.cols.createdAt} TEXT NOT NULL,
+        ${Tables.liveStreams.cols.updatedAt} TEXT NOT NULL,
+        FOREIGN KEY (${Tables.liveStreams.cols.merchantId}) REFERENCES ${Tables.users.tableName}(${Tables.users.cols.id}) ON DELETE CASCADE
       )
     ''');
 
   // 1️⃣2️⃣ LIVE_STREAM_PRODUCTS - Products featured in live streams
   await db.execute('''
-      CREATE TABLE live_stream_products (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        live_stream_id INTEGER NOT NULL,
-        product_id INTEGER NOT NULL,
-        FOREIGN KEY (live_stream_id) REFERENCES live_streams(id) ON DELETE CASCADE,
-        FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
-        UNIQUE(live_stream_id, product_id)
+      CREATE TABLE ${Tables.liveStreamProducts.tableName} (
+        ${Tables.liveStreamProducts.cols.id} INTEGER PRIMARY KEY AUTOINCREMENT,
+        ${Tables.liveStreamProducts.cols.liveStreamId} INTEGER NOT NULL,
+        ${Tables.liveStreamProducts.cols.productId} INTEGER NOT NULL,
+        FOREIGN KEY (${Tables.liveStreamProducts.cols.liveStreamId}) REFERENCES ${Tables.liveStreams.tableName}(${Tables.liveStreams.cols.id}) ON DELETE CASCADE,
+        FOREIGN KEY (${Tables.liveStreamProducts.cols.productId}) REFERENCES ${Tables.products.tableName}(${Tables.products.cols.id}) ON DELETE CASCADE,
+        UNIQUE(${Tables.liveStreamProducts.cols.liveStreamId}, ${Tables.liveStreamProducts.cols.productId})
       )
     ''');
 
   // 1️⃣3️⃣ LIVE_STREAM_CHATS - Chat messages in live streams
   await db.execute('''
-      CREATE TABLE live_stream_chats (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        live_stream_id INTEGER NOT NULL,
-        user_id INTEGER NOT NULL,
-        text TEXT NOT NULL,
-        created_at TEXT NOT NULL,
-        FOREIGN KEY (live_stream_id) REFERENCES live_streams(id) ON DELETE CASCADE,
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      CREATE TABLE ${Tables.liveStreamChats.tableName} (
+        ${Tables.liveStreamChats.cols.id} INTEGER PRIMARY KEY AUTOINCREMENT,
+        ${Tables.liveStreamChats.cols.liveStreamId} INTEGER NOT NULL,
+        ${Tables.liveStreamChats.cols.userId} INTEGER NOT NULL,
+        ${Tables.liveStreamChats.cols.text} TEXT NOT NULL,
+        ${Tables.liveStreamChats.cols.createdAt} TEXT NOT NULL,
+        ${Tables.liveStreamChats.cols.updatedAt} TEXT NOT NULL,
+        FOREIGN KEY (${Tables.liveStreamChats.cols.liveStreamId}) REFERENCES ${Tables.liveStreams.tableName}(${Tables.liveStreams.cols.id}) ON DELETE CASCADE,
+        FOREIGN KEY (${Tables.liveStreamChats.cols.userId}) REFERENCES ${Tables.users.tableName}(${Tables.users.cols.id}) ON DELETE CASCADE
       )
     ''');
 
   // 1️⃣4️⃣ CHAT_ROOMS - Private conversations between users and merchants
   await db.execute('''
-      CREATE TABLE chat_rooms (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER NOT NULL,
-        merchant_id INTEGER NOT NULL,
-        created_at TEXT NOT NULL,
-        updated_at TEXT NOT NULL,
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-        FOREIGN KEY (merchant_id) REFERENCES users(id) ON DELETE CASCADE,
-        UNIQUE(user_id, merchant_id)
+      CREATE TABLE ${Tables.chatRooms.tableName} (
+        ${Tables.chatRooms.cols.id} INTEGER PRIMARY KEY AUTOINCREMENT,
+        ${Tables.chatRooms.cols.userId} INTEGER NOT NULL,
+        ${Tables.chatRooms.cols.merchantId} INTEGER NOT NULL,
+        ${Tables.chatRooms.cols.createdAt} TEXT NOT NULL,
+        ${Tables.chatRooms.cols.updatedAt} TEXT NOT NULL,
+        FOREIGN KEY (${Tables.chatRooms.cols.userId}) REFERENCES ${Tables.users.tableName}(${Tables.users.cols.id}) ON DELETE CASCADE,
+        FOREIGN KEY (${Tables.chatRooms.cols.merchantId}) REFERENCES ${Tables.users.tableName}(${Tables.users.cols.id}) ON DELETE CASCADE,
+        UNIQUE(${Tables.chatRooms.cols.userId}, ${Tables.chatRooms.cols.merchantId})
       )
     ''');
 
   // 1️⃣5️⃣ CHATS - Messages in chat rooms
   await db.execute('''
-      CREATE TABLE chats (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        chat_room_id INTEGER NOT NULL,
-        sender_id INTEGER NOT NULL,
-        text TEXT NOT NULL,
-        created_at TEXT NOT NULL,
-        FOREIGN KEY (chat_room_id) REFERENCES chat_rooms(id) ON DELETE CASCADE,
-        FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE
+      CREATE TABLE ${Tables.chats.tableName} (
+        ${Tables.chats.cols.id} INTEGER PRIMARY KEY AUTOINCREMENT,
+        ${Tables.chats.cols.chatRoomId} INTEGER NOT NULL,
+        ${Tables.chats.cols.senderId} INTEGER NOT NULL,
+        ${Tables.chats.cols.text} TEXT NOT NULL,
+        ${Tables.chats.cols.createdAt} TEXT NOT NULL,
+        ${Tables.chats.cols.updatedAt} TEXT NOT NULL,
+        FOREIGN KEY (${Tables.chats.cols.chatRoomId}) REFERENCES ${Tables.chatRooms.tableName}(${Tables.chatRooms.cols.id}) ON DELETE CASCADE,
+        FOREIGN KEY (${Tables.chats.cols.senderId}) REFERENCES ${Tables.users.tableName}(${Tables.users.cols.id}) ON DELETE CASCADE
       )
     ''');
 
   // 1️⃣6️⃣ CARTS - User shopping carts
   await db.execute('''
-      CREATE TABLE carts (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER NOT NULL,
-        product_id INTEGER NOT NULL,
-        quantity INTEGER DEFAULT 1 CHECK(quantity > 0),
-        created_at TEXT NOT NULL,
-        updated_at TEXT NOT NULL,
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-        FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
-        UNIQUE(user_id, product_id)
+      CREATE TABLE ${Tables.carts.tableName} (
+        ${Tables.carts.cols.id} INTEGER PRIMARY KEY AUTOINCREMENT,
+        ${Tables.carts.cols.userId} INTEGER NOT NULL,
+        ${Tables.carts.cols.productId} INTEGER NOT NULL,
+        ${Tables.carts.cols.quantity} INTEGER DEFAULT 1 CHECK(${Tables.carts.cols.quantity} > 0),
+        ${Tables.carts.cols.createdAt} TEXT NOT NULL,
+        ${Tables.carts.cols.updatedAt} TEXT NOT NULL,
+        FOREIGN KEY (${Tables.carts.cols.userId}) REFERENCES ${Tables.users.tableName}(${Tables.users.cols.id}) ON DELETE CASCADE,
+        FOREIGN KEY (${Tables.carts.cols.productId}) REFERENCES ${Tables.products.tableName}(${Tables.products.cols.id}) ON DELETE CASCADE,
+        UNIQUE(${Tables.carts.cols.userId}, ${Tables.carts.cols.productId})
       )
     ''');
 
   // 1️⃣7️⃣ ORDERS - Purchase orders
   await db.execute('''
-      CREATE TABLE orders (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER NOT NULL,
-        merchant_id INTEGER NOT NULL,
-        status TEXT CHECK(status IN ('waiting', 'accepted', 'delivering', 'completed', 'cancelled')) DEFAULT 'waiting',
-        created_at TEXT NOT NULL,
-        updated_at TEXT NOT NULL,
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-        FOREIGN KEY (merchant_id) REFERENCES users(id) ON DELETE CASCADE
+      CREATE TABLE ${Tables.orders.tableName} (
+        ${Tables.orders.cols.id} INTEGER PRIMARY KEY AUTOINCREMENT,
+        ${Tables.orders.cols.userId} INTEGER NOT NULL,
+        ${Tables.orders.cols.merchantId} INTEGER NOT NULL,
+        ${Tables.orders.cols.status} TEXT CHECK(${Tables.orders.cols.status} IN ('waiting', 'accepted', 'delivering', 'completed', 'cancelled')) DEFAULT 'waiting',
+        ${Tables.orders.cols.createdAt} TEXT NOT NULL,
+        ${Tables.orders.cols.updatedAt} TEXT NOT NULL,
+        FOREIGN KEY (${Tables.orders.cols.userId}) REFERENCES ${Tables.users.tableName}(${Tables.users.cols.id}) ON DELETE CASCADE,
+        FOREIGN KEY (${Tables.orders.cols.merchantId}) REFERENCES ${Tables.users.tableName}(${Tables.users.cols.id}) ON DELETE CASCADE
       )
     ''');
 
   // 1️⃣8️⃣ ORDER_PRODUCTS - Products in orders with price snapshots
   await db.execute('''
-      CREATE TABLE order_products (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        order_id INTEGER NOT NULL,
-        product_id INTEGER NOT NULL,
-        quantity INTEGER DEFAULT 1,
-        price_snapshot REAL NOT NULL,
-        FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
-        FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+      CREATE TABLE ${Tables.orderProducts.tableName} (
+        ${Tables.orderProducts.cols.id} INTEGER PRIMARY KEY AUTOINCREMENT,
+        ${Tables.orderProducts.cols.orderId} INTEGER NOT NULL,
+        ${Tables.orderProducts.cols.productId} INTEGER NOT NULL,
+        ${Tables.orderProducts.cols.quantity} INTEGER DEFAULT 1,
+        ${Tables.orderProducts.cols.priceSnapshot} REAL NOT NULL,
+        FOREIGN KEY (${Tables.orderProducts.cols.orderId}) REFERENCES ${Tables.orders.tableName}(${Tables.orders.cols.id}) ON DELETE CASCADE,
+        FOREIGN KEY (${Tables.orderProducts.cols.productId}) REFERENCES ${Tables.products.tableName}(${Tables.products.cols.id}) ON DELETE CASCADE
       )
     ''');
 
   // 1️⃣9️⃣ REVIEWS - User reviews for merchants
   await db.execute('''
-      CREATE TABLE reviews (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER NOT NULL,
-        merchant_id INTEGER NOT NULL,
-        text TEXT,
-        rating REAL CHECK(rating >= 0.0 AND rating <= 5.0),
-        created_at TEXT NOT NULL,
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-        FOREIGN KEY (merchant_id) REFERENCES users(id) ON DELETE CASCADE,
-        UNIQUE(user_id, merchant_id)
+      CREATE TABLE ${Tables.reviews.tableName} (
+        ${Tables.reviews.cols.id} INTEGER PRIMARY KEY AUTOINCREMENT,
+        ${Tables.reviews.cols.userId} INTEGER NOT NULL,
+        ${Tables.reviews.cols.merchantId} INTEGER NOT NULL,
+        ${Tables.reviews.cols.text} TEXT,
+        ${Tables.reviews.cols.rating} REAL CHECK(${Tables.reviews.cols.rating} >= 0.0 AND ${Tables.reviews.cols.rating} <= 5.0),
+        ${Tables.reviews.cols.createdAt} TEXT NOT NULL,
+        ${Tables.reviews.cols.updatedAt} TEXT NOT NULL,
+        FOREIGN KEY (${Tables.reviews.cols.userId}) REFERENCES ${Tables.users.tableName}(${Tables.users.cols.id}) ON DELETE CASCADE,
+        FOREIGN KEY (${Tables.reviews.cols.merchantId}) REFERENCES ${Tables.users.tableName}(${Tables.users.cols.id}) ON DELETE CASCADE,
+        UNIQUE(${Tables.reviews.cols.userId}, ${Tables.reviews.cols.merchantId})
       )
     ''');
 
   // 2️⃣0️⃣ FOLLOWERS - User following system
   await db.execute('''
-      CREATE TABLE followers (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        follower_id INTEGER NOT NULL,
-        followed_id INTEGER NOT NULL,
-        created_at TEXT NOT NULL,
-        FOREIGN KEY (follower_id) REFERENCES users(id) ON DELETE CASCADE,
-        FOREIGN KEY (followed_id) REFERENCES users(id) ON DELETE CASCADE,
-        UNIQUE(follower_id, followed_id)
+      CREATE TABLE ${Tables.followers.tableName} (
+        ${Tables.followers.cols.id} INTEGER PRIMARY KEY AUTOINCREMENT,
+        ${Tables.followers.cols.followerId} INTEGER NOT NULL,
+        ${Tables.followers.cols.followedId} INTEGER NOT NULL,
+        ${Tables.followers.cols.createdAt} TEXT NOT NULL,
+        ${Tables.followers.cols.updatedAt} TEXT NOT NULL,
+        FOREIGN KEY (${Tables.followers.cols.followerId}) REFERENCES ${Tables.users.tableName}(${Tables.users.cols.id}) ON DELETE CASCADE,
+        FOREIGN KEY (${Tables.followers.cols.followedId}) REFERENCES ${Tables.users.tableName}(${Tables.users.cols.id}) ON DELETE CASCADE,
+        UNIQUE(${Tables.followers.cols.followerId}, ${Tables.followers.cols.followedId})
       )
     ''');
 }
@@ -430,35 +437,40 @@ Future<void> insertMockData(Database db) async {
 
   // 1️⃣ USERS (50 merchants, 50 regular users)
   for (int i = 1; i <= 100; i++) {
-    await db.insert('users', {
-      'username': randomName(rand, i),
-      'password_hash': 'hash_user$i',
-      'profile_image_url': profileImage,
-      'rating': (rand.nextDouble() * 2) + 3.0,
-      'bio': bio[rand.nextInt(bio.length)],
-      'role': i <= 50 ? 'merchant' : 'user', // First 50 are merchants
-      'created_at': now,
-      'updated_at': now,
+    await db.insert(Tables.users.tableName, {
+      Tables.users.cols.username: randomName(rand, i),
+      Tables.users.cols.passwordHash: 'hash_user$i',
+      Tables.users.cols.profileImageUrl: profileImage,
+      Tables.users.cols.rating: (rand.nextDouble() * 2) + 3.0,
+      Tables.users.cols.bio: bio[rand.nextInt(bio.length)],
+      Tables.users.cols.role: i <= 50
+          ? 'merchant'
+          : 'user', // First 50 are merchants
+      Tables.users.cols.createdAt: now,
+      Tables.users.cols.updatedAt: now,
     });
   }
 
   // 2️⃣ PRODUCT_CATEGORIES
   for (int i = 0; i < categories.length; i++) {
-    await db.insert('product_categories', {'name': categories[i]});
+    await db.insert(Tables.productCategories.tableName, {
+      Tables.productCategories.cols.name: categories[i],
+    });
   }
 
   // 3️⃣ PRODUCTS (created by merchants)
   for (int i = 1; i <= 200; i++) {
     final merchantId = rand.nextInt(50) + 1; // Random merchant (1-50)
-    await db.insert('products', {
-      'merchant_id': merchantId,
-      'name': productNames[rand.nextInt(productNames.length)],
-      'description':
+    await db.insert(Tables.products.tableName, {
+      Tables.products.cols.merchantId: merchantId,
+      Tables.products.cols.name:
+          productNames[rand.nextInt(productNames.length)],
+      Tables.products.cols.description:
           productDescriptions[rand.nextInt(productDescriptions.length)],
-      'price': (rand.nextDouble() * 200) + 10, // $10-$210
-      'quantity': rand.nextInt(50) + 1,
-      'created_at': now,
-      'updated_at': now,
+      Tables.products.cols.price: (rand.nextDouble() * 200) + 10, // $10-$210
+      Tables.products.cols.quantity: rand.nextInt(50) + 1,
+      Tables.products.cols.createdAt: now,
+      Tables.products.cols.updatedAt: now,
     });
   }
 
@@ -476,9 +488,9 @@ Future<void> insertMockData(Database db) async {
 
       assignedCategories.add(categoryId);
 
-      await db.insert('product_category_maps', {
-        'product_id': productId,
-        'category_id': categoryId,
+      await db.insert(Tables.productCategoryMaps.tableName, {
+        Tables.productCategoryMaps.cols.productId: productId,
+        Tables.productCategoryMaps.cols.categoryId: categoryId,
       });
     }
   }
@@ -491,14 +503,14 @@ Future<void> insertMockData(Database db) async {
     for (int j = 0; j < numMedia; j++) {
       final isVideo = rand.nextBool() && j == 0; // First media might be video
 
-      await db.insert('product_medias', {
-        'product_id': productId,
-        'url': isVideo
+      await db.insert(Tables.productMedias.tableName, {
+        Tables.productMedias.cols.productId: productId,
+        Tables.productMedias.cols.url: isVideo
             ? productVideos[rand.nextInt(productVideos.length)]
             : productImages[rand.nextInt(productImages.length)],
-        'media_type': isVideo ? 'video' : 'image',
-        'created_at': now,
-        'updated_at': now,
+        Tables.productMedias.cols.mediaType: isVideo ? 'video' : 'image',
+        Tables.productMedias.cols.createdAt: now,
+        Tables.productMedias.cols.updatedAt: now,
       });
     }
   }
@@ -507,11 +519,12 @@ Future<void> insertMockData(Database db) async {
   for (int i = 1; i <= 150; i++) {
     final merchantId = rand.nextInt(50) + 1; // Random merchant
 
-    await db.insert('posts', {
-      'merchant_id': merchantId,
-      'caption': postCaptions[rand.nextInt(postCaptions.length)],
-      'created_at': now,
-      'updated_at': now,
+    await db.insert(Tables.posts.tableName, {
+      Tables.posts.cols.merchantId: merchantId,
+      Tables.posts.cols.caption:
+          postCaptions[rand.nextInt(postCaptions.length)],
+      Tables.posts.cols.createdAt: now,
+      Tables.posts.cols.updatedAt: now,
     });
   }
 
@@ -529,9 +542,9 @@ Future<void> insertMockData(Database db) async {
 
       featuredProducts.add(productId);
 
-      await db.insert('post_products', {
-        'post_id': postId,
-        'product_id': productId,
+      await db.insert(Tables.postProducts.tableName, {
+        Tables.postProducts.cols.postId: postId,
+        Tables.postProducts.cols.productId: productId,
       });
     }
   }
@@ -544,14 +557,14 @@ Future<void> insertMockData(Database db) async {
     for (int j = 0; j < numMedia; j++) {
       final isVideo = rand.nextBool() && j == 0;
 
-      await db.insert('promo_medias', {
-        'post_id': postId,
-        'url': isVideo
+      await db.insert(Tables.promoMedias.tableName, {
+        Tables.promoMedias.cols.postId: postId,
+        Tables.promoMedias.cols.url: isVideo
             ? promoVideos[rand.nextInt(promoVideos.length)]
             : promoImages[rand.nextInt(promoImages.length)],
-        'media_type': isVideo ? 'video' : 'image',
-        'created_at': now,
-        'updated_at': now,
+        Tables.promoMedias.cols.mediaType: isVideo ? 'video' : 'image',
+        Tables.promoMedias.cols.createdAt: now,
+        Tables.promoMedias.cols.updatedAt: now,
       });
     }
   }
@@ -563,10 +576,11 @@ Future<void> insertMockData(Database db) async {
 
     // Try to insert, ignore if duplicate
     try {
-      await db.insert('post_likes', {
-        'user_id': userId,
-        'post_id': postId,
-        'created_at': now,
+      await db.insert(Tables.postLikes.tableName, {
+        Tables.postLikes.cols.userId: userId,
+        Tables.postLikes.cols.postId: postId,
+        Tables.postLikes.cols.createdAt: now,
+        Tables.postLikes.cols.updatedAt: now,
       });
     } catch (e) {
       // Ignore duplicate constraint errors
@@ -579,10 +593,11 @@ Future<void> insertMockData(Database db) async {
     final postId = rand.nextInt(150) + 1;
 
     try {
-      await db.insert('post_saves', {
-        'user_id': userId,
-        'post_id': postId,
-        'created_at': now,
+      await db.insert(Tables.postSaves.tableName, {
+        Tables.postSaves.cols.userId: userId,
+        Tables.postSaves.cols.postId: postId,
+        Tables.postSaves.cols.createdAt: now,
+        Tables.postSaves.cols.updatedAt: now,
       });
     } catch (e) {
       // Ignore duplicates
@@ -593,14 +608,16 @@ Future<void> insertMockData(Database db) async {
   for (int i = 1; i <= 50; i++) {
     final merchantId = rand.nextInt(50) + 1;
 
-    await db.insert('live_streams', {
-      'merchant_id': merchantId,
-      'title': 'Live selling session ${i}',
-      'stream_url': productVideos[rand.nextInt(productVideos.length)],
-      'thumbnail_url': productImages[rand.nextInt(productImages.length)],
-      'view_count': rand.nextInt(1000),
-      'created_at': now,
-      'updated_at': now,
+    await db.insert(Tables.liveStreams.tableName, {
+      Tables.liveStreams.cols.merchantId: merchantId,
+      Tables.liveStreams.cols.title: 'Live selling session ${i}',
+      Tables.liveStreams.cols.streamUrl:
+          productVideos[rand.nextInt(productVideos.length)],
+      Tables.liveStreams.cols.thumbnailUrl:
+          productImages[rand.nextInt(productImages.length)],
+      Tables.liveStreams.cols.viewCount: rand.nextInt(1000),
+      Tables.liveStreams.cols.createdAt: now,
+      Tables.liveStreams.cols.updatedAt: now,
     });
   }
 
@@ -617,9 +634,9 @@ Future<void> insertMockData(Database db) async {
 
       streamProducts.add(productId);
 
-      await db.insert('live_stream_products', {
-        'live_stream_id': streamId,
-        'product_id': productId,
+      await db.insert(Tables.liveStreamProducts.tableName, {
+        Tables.liveStreamProducts.cols.liveStreamId: streamId,
+        Tables.liveStreamProducts.cols.productId: productId,
       });
     }
   }
@@ -631,11 +648,13 @@ Future<void> insertMockData(Database db) async {
     for (int j = 0; j < numChats; j++) {
       final userId = rand.nextInt(100) + 1; // Any user can chat
 
-      await db.insert('live_stream_chats', {
-        'live_stream_id': streamId,
-        'user_id': userId,
-        'text': liveChatMessages[rand.nextInt(liveChatMessages.length)],
-        'created_at': now,
+      await db.insert(Tables.liveStreamChats.tableName, {
+        Tables.liveStreamChats.cols.liveStreamId: streamId,
+        Tables.liveStreamChats.cols.userId: userId,
+        Tables.liveStreamChats.cols.text:
+            liveChatMessages[rand.nextInt(liveChatMessages.length)],
+        Tables.liveStreamChats.cols.createdAt: now,
+        Tables.liveStreamChats.cols.updatedAt: now,
       });
     }
   }
@@ -646,11 +665,11 @@ Future<void> insertMockData(Database db) async {
     final merchantId = rand.nextInt(50) + 1; // Merchant
 
     try {
-      await db.insert('chat_rooms', {
-        'user_id': userId,
-        'merchant_id': merchantId,
-        'created_at': now,
-        'updated_at': now,
+      await db.insert(Tables.chatRooms.tableName, {
+        Tables.chatRooms.cols.userId: userId,
+        Tables.chatRooms.cols.merchantId: merchantId,
+        Tables.chatRooms.cols.createdAt: now,
+        Tables.chatRooms.cols.updatedAt: now,
       });
     } catch (e) {
       // Ignore duplicates
@@ -658,21 +677,22 @@ Future<void> insertMockData(Database db) async {
   }
 
   // 1️⃣5️⃣ CHATS (messages in chat rooms)
-  final chatRooms = await db.query('chat_rooms');
+  final chatRooms = await db.query(Tables.chatRooms.tableName);
   for (final room in chatRooms) {
-    final roomId = room['id'] as int;
-    final userId = room['user_id'] as int;
-    final merchantId = room['merchant_id'] as int;
+    final roomId = room[Tables.chatRooms.cols.id] as int;
+    final userId = room[Tables.chatRooms.cols.userId] as int;
+    final merchantId = room[Tables.chatRooms.cols.merchantId] as int;
     final numMessages = rand.nextInt(10) + 1;
 
     for (int j = 0; j < numMessages; j++) {
       final senderId = rand.nextBool() ? userId : merchantId;
 
-      await db.insert('chats', {
-        'chat_room_id': roomId,
-        'sender_id': senderId,
-        'text': chatMessages[rand.nextInt(chatMessages.length)],
-        'created_at': now,
+      await db.insert(Tables.chats.tableName, {
+        Tables.chats.cols.chatRoomId: roomId,
+        Tables.chats.cols.senderId: senderId,
+        Tables.chats.cols.text: chatMessages[rand.nextInt(chatMessages.length)],
+        Tables.chats.cols.createdAt: now,
+        Tables.chats.cols.updatedAt: now,
       });
     }
   }
@@ -691,12 +711,12 @@ Future<void> insertMockData(Database db) async {
 
       cartProducts.add(productId);
 
-      await db.insert('carts', {
-        'user_id': userId,
-        'product_id': productId,
-        'quantity': rand.nextInt(3) + 1,
-        'created_at': now,
-        'updated_at': now,
+      await db.insert(Tables.carts.tableName, {
+        Tables.carts.cols.userId: userId,
+        Tables.carts.cols.productId: productId,
+        Tables.carts.cols.quantity: rand.nextInt(3) + 1,
+        Tables.carts.cols.createdAt: now,
+        Tables.carts.cols.updatedAt: now,
       });
     }
   }
@@ -713,12 +733,12 @@ Future<void> insertMockData(Database db) async {
       'cancelled',
     ];
 
-    await db.insert('orders', {
-      'user_id': userId,
-      'merchant_id': merchantId,
-      'status': statuses[rand.nextInt(statuses.length)],
-      'created_at': now,
-      'updated_at': now,
+    await db.insert(Tables.orders.tableName, {
+      Tables.orders.cols.userId: userId,
+      Tables.orders.cols.merchantId: merchantId,
+      Tables.orders.cols.status: statuses[rand.nextInt(statuses.length)],
+      Tables.orders.cols.createdAt: now,
+      Tables.orders.cols.updatedAt: now,
     });
   }
 
@@ -730,11 +750,11 @@ Future<void> insertMockData(Database db) async {
       final productId = rand.nextInt(200) + 1;
       final priceSnapshot = (rand.nextDouble() * 200) + 10;
 
-      await db.insert('order_products', {
-        'order_id': orderId,
-        'product_id': productId,
-        'quantity': rand.nextInt(2) + 1,
-        'price_snapshot': priceSnapshot,
+      await db.insert(Tables.orderProducts.tableName, {
+        Tables.orderProducts.cols.orderId: orderId,
+        Tables.orderProducts.cols.productId: productId,
+        Tables.orderProducts.cols.quantity: rand.nextInt(2) + 1,
+        Tables.orderProducts.cols.priceSnapshot: priceSnapshot,
       });
     }
   }
@@ -745,12 +765,14 @@ Future<void> insertMockData(Database db) async {
     final merchantId = rand.nextInt(50) + 1; // Merchant
 
     try {
-      await db.insert('reviews', {
-        'user_id': userId,
-        'merchant_id': merchantId,
-        'text': reviewMessages[rand.nextInt(reviewMessages.length)],
-        'rating': (rand.nextDouble() * 2) + 3.0, // 3.0-5.0
-        'created_at': now,
+      await db.insert(Tables.reviews.tableName, {
+        Tables.reviews.cols.userId: userId,
+        Tables.reviews.cols.merchantId: merchantId,
+        Tables.reviews.cols.text:
+            reviewMessages[rand.nextInt(reviewMessages.length)],
+        Tables.reviews.cols.rating: (rand.nextDouble() * 2) + 3.0, // 3.0-5.0
+        Tables.reviews.cols.createdAt: now,
+        Tables.reviews.cols.updatedAt: now,
       });
     } catch (e) {
       // Ignore duplicates
@@ -765,10 +787,11 @@ Future<void> insertMockData(Database db) async {
     if (followerId != followedId) {
       // Can't follow yourself
       try {
-        await db.insert('followers', {
-          'follower_id': followerId,
-          'followed_id': followedId,
-          'created_at': now,
+        await db.insert(Tables.followers.tableName, {
+          Tables.followers.cols.followerId: followerId,
+          Tables.followers.cols.followedId: followedId,
+          Tables.followers.cols.createdAt: now,
+          Tables.followers.cols.updatedAt: now,
         });
       } catch (e) {
         // Ignore duplicates

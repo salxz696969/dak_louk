@@ -69,13 +69,3 @@ abstract class BaseCols {
   static const String createdAtCol = 'created_at';
   static const String updatedAtCol = 'updated_at';
 }
-
-// base columns for tables that only have id and created_at (no updated_at)
-abstract class BaseColsCreatedOnly {
-  const BaseColsCreatedOnly();
-  String get id => idCol;
-  String get createdAt => createdAtCol;
-
-  static const String idCol = 'id';
-  static const String createdAtCol = 'created_at';
-}

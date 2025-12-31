@@ -9,7 +9,7 @@ class ReviewsTable implements DbTable<ReviewsCols> {
 }
 
 // Note: Reviews table only has created_at, not updated_at
-class ReviewsCols extends BaseColsCreatedOnly {
+class ReviewsCols extends BaseCols {
   const ReviewsCols();
   static const String userIdCol = 'user_id';
   static const String merchantIdCol = 'merchant_id';
