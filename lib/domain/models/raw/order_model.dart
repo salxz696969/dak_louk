@@ -1,24 +1,20 @@
 part of domain;
 
-class ProductProgressModel  extends Cacheable{
+class OrderModel extends Cacheable {
   final int id;
   final int userId;
-  final int productId;
-  final ProgressStatus status;
+  final int merchantId;
+  final String status;
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  final UserModel? user;
-  final ProductModel? product;
-
-  ProductProgressModel({
+  OrderModel({
     required this.id,
     required this.userId,
-    required this.productId,
+    required this.merchantId,
     required this.status,
     required this.createdAt,
     required this.updatedAt,
-    this.user,
-    this.product,
   });
 }
+

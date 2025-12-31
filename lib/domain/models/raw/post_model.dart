@@ -1,16 +1,16 @@
 part of domain;
 
-class MediaModel extends Cacheable {
+class PostModel extends Cacheable {
   final int id;
-  final String url;
-  final int postId;
+  final int merchantId;
+  final String? caption;
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  MediaModel({
+  PostModel({
     required this.id,
-    required this.url,
-    required this.postId,
+    required this.merchantId,
+    this.caption,
     required this.createdAt,
     required this.updatedAt,
   });

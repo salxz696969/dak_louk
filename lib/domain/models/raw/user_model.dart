@@ -4,10 +4,10 @@ class UserModel extends Cacheable {
   final int id;
   final String username;
   final String passwordHash;
-  final String profileImageUrl;
+  final String? profileImageUrl;
   final double rating;
+  final String? bio;
   final String role;
-  final String bio;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -15,10 +15,10 @@ class UserModel extends Cacheable {
     required this.id,
     required this.username,
     required this.passwordHash,
-    required this.profileImageUrl,
+    this.profileImageUrl,
     required this.rating,
+    this.bio,
     required this.role,
-    required this.bio,
     required this.createdAt,
     required this.updatedAt,
   });
