@@ -11,7 +11,8 @@ class ChatRoomsTable implements DbTable<ChatRoomsCols> {
 class ChatRoomsCols extends BaseCols {
   const ChatRoomsCols();
   static const String userIdCol = 'user_id';
-  static const String targetUserIdCol = 'target_user_id';
+  static const String merchantIdCol = 'merchant_id';
+
   String get userId => userIdCol;
-  String get targetUserId => targetUserIdCol;
+  String get merchantId => merchantIdCol;
 }

@@ -10,15 +10,15 @@ class LiveStreamsTable implements DbTable<LiveStreamsCols> {
 
 class LiveStreamsCols extends BaseCols {
   const LiveStreamsCols();
-  static const String urlCol = 'url';
-  static const String userIdCol = 'user_id';
+  static const String merchantIdCol = 'merchant_id';
   static const String titleCol = 'title';
+  static const String streamUrlCol = 'stream_url';
   static const String thumbnailUrlCol = 'thumbnail_url';
-  static const String viewCol = 'view';
+  static const String viewCountCol = 'view_count';
 
-  String get url => urlCol;
-  String get userId => userIdCol;
+  String get merchantId => merchantIdCol;
   String get title => titleCol;
+  String get streamUrl => streamUrlCol;
   String get thumbnailUrl => thumbnailUrlCol;
-  String get view => viewCol;
+  String get viewCount => viewCountCol;
 }

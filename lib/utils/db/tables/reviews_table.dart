@@ -8,15 +8,16 @@ class ReviewsTable implements DbTable<ReviewsCols> {
   ReviewsCols get cols => ReviewsCols();
 }
 
-class ReviewsCols extends BaseCols {
+// Note: Reviews table only has created_at, not updated_at
+class ReviewsCols extends BaseColsCreatedOnly {
   const ReviewsCols();
   static const String userIdCol = 'user_id';
-  static const String targetUserIdCol = 'target_user_id';
+  static const String merchantIdCol = 'merchant_id';
   static const String textCol = 'text';
   static const String ratingCol = 'rating';
 
   String get userId => userIdCol;
-  String get targetUserId => targetUserIdCol;
+  String get merchantId => merchantIdCol;
   String get text => textCol;
   String get rating => ratingCol;
 }

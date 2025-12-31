@@ -8,13 +8,14 @@ class ChatsTable implements DbTable<ChatsCols> {
   ChatsCols get cols => ChatsCols();
 }
 
-class ChatsCols extends BaseCols {
+// Note: Chats table only has created_at, not updated_at
+class ChatsCols extends BaseColsCreatedOnly {
   const ChatsCols();
-  static const String userIdCol = 'user_id';
-  static const String textCol = 'text';
   static const String chatRoomIdCol = 'chat_room_id';
+  static const String senderIdCol = 'sender_id';
+  static const String textCol = 'text';
 
-  String get userId => userIdCol;
-  String get text => textCol;
   String get chatRoomId => chatRoomIdCol;
+  String get senderId => senderIdCol;
+  String get text => textCol;
 }
