@@ -52,3 +52,7 @@ part 'dto/live_stream_dto.dart';
 part 'dto/live_stream_chat_dto.dart';
 part 'dto/review_dto.dart';
 part 'dto/user_dto.dart';
+
+// Auth DTOs
+part 'dto/auth/log_in_dto.dart';
+part 'dto/auth/sign_up_dto.dart';

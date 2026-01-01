@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:dak_louk/data/tables/tables.dart';
+import 'package:dak_louk/core/utils/hash.dart';
 import 'package:sqflite/sqflite.dart';
 
 Future<void> initDb(Database db) async {
@@ -8,6 +9,7 @@ Future<void> initDb(Database db) async {
       CREATE TABLE ${Tables.users.tableName} (
         ${Tables.users.cols.id} INTEGER PRIMARY KEY AUTOINCREMENT,
         ${Tables.users.cols.username} TEXT UNIQUE NOT NULL,
+        ${Tables.users.cols.email} TEXT UNIQUE NOT NULL,
         ${Tables.users.cols.passwordHash} TEXT NOT NULL,
         ${Tables.users.cols.profileImageUrl} TEXT,
         ${Tables.users.cols.bio} TEXT,
@@ -22,8 +24,9 @@ Future<void> initDb(Database db) async {
         ${Tables.merchants.cols.id} INTEGER PRIMARY KEY AUTOINCREMENT,
         ${Tables.merchants.cols.userId} INTEGER NOT NULL,
         ${Tables.merchants.cols.rating} REAL DEFAULT 0.0,
-        ${Tables.merchants.cols.businessName} TEXT,
-        ${Tables.merchants.cols.businessDescription} TEXT,
+        ${Tables.merchants.cols.username} TEXT,
+        ${Tables.merchants.cols.email} TEXT,
+        ${Tables.merchants.cols.passwordHash} TEXT,
         ${Tables.merchants.cols.createdAt} TEXT NOT NULL,
         ${Tables.merchants.cols.updatedAt} TEXT NOT NULL,
         FOREIGN KEY (${Tables.merchants.cols.userId}) REFERENCES ${Tables.users.tableName}(${Tables.users.cols.id}) ON DELETE CASCADE
@@ -451,7 +454,8 @@ Future<void> insertMockData(Database db) async {
   for (int i = 1; i <= 100; i++) {
     await db.insert(Tables.users.tableName, {
       Tables.users.cols.username: randomName(rand, i),
-      Tables.users.cols.passwordHash: 'hash_user$i',
+      Tables.users.cols.email: 'user$i@gmail.com',
+      Tables.users.cols.passwordHash: Hasher.sha256Hash('password$i'),
       Tables.users.cols.profileImageUrl: profileImage,
       Tables.users.cols.bio: bio[rand.nextInt(bio.length)],
       Tables.users.cols.createdAt: now,
@@ -459,6 +463,21 @@ Future<void> insertMockData(Database db) async {
     });
   }
 
+  // 2️⃣ MERCHANTS (50 merchants)
+  for (int i = 1; i <= 50; i++) {
+    await db.insert(Tables.merchants.tableName, {
+      Tables.merchants.cols.userId: i,
+      Tables.merchants.cols.username: randomName(rand, i),
+      Tables.merchants.cols.email: 'merchant$i@gmail.com',
+      Tables.merchants.cols.passwordHash: Hasher.sha256Hash(
+        'merchantpassword$i',
+      ),
+      Tables.merchants.cols.rating:
+          (rand.nextDouble() * 2) + 3.0, // 3.0-5.0 rating
+      Tables.merchants.cols.createdAt: now,
+      Tables.merchants.cols.updatedAt: now,
+    });
+  }
   // 2️⃣ PRODUCT_CATEGORIES
   for (int i = 0; i < categories.length; i++) {
     await db.insert(Tables.productCategories.tableName, {

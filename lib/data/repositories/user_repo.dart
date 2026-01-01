@@ -1,3 +1,4 @@
+import 'package:dak_louk/core/utils/orm.dart';
 import 'package:dak_louk/data/repositories/base_repo.dart';
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/data/tables/tables.dart';
@@ -32,5 +33,23 @@ class UserRepository extends BaseRepository<UserModel> {
       Tables.users.cols.createdAt: user.createdAt.toIso8601String(),
       Tables.users.cols.updatedAt: user.updatedAt.toIso8601String(),
     };
+  }
+
+  // aditional methods for auth
+  Future<UserModel?> getUserByEmailAndPassword(
+    String email,
+    String passwordHash,
+  ) async {
+    final statement = Clauses.where.eq(Tables.users.cols.email, email);
+
+    final statement2 = Clauses.where.eq(
+      Tables.users.cols.passwordHash,
+      passwordHash,
+    );
+    final result = await queryThisTable(
+      where: statement.clause + ' AND ' + statement2.clause,
+      args: statement.args + statement2.args,
+    );
+    return result.firstOrNull;
   }
 }
