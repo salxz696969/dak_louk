@@ -38,14 +38,26 @@ class MediaPickerSheet {
                   type == MediaType.image ? 'Take Photo' : 'Record Video',
                 ),
                 onTap: () async {
-                  Navigator.pop(
-                    context,
-                    await MediaPicker.pickAndStoreMedia(
+                  // attempted to make the simulator not crash when opening camera, but it still crash even with graceful handlong so it is what it is
+                  try {
+                    final result = await MediaPicker.pickAndStoreMedia(
                       type: type,
                       source: ImageSource.camera,
                       folder: folder,
-                    ),
-                  );
+                    );
+
+                    if (!context.mounted) return;
+
+                    Navigator.pop<String?>(context, result);
+                  } catch (e) {
+                    if (!context.mounted) return;
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Failed to pick media')),
+                    );
+
+                    Navigator.pop<String?>(context, null);
+                  }
                 },
               ),
             ],

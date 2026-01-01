@@ -4,56 +4,52 @@ class PostVM extends Cacheable {
   final int id;
   final int merchantId;
   final String? caption;
+  final List<PromoMediaModel>? promoMedias;
   final DateTime createdAt;
   final DateTime updatedAt;
-
-  // Related primitive data
-  final String? merchantName;
-  final String? merchantProfileImage;
-  final List<String>? mediaUrls;
-  final List<String>? productNames;
   final int likesCount;
   final int savesCount;
   final bool isLiked;
   final bool isSaved;
 
+  // Related primitive data
+  final PostMerchantVM merchant;
+  final List<PostProductVM> products;
+
   PostVM({
     required this.id,
     required this.merchantId,
     this.caption,
+    this.promoMedias,
     required this.createdAt,
     required this.updatedAt,
-    this.merchantName,
-    this.merchantProfileImage,
-    this.mediaUrls,
-    this.productNames,
-    this.likesCount = 0,
-    this.savesCount = 0,
-    this.isLiked = false,
-    this.isSaved = false,
+    required this.merchant,
+    required this.products,
+    required this.likesCount,
+    required this.savesCount,
+    required this.isLiked,
+    required this.isSaved,
   });
 
   factory PostVM.fromRaw(
     PostModel raw, {
-    String? merchantName,
-    String? merchantProfileImage,
-    List<String>? mediaUrls,
-    List<String>? productNames,
-    int likesCount = 0,
-    int savesCount = 0,
-    bool isLiked = false,
-    bool isSaved = false,
+    List<PromoMediaModel>? promoMedias,
+    required PostMerchantVM merchant,
+    required List<PostProductVM> products,
+    required int likesCount,
+    required int savesCount,
+    required bool isLiked,
+    required bool isSaved,
   }) {
     return PostVM(
       id: raw.id,
       merchantId: raw.merchantId,
       caption: raw.caption,
+      promoMedias: promoMedias,
       createdAt: raw.createdAt,
       updatedAt: raw.updatedAt,
-      merchantName: merchantName,
-      merchantProfileImage: merchantProfileImage,
-      mediaUrls: mediaUrls,
-      productNames: productNames,
+      merchant: merchant,
+      products: products,
       likesCount: likesCount,
       savesCount: savesCount,
       isLiked: isLiked,
@@ -62,5 +58,44 @@ class PostVM extends Cacheable {
   }
 
   // Simple getters
-  String? get primaryMediaUrl => mediaUrls?.isNotEmpty == true ? mediaUrls!.first : null;
+  String? get primaryMediaUrl =>
+      products.isNotEmpty ? products.first.imageUrls.first : null;
+}
+
+class PostProductVM {
+  final int id;
+  final String name;
+  final List<String> imageUrls;
+  final String price;
+  final String quantity;
+  final String description;
+  final ProductCategory category;
+
+  PostProductVM({
+    required this.id,
+    required this.name,
+    required this.imageUrls,
+    required this.price,
+    required this.quantity,
+    required this.description,
+    required this.category,
+  });
+}
+
+class PostMerchantVM {
+  final int id;
+  final String name;
+  final String bio;
+  final String profileImage;
+  final String username;
+  final double rating;
+
+  PostMerchantVM({
+    required this.id,
+    required this.name,
+    required this.bio,
+    required this.profileImage,
+    required this.username,
+    required this.rating,
+  });
 }

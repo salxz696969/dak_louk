@@ -10,7 +10,7 @@ extension StringCasingExtension on String {
 }
 
 class CategoryBar extends StatefulWidget {
-  final ValueChanged<String> onCategorySelected;
+  final ValueChanged<ProductCategory> onCategorySelected;
   const CategoryBar({super.key, required this.onCategorySelected});
 
   @override
@@ -18,11 +18,11 @@ class CategoryBar extends StatefulWidget {
 }
 
 class _CategoryBarState extends State<CategoryBar> {
-  String selectedCategory = "All";
+  ProductCategory selectedCategory = ProductCategory.all;
 
   @override
   Widget build(BuildContext context) {
-    final category = ["All", ...ProductCategory.values.map((e) => e.name)];
+    final categories = ProductCategory.values;
     return SizedBox(
       height: 44,
       child: SingleChildScrollView(
@@ -30,15 +30,15 @@ class _CategoryBarState extends State<CategoryBar> {
         padding: const EdgeInsets.symmetric(horizontal: 8),
         child: Row(
           children: [
-            for (final label in category) ...[
+            for (final categoryItem in categories) ...[
               ChoiceChip(
-                label: Text(label.capitalize()),
-                selected: label == selectedCategory,
+                label: Text(categoryItem.name.capitalize()),
+                selected: categoryItem == selectedCategory,
                 onSelected: (_) {
                   setState(() {
-                    selectedCategory = label;
+                    selectedCategory = categoryItem;
                   });
-                  widget.onCategorySelected(label);
+                  widget.onCategorySelected(categoryItem);
                 },
               ),
               const SizedBox(width: 8),

@@ -13,12 +13,16 @@ class MerchantsCols extends BaseCols {
   static const String userIdCol = 'user_id';
   static const String ratingCol = 'rating';
   static const String usernameCol = 'username';
+  static const String bioCol = 'bio';
   static const String emailCol = 'email';
+  static const String profileImageCol = 'profile_image';
   static const String passwordHashCol = 'password_hash';
 
   String get userId => userIdCol;
   String get rating => ratingCol;
   String get username => usernameCol;
   String get email => emailCol;
+  String get bio => bioCol;
+  String get profileImage => profileImageCol;
   String get passwordHash => passwordHashCol;
 }

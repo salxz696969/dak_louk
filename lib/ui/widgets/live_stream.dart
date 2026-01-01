@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/domain/services/post_service.dart';
-import 'package:dak_louk/ui/widgets/post_slider.dart';
+import 'package:dak_louk/ui/widgets/posts/post_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 

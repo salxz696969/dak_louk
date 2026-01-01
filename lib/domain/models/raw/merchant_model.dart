@@ -6,6 +6,8 @@ class MerchantModel extends Cacheable {
   final double rating;
   final String username;
   final String email;
+  final String bio;
+  final String profileImage;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -15,6 +17,8 @@ class MerchantModel extends Cacheable {
     required this.rating,
     required this.username,
     required this.email,
+    required this.bio,
+    required this.profileImage,
     required this.createdAt,
     required this.updatedAt,
   });

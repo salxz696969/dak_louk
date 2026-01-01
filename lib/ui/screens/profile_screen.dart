@@ -230,7 +230,7 @@ class _PostGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<PostVM>>(
-      future: _postService.getMerchantPosts(merchantId),
+      future: Future.value(List<PostVM>.empty()),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Padding(
@@ -375,11 +375,11 @@ class _PhotoContainer extends StatelessWidget {
         children: [
           Positioned.fill(
             child: Image(
-              image: AssetImage(post.mediaUrls?.first ?? ''),
+              image: AssetImage(post.promoMedias?.first.url ?? ''),
               fit: BoxFit.cover,
             ),
           ),
-          if (post.mediaUrls?.isNotEmpty ?? false)
+          if (post.promoMedias?.isNotEmpty ?? false)
             Positioned(
               top: 8,
               right: 8,

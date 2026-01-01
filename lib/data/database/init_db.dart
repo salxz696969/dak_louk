@@ -8,7 +8,7 @@ Future<void> initDb(Database db) async {
   await db.execute('''
       CREATE TABLE ${Tables.users.tableName} (
         ${Tables.users.cols.id} INTEGER PRIMARY KEY AUTOINCREMENT,
-        ${Tables.users.cols.username} TEXT UNIQUE NOT NULL,
+        ${Tables.users.cols.username} TEXT NOT NULL,
         ${Tables.users.cols.email} TEXT UNIQUE NOT NULL,
         ${Tables.users.cols.passwordHash} TEXT NOT NULL,
         ${Tables.users.cols.profileImageUrl} TEXT,
@@ -24,8 +24,10 @@ Future<void> initDb(Database db) async {
         ${Tables.merchants.cols.id} INTEGER PRIMARY KEY AUTOINCREMENT,
         ${Tables.merchants.cols.userId} INTEGER NOT NULL,
         ${Tables.merchants.cols.rating} REAL DEFAULT 0.0,
-        ${Tables.merchants.cols.username} TEXT,
+        ${Tables.merchants.cols.username} TEXT NOT NULL,
         ${Tables.merchants.cols.email} TEXT,
+        ${Tables.merchants.cols.bio} TEXT,
+        ${Tables.merchants.cols.profileImage} TEXT,
         ${Tables.merchants.cols.passwordHash} TEXT,
         ${Tables.merchants.cols.createdAt} TEXT NOT NULL,
         ${Tables.merchants.cols.updatedAt} TEXT NOT NULL,
@@ -304,10 +306,10 @@ const productVideos = [
 ];
 
 const promoImages = [
-  'assets/promo/coffee1.jpg',
-  'assets/promo/coffee2.jpg',
-  'assets/promo/coffee3.jpg',
-  'assets/promo/coffee4.jpg',
+  'assets/images/coffee1.png',
+  'assets/images/coffee2.png',
+  'assets/images/coffee3.png',
+  'assets/images/coffee4.png',
 ];
 
 const promoVideos = [
@@ -469,11 +471,13 @@ Future<void> insertMockData(Database db) async {
       Tables.merchants.cols.userId: i,
       Tables.merchants.cols.username: randomName(rand, i),
       Tables.merchants.cols.email: 'merchant$i@gmail.com',
+      Tables.merchants.cols.bio: bio[rand.nextInt(bio.length)],
       Tables.merchants.cols.passwordHash: Hasher.sha256Hash(
         'merchantpassword$i',
       ),
       Tables.merchants.cols.rating:
           (rand.nextDouble() * 2) + 3.0, // 3.0-5.0 rating
+      Tables.merchants.cols.profileImage: profileImage,
       Tables.merchants.cols.createdAt: now,
       Tables.merchants.cols.updatedAt: now,
     });
@@ -522,20 +526,16 @@ Future<void> insertMockData(Database db) async {
     }
   }
 
-  // 5️⃣ PRODUCT_MEDIAS (images/videos for products)
+  // 5️⃣ PRODUCT_MEDIAS (images only for products)
   for (int productId = 1; productId <= 200; productId++) {
-    // Each product gets 2-5 media files
+    // Each product gets 2-5 media files (all images)
     final numMedia = rand.nextInt(4) + 2;
 
     for (int j = 0; j < numMedia; j++) {
-      final isVideo = rand.nextBool() && j == 0; // First media might be video
-
       await db.insert(Tables.productMedias.tableName, {
         Tables.productMedias.cols.productId: productId,
-        Tables.productMedias.cols.url: isVideo
-            ? productVideos[rand.nextInt(productVideos.length)]
-            : productImages[rand.nextInt(productImages.length)],
-        Tables.productMedias.cols.mediaType: isVideo ? 'video' : 'image',
+        Tables.productMedias.cols.url: productImages[rand.nextInt(productImages.length)],
+        Tables.productMedias.cols.mediaType: 'image',
         Tables.productMedias.cols.createdAt: now,
         Tables.productMedias.cols.updatedAt: now,
       });
@@ -576,20 +576,16 @@ Future<void> insertMockData(Database db) async {
     }
   }
 
-  // 8️⃣ PROMO_MEDIAS (promotional media for posts)
+  // 8️⃣ PROMO_MEDIAS (images only for promotional media in posts)
   for (int postId = 1; postId <= 150; postId++) {
-    // Each post gets 1-3 promotional media
+    // Each post gets 1-3 promotional media (all images)
     final numMedia = rand.nextInt(3) + 1;
 
     for (int j = 0; j < numMedia; j++) {
-      final isVideo = rand.nextBool() && j == 0;
-
       await db.insert(Tables.promoMedias.tableName, {
         Tables.promoMedias.cols.postId: postId,
-        Tables.promoMedias.cols.url: isVideo
-            ? promoVideos[rand.nextInt(promoVideos.length)]
-            : promoImages[rand.nextInt(promoImages.length)],
-        Tables.promoMedias.cols.mediaType: isVideo ? 'video' : 'image',
+        Tables.promoMedias.cols.url: promoImages[rand.nextInt(promoImages.length)],
+        Tables.promoMedias.cols.mediaType: 'image',
         Tables.promoMedias.cols.createdAt: now,
         Tables.promoMedias.cols.updatedAt: now,
       });
@@ -631,7 +627,7 @@ Future<void> insertMockData(Database db) async {
     }
   }
 
-  // 1️⃣1️⃣ LIVE_STREAMS (merchant live streams)
+  // 1️⃣1️⃣ LIVE_STREAMS (merchant live streams -- retain videos here)
   for (int i = 1; i <= 50; i++) {
     final merchantId = rand.nextInt(50) + 1;
 

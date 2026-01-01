@@ -1,6 +1,14 @@
 import 'package:dak_louk/core/auth/app_session.dart';
 import 'package:dak_louk/core/utils/error.dart';
+import 'package:dak_louk/data/repositories/merchant_repo.dart';
+import 'package:dak_louk/data/repositories/product_repo.dart';
+import 'package:dak_louk/data/repositories/product_media_repo.dart';
+import 'package:dak_louk/data/repositories/product_category_repo.dart';
+import 'package:dak_louk/data/repositories/product_category_maps_repo.dart';
+import 'package:dak_louk/data/repositories/post_product_repo.dart';
+import 'package:dak_louk/data/repositories/post_like_repo.dart';
 import 'package:dak_louk/data/repositories/post_repo.dart';
+import 'package:dak_louk/data/repositories/post_save_repo.dart';
 import 'package:dak_louk/data/repositories/promo_media_repo.dart';
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/core/utils/orm.dart';
@@ -9,7 +17,20 @@ import 'package:dak_louk/data/tables/tables.dart';
 class PostService {
   late final currentUserId;
   final PostRepository _postRepository = PostRepository();
+  final MerchantRepository _merchantRepository = MerchantRepository();
+  final PostProductsRepository _postProductsRepository =
+      PostProductsRepository();
   final PromoMediaRepository _promoMediaRepository = PromoMediaRepository();
+  final PostLikeRepository _postLikeRepository = PostLikeRepository();
+  final PostSaveRepository _postSaveRepository = PostSaveRepository();
+  final ProductRepository _productRepository = ProductRepository();
+  final ProductMediaRepository _productMediaRepository =
+      ProductMediaRepository();
+  final ProductCategoryRepository _productCategoryRepository =
+      ProductCategoryRepository();
+  final ProductCategoryMapsRepository _productCategoryMapsRepository =
+      ProductCategoryMapsRepository();
+
   // Business logic methods migrated from PostRepository
   PostService() {
     if (AppSession.instance.isLoggedIn) {
@@ -18,71 +39,215 @@ class PostService {
       throw AppError(type: ErrorType.UNAUTHORIZED, message: 'Unauthorized');
     }
   }
-  Future<List<PostVM>> getMerchantPosts(int merchantId) async {
+  // Future<List<PostVM>> getMerchantPosts(int merchantId) async {
+  //   try {
+  //     final statement = Clauses.where.eq(
+  //       Tables.posts.cols.merchantId,
+  //       merchantId,
+  //     );
+  //     final posts = await _postRepository.queryThisTable(
+  //       where: statement.clause,
+  //       args: statement.args,
+  //     );
+
+  //     // Populate relations
+  //     final enrichedPosts = await Future.wait(
+  //       posts.map((post) async {
+  //         final products = await _postProductsRepository.queryThisTable(
+  //           where: Clauses.where
+  //               .eq(Tables.postProducts.cols.postId, post.id)
+  //               .clause,
+  //         );
+  //         final merchant = await _merchantRepository.getById(post.merchantId);
+  //         if (merchant == null) {
+  //           throw AppError(
+  //             type: ErrorType.NOT_FOUND,
+  //             message: 'Merchant not found',
+  //           );
+  //         }
+  //         return PostVM.fromRaw(
+  //           post,
+  //           merchantName: merchant.username,
+  //           merchantProfileImage: merchant.profileImage,
+  //           mediaUrls: [],
+  //           productNames: [],
+  //           likesCount: 0,
+  //           savesCount: 0,
+  //           isLiked: false,
+  //           isSaved: false,
+  //         );
+  //       }),
+  //     );
+
+  //     return enrichedPosts;
+  //   } catch (e) {
+  //     rethrow;
+  //   }
+  // }
+
+  Future<List<PostVM>> getAllPosts({
+    ProductCategory category = ProductCategory.all,
+    int limit = 100,
+  }) async {
     try {
-      final statement = Clauses.where.eq(
-        Tables.posts.cols.merchantId,
-        merchantId,
-      );
-      final posts = await _postRepository.queryThisTable(
-        where: statement.clause,
-        args: statement.args,
-      );
-
-      // Populate relations
-      final enrichedPosts = await Future.wait(
-        posts.map((post) async {
-          return PostVM.fromRaw(post);
-        }),
-      );
-
-      return enrichedPosts;
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  Future<List<PostVM>> getAllPosts(int limit) async {
-    try {
-      List<PostModel> posts;
       if (limit <= 0) limit = 100;
 
-      posts = await _postRepository.queryThisTable(limit: limit);
+      List<PostModel> posts;
 
-      // Populate relations
+      if (category == ProductCategory.all) {
+        // Get all posts if category is 'all'
+        posts = await _postRepository.queryThisTable(limit: limit);
+      } else {
+        // Filter posts by category
+        posts = await _getPostsByCategory(category, limit);
+      }
+
+      if (posts.isEmpty) return [];
+
+      // Get all likes and saves for these posts
+      final postLikes = await _postLikeRepository.queryThisTable();
+      final postSaves = await _postSaveRepository.queryThisTable();
+
+      // Populate relations for each post
       final enrichedPosts = await Future.wait(
         posts.map((post) async {
-          return PostVM.fromRaw(post);
+          // Get merchant info
+          final merchant = await _merchantRepository.getById(post.merchantId);
+          if (merchant == null) {
+            throw AppError(
+              type: ErrorType.NOT_FOUND,
+              message: 'Merchant not found for post ${post.id}',
+            );
+          }
+
+          // Get promo medias for this post
+          final promoMedias = await _promoMediaRepository.queryThisTable(
+            where: Clauses.where
+                .eq(Tables.promoMedias.cols.postId, post.id)
+                .clause,
+            args: Clauses.where
+                .eq(Tables.promoMedias.cols.postId, post.id)
+                .args,
+          );
+
+          // Get post-product relationships
+          final postProductRelations = await _postProductsRepository
+              .queryThisTable(
+                where: Clauses.where
+                    .eq(Tables.postProducts.cols.postId, post.id)
+                    .clause,
+                args: Clauses.where
+                    .eq(Tables.postProducts.cols.postId, post.id)
+                    .args,
+              );
+
+          // Get products for this post
+          final postProducts = <PostProductVM>[];
+          for (final relation in postProductRelations) {
+            final product = await _productRepository.getById(
+              relation.productId,
+            );
+            if (product != null) {
+              // Get product media
+              final productMedias = await _productMediaRepository
+                  .queryThisTable(
+                    where: Clauses.where
+                        .eq(Tables.productMedias.cols.productId, product.id)
+                        .clause,
+                    args: Clauses.where
+                        .eq(Tables.productMedias.cols.productId, product.id)
+                        .args,
+                  );
+
+              // Get product categories
+              final categoryMaps = await _productCategoryMapsRepository
+                  .queryThisTable(
+                    where: Clauses.where
+                        .eq(
+                          Tables.productCategoryMaps.cols.productId,
+                          product.id,
+                        )
+                        .clause,
+                    args: Clauses.where
+                        .eq(
+                          Tables.productCategoryMaps.cols.productId,
+                          product.id,
+                        )
+                        .args,
+                  );
+
+              ProductCategory category = ProductCategory.others; // default
+              if (categoryMaps.isNotEmpty) {
+                final categoryModel = await _productCategoryRepository.getById(
+                  categoryMaps.first.categoryId,
+                );
+                if (categoryModel != null) {
+                  // Convert string to enum
+                  category = ProductCategory.values.firstWhere(
+                    (e) => e.name == categoryModel.name,
+                    orElse: () => ProductCategory.others,
+                  );
+                }
+              }
+
+              postProducts.add(
+                PostProductVM(
+                  id: product.id,
+                  name: product.name,
+                  imageUrls: productMedias.map((media) => media.url).toList(),
+                  price: product.price.toStringAsFixed(2),
+                  quantity: product.quantity.toString(),
+                  description: product.description ?? '',
+                  category: category,
+                ),
+              );
+            }
+          }
+
+          final merchantVM = PostMerchantVM(
+            id: merchant.id,
+            bio: merchant.bio,
+            name: merchant.username,
+            profileImage: merchant.profileImage,
+            username: merchant.username,
+            rating: merchant.rating,
+          );
+
+          // Calculate likes and saves for this post
+          final likesCount = postLikes
+              .where((like) => like.postId == post.id)
+              .length;
+          final savesCount = postSaves
+              .where((save) => save.postId == post.id)
+              .length;
+          final isLiked = postLikes.any(
+            (like) => like.postId == post.id && like.userId == currentUserId,
+          );
+          final isSaved = postSaves.any(
+            (save) => save.postId == post.id && save.userId == currentUserId,
+          );
+
+          return PostVM.fromRaw(
+            post,
+            promoMedias: promoMedias.isNotEmpty ? promoMedias : null,
+            merchant: merchantVM,
+            products: postProducts,
+            likesCount: likesCount,
+            savesCount: savesCount,
+            isLiked: isLiked,
+            isSaved: isSaved,
+          );
         }),
       );
 
       return enrichedPosts;
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  Future<List<PostVM>> getPostsByProductId(int productId) async {
-    try {
-      final statement = Clauses.where.eq(
-        Tables.postProducts.cols.productId,
-        productId,
-      );
-      final posts = await _postRepository.queryThisTable(
-        where: statement.clause,
-        args: statement.args,
-      );
-      if (posts.isNotEmpty) {
-        return posts.map((post) => PostVM.fromRaw(post)).toList();
-      }
-      throw AppError(type: ErrorType.NOT_FOUND, message: 'No posts found');
     } catch (e) {
       if (e is AppError) {
         rethrow;
       }
       throw AppError(
         type: ErrorType.DB_ERROR,
-        message: 'Failed to get posts by product id',
+        message: 'Failed to get all posts: ${e.toString()}',
       );
     }
   }
@@ -90,23 +255,49 @@ class PostService {
   // Migrated from PostDao
   Future<List<PostVM>> getPostsByLiveStreamId(int liveStreamId) async {
     try {
-      final statement = Clauses.where.eq(
-        Tables.liveStreams.cols.id,
-        liveStreamId,
-      );
-      final posts = await _postRepository.queryThisTable(
-        where: statement.clause,
-        args: statement.args,
-      );
-
-      // Populate relations like in the original DAO
-      final enrichedPosts = await Future.wait(
-        posts.map((post) async {
-          return PostVM.fromRaw(post);
-        }),
+      // Get live stream products first
+      final liveStreamProducts = await _productRepository.queryThisTable(
+        where: Clauses.where
+            .eq(Tables.liveStreamProducts.cols.liveStreamId, liveStreamId)
+            .clause,
+        args: Clauses.where
+            .eq(Tables.liveStreamProducts.cols.liveStreamId, liveStreamId)
+            .args,
       );
 
-      return enrichedPosts;
+      if (liveStreamProducts.isEmpty) {
+        throw AppError(
+          type: ErrorType.NOT_FOUND,
+          message: 'No products found for live stream',
+        );
+      }
+
+      final productIds = liveStreamProducts
+          .map((product) => product.id)
+          .toList();
+      final posts = <PostModel>[];
+
+      // Get posts that feature these products
+      for (final productId in productIds) {
+        final postProductRelations = await _postProductsRepository
+            .queryThisTable(
+              where: Clauses.where
+                  .eq(Tables.postProducts.cols.productId, productId)
+                  .clause,
+              args: Clauses.where
+                  .eq(Tables.postProducts.cols.productId, productId)
+                  .args,
+            );
+
+        for (final relation in postProductRelations) {
+          final post = await _postRepository.getById(relation.postId);
+          if (post != null && !posts.any((p) => p.id == post.id)) {
+            posts.add(post);
+          }
+        }
+      }
+
+      return await _buildPostVMs(posts);
     } catch (e) {
       if (e is AppError) {
         rethrow;
@@ -125,10 +316,10 @@ class PostService {
         orderBy: orderByStmt.clause,
         limit: limit,
       );
-      if (posts.isNotEmpty) {
-        return posts.map((post) => PostVM.fromRaw(post)).toList();
+      if (posts.isEmpty) {
+        throw AppError(type: ErrorType.NOT_FOUND, message: 'No posts found');
       }
-      throw AppError(type: ErrorType.NOT_FOUND, message: 'No posts found');
+      return await _buildPostVMs(posts);
     } catch (e) {
       if (e is AppError) {
         rethrow;
@@ -150,10 +341,10 @@ class PostService {
         where: statement.clause,
         args: statement.args,
       );
-      if (posts.isNotEmpty) {
-        return posts.map((post) => PostVM.fromRaw(post)).toList();
+      if (posts.isEmpty) {
+        throw AppError(type: ErrorType.NOT_FOUND, message: 'No posts found');
       }
-      throw AppError(type: ErrorType.NOT_FOUND, message: 'No posts found');
+      return await _buildPostVMs(posts);
     } catch (e) {
       if (e is AppError) {
         rethrow;
@@ -180,7 +371,8 @@ class PostService {
 
       final newPost = await _postRepository.getById(id);
       if (newPost != null) {
-        return PostVM.fromRaw(newPost);
+        final postVMs = await _buildPostVMs([newPost]);
+        return postVMs.isNotEmpty ? postVMs.first : null;
       }
       throw AppError(type: ErrorType.NOT_FOUND, message: 'Post not found');
     } catch (e) {
@@ -196,9 +388,10 @@ class PostService {
 
   Future<PostVM?> getPostById(int id) async {
     try {
-      final newPost = await _postRepository.getById(id);
-      if (newPost != null) {
-        return PostVM.fromRaw(newPost);
+      final post = await _postRepository.getById(id);
+      if (post != null) {
+        final postVMs = await _buildPostVMs([post]);
+        return postVMs.isNotEmpty ? postVMs.first : null;
       }
       throw AppError(type: ErrorType.NOT_FOUND, message: 'Post not found');
     } catch (e) {
@@ -226,13 +419,14 @@ class PostService {
           id: id,
           merchantId: currentUserId,
           caption: dto.caption,
-          createdAt: DateTime.now(),
+          createdAt: post.createdAt, // Keep original creation time
           updatedAt: DateTime.now(),
         ),
       );
-      final newPost = await _postRepository.getById(post.id);
-      if (newPost != null) {
-        return PostVM.fromRaw(newPost);
+      final updatedPost = await _postRepository.getById(id);
+      if (updatedPost != null) {
+        final postVMs = await _buildPostVMs([updatedPost]);
+        return postVMs.isNotEmpty ? postVMs.first : null;
       }
       throw AppError(type: ErrorType.NOT_FOUND, message: 'Post not found');
     } catch (e) {
@@ -268,6 +462,208 @@ class PostService {
       throw AppError(
         type: ErrorType.DB_ERROR,
         message: 'Failed to delete post',
+      );
+    }
+  }
+
+  // Helper method to build PostVMs from PostModels
+  Future<List<PostVM>> _buildPostVMs(List<PostModel> posts) async {
+    if (posts.isEmpty) return [];
+
+    // Get all likes and saves
+    final postLikes = await _postLikeRepository.queryThisTable();
+    final postSaves = await _postSaveRepository.queryThisTable();
+
+    final enrichedPosts = await Future.wait(
+      posts.map((post) async {
+        // Get merchant info
+        final merchant = await _merchantRepository.getById(post.merchantId);
+        if (merchant == null) {
+          throw AppError(
+            type: ErrorType.NOT_FOUND,
+            message: 'Merchant not found for post ${post.id}',
+          );
+        }
+
+        // Get post-product relationships
+        final postProductRelations = await _postProductsRepository
+            .queryThisTable(
+              where: Clauses.where
+                  .eq(Tables.postProducts.cols.postId, post.id)
+                  .clause,
+              args: Clauses.where
+                  .eq(Tables.postProducts.cols.postId, post.id)
+                  .args,
+            );
+
+        // Get products for this post
+        final postProducts = <PostProductVM>[];
+        for (final relation in postProductRelations) {
+          final product = await _productRepository.getById(relation.productId);
+          if (product != null) {
+            // Get product media
+            final productMedias = await _productMediaRepository.queryThisTable(
+              where: Clauses.where
+                  .eq(Tables.productMedias.cols.productId, product.id)
+                  .clause,
+              args: Clauses.where
+                  .eq(Tables.productMedias.cols.productId, product.id)
+                  .args,
+            );
+
+            // Get product categories
+            final categoryMaps = await _productCategoryMapsRepository
+                .queryThisTable(
+                  where: Clauses.where
+                      .eq(Tables.productCategoryMaps.cols.productId, product.id)
+                      .clause,
+                  args: Clauses.where
+                      .eq(Tables.productCategoryMaps.cols.productId, product.id)
+                      .args,
+                );
+
+            ProductCategory category = ProductCategory.others; // default
+            if (categoryMaps.isNotEmpty) {
+              final categoryModel = await _productCategoryRepository.getById(
+                categoryMaps.first.categoryId,
+              );
+              if (categoryModel != null) {
+                // Convert string to enum
+                category = ProductCategory.values.firstWhere(
+                  (e) => e.name == categoryModel.name,
+                  orElse: () => ProductCategory.others,
+                );
+              }
+            }
+
+            postProducts.add(
+              PostProductVM(
+                id: product.id,
+                name: product.name,
+                imageUrls: productMedias.map((media) => media.url).toList(),
+                price: product.price.toStringAsFixed(2),
+                quantity: product.quantity.toString(),
+                description: product.description ?? '',
+                category: category,
+              ),
+            );
+          }
+        }
+
+        // Create merchant VM
+        final merchantVM = PostMerchantVM(
+          id: merchant.id,
+          bio: merchant.bio,
+          name: merchant.username,
+          profileImage: merchant.profileImage,
+          username: merchant.username,
+          rating: merchant.rating,
+        );
+
+        // Calculate likes and saves for this post
+        final likesCount = postLikes
+            .where((like) => like.postId == post.id)
+            .length;
+        final savesCount = postSaves
+            .where((save) => save.postId == post.id)
+            .length;
+        final isLiked = postLikes.any(
+          (like) => like.postId == post.id && like.userId == currentUserId,
+        );
+        final isSaved = postSaves.any(
+          (save) => save.postId == post.id && save.userId == currentUserId,
+        );
+
+        return PostVM.fromRaw(
+          post,
+          merchant: merchantVM,
+          products: postProducts,
+          likesCount: likesCount,
+          savesCount: savesCount,
+          isLiked: isLiked,
+          isSaved: isSaved,
+        );
+      }),
+    );
+
+    return enrichedPosts;
+  }
+
+  // Helper method to get posts filtered by category
+  Future<List<PostModel>> _getPostsByCategory(
+    ProductCategory category,
+    int limit,
+  ) async {
+    try {
+      // First, get the category ID from the database
+      final categoryStatement = Clauses.where.eq(
+        Tables.productCategories.cols.name,
+        category.name,
+      );
+      final categoryModels = await _productCategoryRepository.queryThisTable(
+        where: categoryStatement.clause,
+        args: categoryStatement.args,
+      );
+
+      if (categoryModels.isEmpty) {
+        return []; // No category found, return empty list
+      }
+
+      final categoryId = categoryModels.first.id;
+
+      // Get all products in this category
+      final categoryMapsStatement = Clauses.where.eq(
+        Tables.productCategoryMaps.cols.categoryId,
+        categoryId,
+      );
+      final categoryMaps = await _productCategoryMapsRepository.queryThisTable(
+        where: categoryMapsStatement.clause,
+        args: categoryMapsStatement.args,
+      );
+
+      if (categoryMaps.isEmpty) {
+        return []; // No products in this category
+      }
+
+      final productIds = categoryMaps.map((map) => map.productId).toList();
+
+      // Get all post-product relationships for these products
+      final posts = <PostModel>[];
+      final addedPostIds = <int>{};
+
+      for (final productId in productIds) {
+        final postProductStatement = Clauses.where.eq(
+          Tables.postProducts.cols.productId,
+          productId,
+        );
+        final postProductRelations = await _postProductsRepository
+            .queryThisTable(
+              where: postProductStatement.clause,
+              args: postProductStatement.args,
+            );
+
+        for (final relation in postProductRelations) {
+          // Avoid duplicate posts
+          if (!addedPostIds.contains(relation.postId)) {
+            final post = await _postRepository.getById(relation.postId);
+            if (post != null) {
+              posts.add(post);
+              addedPostIds.add(relation.postId);
+
+              // Stop if we've reached the limit
+              if (posts.length >= limit) {
+                return posts;
+              }
+            }
+          }
+        }
+      }
+
+      return posts;
+    } catch (e) {
+      throw AppError(
+        type: ErrorType.DB_ERROR,
+        message: 'Failed to get posts by category: ${e.toString()}',
       );
     }
   }

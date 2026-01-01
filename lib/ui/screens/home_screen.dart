@@ -1,6 +1,7 @@
 import 'package:dak_louk/domain/services/post_service.dart';
 import 'package:dak_louk/ui/widgets/category_bar.dart';
-import 'package:dak_louk/ui/widgets/post_block.dart';
+import 'package:dak_louk/ui/widgets/posts/post_item.dart';
+import 'package:dak_louk/ui/widgets/posts/product_item.dart';
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:flutter/material.dart';
 
@@ -13,11 +14,11 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final PostService _postService = PostService();
-  String selectedCategory = 'all';
+  ProductCategory selectedCategory = ProductCategory.all;
 
-  void onCategorySelected(String category) {
+  void onCategorySelected(ProductCategory category) {
     setState(() {
-      selectedCategory = category.toLowerCase();
+      selectedCategory = category;
     });
   }
 
@@ -30,7 +31,10 @@ class _HomeScreenState extends State<HomeScreen> {
         const SizedBox(height: 20.0),
         Expanded(
           child: FutureBuilder<List<PostVM>>(
-            future: _postService.getAllPosts(100),
+            future: _postService.getAllPosts(
+              category: selectedCategory,
+              limit: 100,
+            ),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
@@ -45,7 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(height: 16.0),
                 itemCount: posts.length,
                 itemBuilder: (context, index) {
-                  return PostBlock(post: posts[index]);
+                  return PostItem(post: posts[index]);
                 },
               );
             },

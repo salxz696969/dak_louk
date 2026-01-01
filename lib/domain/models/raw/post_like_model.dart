@@ -15,5 +15,3 @@ class PostLikeModel extends Cacheable {
     required this.updatedAt,
   });
 }
-
-

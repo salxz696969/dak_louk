@@ -14,7 +14,9 @@ class MerchantRepository extends BaseRepository<MerchantModel> {
       userId: merchant[Tables.merchants.cols.userId] as int,
       rating: merchant[Tables.merchants.cols.rating] as double,
       username: merchant[Tables.merchants.cols.username] as String,
+      bio: merchant[Tables.merchants.cols.bio] as String,
       email: merchant[Tables.merchants.cols.email] as String,
+      profileImage: merchant[Tables.merchants.cols.profileImage] as String,
       createdAt: DateTime.parse(
         merchant[Tables.merchants.cols.createdAt] as String,
       ),
@@ -31,6 +33,7 @@ class MerchantRepository extends BaseRepository<MerchantModel> {
       Tables.merchants.cols.userId: merchant.userId,
       Tables.merchants.cols.rating: merchant.rating,
       Tables.merchants.cols.username: merchant.username,
+      Tables.merchants.cols.bio: merchant.bio,
       Tables.merchants.cols.email: merchant.email,
       Tables.merchants.cols.createdAt: merchant.createdAt.toIso8601String(),
       Tables.merchants.cols.updatedAt: merchant.updatedAt.toIso8601String(),

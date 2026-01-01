@@ -2,8 +2,8 @@ import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/domain/services/post_service.dart';
 import 'package:dak_louk/ui/widgets/add_and_remove_button.dart';
 import 'package:dak_louk/ui/widgets/appbar.dart';
-import 'package:dak_louk/ui/widgets/photo_slider.dart';
-import 'package:dak_louk/ui/widgets/post_slider.dart';
+import 'package:dak_louk/ui/widgets/posts/product_photo_slider.dart';
+import 'package:dak_louk/ui/widgets/posts/post_slider.dart';
 import 'package:dak_louk/ui/widgets/username_container.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -46,15 +46,15 @@ class _ProductInfoScreenState extends State<ProductInfoScreen> {
                 merchantId: widget.post.merchantId,
                 rating: "0.0", // to change
                 bio: "", // to change
-                profile: AssetImage(widget.post.merchantProfileImage ?? ''),
-                username: widget.post.merchantName ?? '',
+                profile: AssetImage(widget.post.merchant.profileImage),
+                username: widget.post.merchant.username,
               ),
             ),
             PhotoSlider(
-              quantity: "0", // to change
+              quantity: 0, // to change
               images:
-                  widget.post.mediaUrls
-                      ?.map((image) => AssetImage(image))
+                  widget.post.promoMedias
+                      ?.map((promoMedia) => AssetImage(promoMedia.url))
                       .toList() ??
                   [],
             ),
@@ -72,7 +72,7 @@ class _ProductInfoScreenState extends State<ProductInfoScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12.0),
               child: Text(
-                "\$${widget.post.productNames?.first ?? '0'}", // to change
+                "\$${widget.post.products.first.price}", // to change
                 style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.w600,
@@ -116,7 +116,7 @@ class _ProductInfoScreenState extends State<ProductInfoScreen> {
                 cart: CartVM(
                   id: 0,
                   userId: widget.post.merchantId,
-                  productId: widget.post.id,
+                  productId: widget.post.products.first.id,
                   quantity: quantity,
                   createdAt: DateTime.now(), // to change
                   updatedAt: DateTime.now(), // to change
@@ -132,7 +132,7 @@ class _ProductInfoScreenState extends State<ProductInfoScreen> {
               ),
             ),
             _SimilarItems(
-              category: widget.post.productNames?.first ?? '',
+              category: widget.post.products.first.category.name,
             ), // to change
           ],
         ),
@@ -148,7 +148,13 @@ class _SimilarItems extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<PostVM>>(
-      future: _postService.getAllPosts(10),
+      future: _postService.getAllPosts(
+        category: ProductCategory.values.firstWhere(
+          (e) => e.name == category,
+          orElse: () => ProductCategory.others,
+        ),
+        limit: 10,
+      ),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());

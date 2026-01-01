@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class PhotoSlider extends StatefulWidget {
   final List<ImageProvider> images;
-  final String quantity;
+  final int quantity;
 
   const PhotoSlider({super.key, required this.quantity, required this.images});
 

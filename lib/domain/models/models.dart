@@ -16,6 +16,7 @@ part 'raw/product_category_model.dart';
 part 'raw/order_model.dart';
 part 'raw/order_product_model.dart';
 part 'raw/post_model.dart';
+part 'raw/post_product_model.dart';
 part 'raw/post_like_model.dart';
 part 'raw/post_save_model.dart';
 part 'raw/follower_model.dart';
@@ -26,6 +27,7 @@ part 'raw/live_stream_model.dart';
 part 'raw/live_stream_chat_model.dart';
 part 'raw/review_model.dart';
 part 'raw/product_media_model.dart';
+part 'raw/product_category_map_model.dart';
 
 // View Models
 part 'view_models/cart_vm.dart';
