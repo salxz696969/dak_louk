@@ -264,111 +264,6 @@ class PostService {
     }
   }
 
-  
-  // Migrated from PostDao
-  Future<List<PostVM>> getPostsByLiveStreamId(int liveStreamId) async {
-    try {
-      // Get live stream products first
-      final liveStreamProducts = await _productRepository.queryThisTable(
-        where: Clauses.where
-            .eq(Tables.liveStreamProducts.cols.liveStreamId, liveStreamId)
-            .clause,
-        args: Clauses.where
-            .eq(Tables.liveStreamProducts.cols.liveStreamId, liveStreamId)
-            .args,
-      );
-
-      if (liveStreamProducts.isEmpty) {
-        throw AppError(
-          type: ErrorType.NOT_FOUND,
-          message: 'No products found for live stream',
-        );
-      }
-
-      final productIds = liveStreamProducts
-          .map((product) => product.id)
-          .toList();
-      final posts = <PostModel>[];
-
-      // Get posts that feature these products
-      for (final productId in productIds) {
-        final postProductRelations = await _postProductsRepository
-            .queryThisTable(
-              where: Clauses.where
-                  .eq(Tables.postProducts.cols.productId, productId)
-                  .clause,
-              args: Clauses.where
-                  .eq(Tables.postProducts.cols.productId, productId)
-                  .args,
-            );
-
-        for (final relation in postProductRelations) {
-          final post = await _postRepository.getById(relation.postId);
-          if (post != null && !posts.any((p) => p.id == post.id)) {
-            posts.add(post);
-          }
-        }
-      }
-
-      return await _buildPostVMs(posts);
-    } catch (e) {
-      if (e is AppError) {
-        rethrow;
-      }
-      throw AppError(
-        type: ErrorType.DB_ERROR,
-        message: 'Failed to get posts by live stream id',
-      );
-    }
-  }
-
-  Future<List<PostVM>> getRecentPosts({int limit = 20}) async {
-    try {
-      final orderByStmt = Clauses.orderBy.desc(Tables.posts.cols.createdAt);
-      final posts = await _postRepository.queryThisTable(
-        orderBy: orderByStmt.clause,
-        limit: limit,
-      );
-      if (posts.isEmpty) {
-        throw AppError(type: ErrorType.NOT_FOUND, message: 'No posts found');
-      }
-      return await _buildPostVMs(posts);
-    } catch (e) {
-      if (e is AppError) {
-        rethrow;
-      }
-      throw AppError(
-        type: ErrorType.DB_ERROR,
-        message: 'Failed to get recent posts',
-      );
-    }
-  }
-
-  Future<List<PostVM>> searchPosts(String searchTerm) async {
-    try {
-      final statement = Clauses.like.like(
-        Tables.posts.cols.caption,
-        searchTerm,
-      );
-      final posts = await _postRepository.queryThisTable(
-        where: statement.clause,
-        args: statement.args,
-      );
-      if (posts.isEmpty) {
-        throw AppError(type: ErrorType.NOT_FOUND, message: 'No posts found');
-      }
-      return await _buildPostVMs(posts);
-    } catch (e) {
-      if (e is AppError) {
-        rethrow;
-      }
-      throw AppError(
-        type: ErrorType.DB_ERROR,
-        message: 'Failed to search posts',
-      );
-    }
-  }
-
   // Basic CRUD operations
   Future<PostVM?> createPost(CreatePostDTO dto) async {
     try {
@@ -479,6 +374,28 @@ class PostService {
     }
   }
 
+  Future<List<PostVM>> getSimilarPosts(int postId) async {
+    try {
+      final post = await _postRepository.getById(postId);
+      if (post == null) {
+        throw AppError(type: ErrorType.NOT_FOUND, message: 'Post not found');
+      }
+      final posts = await _postRepository.queryThisTable(
+        where: Clauses.like
+            .like(Tables.posts.cols.caption, post.caption!)
+            .clause,
+        args: Clauses.like.like(Tables.posts.cols.caption, post.caption!).args,
+        limit: 10,
+      );
+      return await _buildPostVMs(posts);
+    } catch (e) {
+      throw AppError(
+        type: ErrorType.DB_ERROR,
+        message: 'Failed to get posts by merchant id',
+      );
+    }
+  }
+
   // Helper method to build PostVMs from PostModels
   Future<List<PostVM>> _buildPostVMs(List<PostModel> posts) async {
     if (posts.isEmpty) return [];
@@ -579,7 +496,7 @@ class PostService {
           name: merchant.username,
           profileImage: merchant.profileImage,
           username: merchant.username,
-          rating: merchant.rating,
+          rating: (merchant.rating * 100).truncate() / 100,
         );
 
         // Calculate likes and saves for this post

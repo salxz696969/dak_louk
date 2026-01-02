@@ -1,5 +1,6 @@
 import 'package:dak_louk/core/auth/app_session.dart';
 import 'package:dak_louk/core/utils/error.dart';
+import 'package:dak_louk/data/repositories/cart_repo.dart';
 import 'package:dak_louk/data/repositories/live_stream_repo.dart';
 import 'package:dak_louk/data/repositories/merchant_repo.dart';
 import 'package:dak_louk/data/repositories/product_repo.dart';
@@ -19,6 +20,7 @@ class MerchantService {
   final ProductRepository _productRepository = ProductRepository();
   final ProductMediaRepository _productMediaRepository =
       ProductMediaRepository();
+  final CartRepository _cartRepository = CartRepository();
 
   MerchantService() {
     if (AppSession.instance.isLoggedIn) {
@@ -117,6 +119,20 @@ class MerchantService {
             .args,
       );
 
+      final isAddedToCart = await _cartRepository.queryThisTable(
+        where: Clauses.where
+            .eq(
+              Tables.carts.cols.productId,
+              products.map((product) => product.id).toList(),
+            )
+            .clause,
+        args: Clauses.where
+            .eq(
+              Tables.carts.cols.productId,
+              products.map((product) => product.id).toList(),
+            )
+            .args,
+      );
       final List<MerchantProductsVM> result = [];
 
       for (final product in products) {
@@ -132,7 +148,11 @@ class MerchantService {
         final mediaVMs = medias.map(ProductMediaVM.fromRaw).toList();
 
         result.add(
-          MerchantProductsVM.fromRaw(product, productMedias: mediaVMs),
+          MerchantProductsVM.fromRaw(
+            product,
+            productMedias: mediaVMs,
+            isAddedToCart: isAddedToCart.isNotEmpty,
+          ),
         );
       }
 

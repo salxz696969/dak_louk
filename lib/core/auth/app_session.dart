@@ -19,10 +19,18 @@ class AppSession {
   static const _keyPhone = 'phone';
   static const _keyAddress = 'address';
 
+  static const _keyMerchantId = 'merchant_id';
+  static const _keyMerchantUsername = 'merchant_username';
+  static const _keyMerchantProfileImage = 'merchant_profile_image';
+
   int? _userId;
   String? _username;
   String? _phone;
   String? _address;
+
+  int? _merchantId;
+  String? _merchantUsername;
+  String? _merchantProfileImage;
   Role? _role;
 
   bool get isLoggedIn => _userId != null;
@@ -33,6 +41,9 @@ class AppSession {
   String? get address => _address;
   Role? get role => _role;
 
+  int? get merchantId => _merchantId;
+  String? get merchantUsername => _merchantUsername;
+  String? get merchantProfileImage => _merchantProfileImage;
   Future<void> init() async {
     final prefs = await SharedPreferences.getInstance();
 
@@ -66,8 +77,9 @@ class AppSession {
       _address = user.address;
     }
     if (merchant != null) {
-      _userId = merchant.id;
-      _username = merchant.username;
+      _merchantId = merchant.id;
+      _merchantUsername = merchant.username;
+      _merchantProfileImage = merchant.profileImage;
       _role = Role.merchant;
     }
     final prefs = await SharedPreferences.getInstance();
@@ -75,6 +87,10 @@ class AppSession {
     await prefs.setInt(_keyUserId, _userId!);
     await prefs.setString(_keyUsername, _username!);
     await prefs.setString(_keyRole, _role!.name);
+
+    await prefs.setInt(_keyMerchantId, _merchantId!);
+    await prefs.setString(_keyMerchantUsername, _merchantUsername!);
+    await prefs.setString(_keyMerchantProfileImage, _merchantProfileImage!);
   }
 
   Future<void> signUpUser({
