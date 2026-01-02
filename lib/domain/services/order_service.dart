@@ -1,3 +1,4 @@
+import 'package:dak_louk/data/repositories/cart_repo.dart';
 import 'package:dak_louk/data/repositories/order_product_repo.dart';
 import 'package:dak_louk/data/repositories/order_repo.dart';
 import 'package:dak_louk/domain/models/models.dart';
@@ -11,6 +12,7 @@ class OrderService {
   final OrderRepository _orderRepository = OrderRepository();
   final OrderProductRepository _orderProductRepository =
       OrderProductRepository();
+  final CartRepository _cartRepository = CartRepository();
   OrderService() {
     if (AppSession.instance.isLoggedIn) {
       currentUserId = AppSession.instance.userId;
@@ -78,6 +80,8 @@ class OrderService {
         final orderProductId = await _orderProductRepository.insert(
           orderProduct,
         );
+        // delete prducts in cart
+        await _cartRepository.delete(item.productId);
         if (orderProductId <= 0) {
           throw AppError(
             type: ErrorType.DB_ERROR,

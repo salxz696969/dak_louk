@@ -2,7 +2,7 @@ import 'package:dak_louk/domain/services/chat_service.dart';
 import 'package:dak_louk/domain/services/chat_room_service.dart';
 import 'package:dak_louk/ui/screens/chat_screen.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:dak_louk/ui/screens/profile_screen.dart';
+import 'package:dak_louk/ui/screens/merchant_profile_screen.dart';
 import 'package:flutter/material.dart';
 
 class UsernameContainer extends StatelessWidget {
@@ -32,7 +32,7 @@ class UsernameContainer extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => ProfileScreen(
+                  builder: (context) => MerchantProfileScreen(
                     userId: 1,
                     bio: bio,
                     username: username,

@@ -1,8 +1,9 @@
+import 'package:dak_louk/ui/screens/orders_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:dak_louk/ui/screens/home_screen.dart';
 import 'package:dak_louk/ui/screens/chat_room_screen_.dart';
 import 'package:dak_louk/ui/screens/live_stream_screen.dart';
-import 'package:dak_louk/ui/screens/setting_screen.dart';
+import 'package:dak_louk/ui/screens/profile_screen.dart';
 import 'package:dak_louk/ui/screens/cart_screen.dart';
 import 'package:dak_louk/ui/widgets/appbar.dart';
 import 'package:dak_louk/ui/widgets/navbar.dart';
@@ -20,9 +21,10 @@ class BaseScaffold extends StatefulWidget {
 class _BaseScaffoldState extends State<BaseScaffold> {
   static const List<Widget> _tabs = [
     HomeScreen(),
-    ChatRoomScreen(),
     LiveStreamScreen(),
-    SettingScreen(),
+    OrdersScreen(),
+    ChatRoomScreen(),
+    ProfileScreen(),
   ];
 
   late int _currentIndex;
