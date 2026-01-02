@@ -1,8 +1,8 @@
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/domain/services/post_like_service.dart';
 import 'package:dak_louk/domain/services/post_save_service.dart';
-import 'package:dak_louk/ui/widgets/posts/product_item.dart';
-import 'package:dak_louk/ui/widgets/posts/username_container.dart';
+import 'package:dak_louk/ui/widgets/screens/posts/product_item.dart';
+import 'package:dak_louk/ui/widgets/screens/posts/username_container.dart';
 import 'package:flutter/material.dart';
 
 class PostItem extends StatefulWidget {

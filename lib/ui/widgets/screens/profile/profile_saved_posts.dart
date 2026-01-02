@@ -1,5 +1,5 @@
 import 'package:dak_louk/domain/models/models.dart';
-import 'package:dak_louk/ui/widgets/profile/profile_liked_posts.dart';
+import 'package:dak_louk/ui/widgets/screens/profile/profile_liked_posts.dart';
 import 'package:flutter/material.dart';
 
 class SavedPosts extends StatelessWidget {

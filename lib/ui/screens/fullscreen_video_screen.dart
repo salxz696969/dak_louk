@@ -1,5 +1,5 @@
 import 'package:dak_louk/domain/models/models.dart';
-import 'package:dak_louk/ui/widgets/livestream/live_stream.dart';
+import 'package:dak_louk/ui/widgets/screens/livestream/live_stream.dart';
 import 'package:flutter/material.dart';
 
 class FullScreenVideoScreen extends StatefulWidget {

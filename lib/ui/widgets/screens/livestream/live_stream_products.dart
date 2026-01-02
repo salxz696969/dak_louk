@@ -1,6 +1,6 @@
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/domain/services/live_stream_products_service.dart';
-import 'package:dak_louk/ui/widgets/livestream/live_stream_product_item.dart';
+import 'package:dak_louk/ui/widgets/screens/livestream/live_stream_product_item.dart';
 import 'package:flutter/material.dart';
 
 class LiveStreamProducts extends StatelessWidget {

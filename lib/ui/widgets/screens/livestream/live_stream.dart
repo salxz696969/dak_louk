@@ -1,7 +1,7 @@
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/domain/services/live_stream_chat_service.dart';
-import 'package:dak_louk/ui/widgets/livestream/live_stream_products.dart';
-import 'package:dak_louk/ui/widgets/livestream/live_stream_chat.dart';
+import 'package:dak_louk/ui/widgets/screens/livestream/live_stream_products.dart';
+import 'package:dak_louk/ui/widgets/screens/livestream/live_stream_chat.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 

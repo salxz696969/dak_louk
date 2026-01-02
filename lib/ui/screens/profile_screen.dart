@@ -1,9 +1,9 @@
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/domain/services/user_service.dart';
-import 'package:dak_louk/ui/widgets/profile/profile_info.dart';
-import 'package:dak_louk/ui/widgets/profile/profile_liked_posts.dart';
-import 'package:dak_louk/ui/widgets/profile/profile_saved_posts.dart';
-import 'package:dak_louk/ui/widgets/profile/profile_tabs.dart';
+import 'package:dak_louk/ui/widgets/screens/profile/profile_info.dart';
+import 'package:dak_louk/ui/widgets/screens/profile/profile_liked_posts.dart';
+import 'package:dak_louk/ui/widgets/screens/profile/profile_saved_posts.dart';
+import 'package:dak_louk/ui/widgets/screens/profile/profile_tabs.dart';
 import 'package:flutter/material.dart';
 
 // (1) PROFILE TABS ENUM

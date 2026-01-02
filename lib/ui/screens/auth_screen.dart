@@ -1,9 +1,9 @@
 import 'package:dak_louk/domain/services/auth_service.dart';
 import 'package:dak_louk/domain/models/models.dart';
-import 'package:dak_louk/ui/widgets/base_scaffold.dart';
+import 'package:dak_louk/ui/widgets/common/base_scaffold.dart';
 import 'package:flutter/material.dart';
-import 'package:dak_louk/ui/widgets/auth/log_in.dart';
-import 'package:dak_louk/ui/widgets/auth/sign_up.dart';
+import 'package:dak_louk/ui/widgets/screens/auth/log_in.dart';
+import 'package:dak_louk/ui/widgets/screens/auth/sign_up.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
