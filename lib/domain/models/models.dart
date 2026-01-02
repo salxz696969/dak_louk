@@ -42,7 +42,10 @@ part 'view_models/chat_room_vm.dart';
 part 'view_models/live_stream_vm.dart';
 part 'view_models/live_stream_chat_vm.dart';
 part 'view_models/review_vm.dart';
-
+part 'view_models/merchant_vm.dart';
+part 'view_models/merchant_profile/merchant_posts_vm.dart';
+part 'view_models/merchant_profile/merchant_livestreams_vm.dart';
+part 'view_models/merchant_profile/merchant_products_vm.dart';
 part 'dto/cart_dto.dart';
 part 'dto/product_dto.dart';
 part 'dto/order_dto.dart';
