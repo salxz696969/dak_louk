@@ -1,6 +1,7 @@
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/domain/services/cart_service.dart';
 import 'package:dak_louk/ui/widgets/cart/cart_item.dart';
+import 'package:dak_louk/ui/screens/checkout_screen.dart';
 import 'package:flutter/material.dart';
 
 class CartItemWrapper extends StatefulWidget {
@@ -34,10 +35,10 @@ class _CartItemWrapperState extends State<CartItemWrapper> {
   }
 
   void _handlePlaceOrder() {
-    // Placeholder handler for now
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Place order for ${widget.cart.merchant.username}'),
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CheckoutScreen(carts: [widget.cart]),
       ),
     );
   }
