@@ -222,12 +222,39 @@ class _SimilarItemCardState extends State<_SimilarItemCard> {
                                   baseQuantity: 1,
                                   size: 25.0,
                                   cart: CartVM(
-                                    id: 0,
-                                    userId: widget.post.merchantId,
-                                    productId: widget.post.products.first.id,
-                                    quantity: 1,
-                                    createdAt: DateTime.now(),
-                                    updatedAt: DateTime.now(),
+                                    merchant: CartMerchantVM(
+                                      id: widget.post.merchantId,
+                                      username: widget.post.merchant.username,
+                                      profileImage:
+                                          widget.post.merchant.profileImage,
+                                    ),
+                                    items: [
+                                      CartItemVM(
+                                        id: widget.post.products.first.id,
+                                        userId: widget.post.merchantId,
+                                        productId:
+                                            widget.post.products.first.id,
+                                        name: widget.post.products.first.name,
+                                        price:
+                                            double.tryParse(
+                                              widget.post.products.first.price
+                                                  .toString()
+                                                  .replaceAll('\$', ''),
+                                            ) ??
+                                            0.0,
+                                        image: widget
+                                            .post
+                                            .products
+                                            .first
+                                            .imageUrls
+                                            .first,
+                                        quantity: 1,
+                                        availableQuantity:
+                                            widget.post.products.first.quantity,
+                                        createdAt: DateTime.now(),
+                                        updatedAt: DateTime.now(),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               )

@@ -40,13 +40,13 @@ class _AddAndRemoveButtonState extends State<AddAndRemoveButton> {
               setState(() {
                 currentQuantity = 0;
               });
-              await _cartService.deleteCart(widget.cart.id);
+              await _cartService.deleteCart(widget.cart.items.first.id);
             } else if (currentQuantity > 1) {
               setState(() {
                 currentQuantity = currentQuantity - 1;
               });
               await _cartService.updateCart(
-                widget.cart.id,
+                widget.cart.items.first.id,
                 UpdateCartDTO(quantity: currentQuantity),
               );
             }
@@ -69,12 +69,12 @@ class _AddAndRemoveButtonState extends State<AddAndRemoveButton> {
         const SizedBox(width: 5),
         InkWell(
           onTap: () async {
-            if (currentQuantity < widget.cart.quantity) {
+            if (currentQuantity < widget.cart.items.first.availableQuantity) {
               setState(() {
                 currentQuantity = currentQuantity + 1;
               });
               await _cartService.updateCart(
-                widget.cart.id,
+                widget.cart.items.first.id,
                 UpdateCartDTO(quantity: currentQuantity),
               );
             }

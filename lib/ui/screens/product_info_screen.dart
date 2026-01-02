@@ -114,12 +114,25 @@ class _ProductInfoScreenState extends State<ProductInfoScreen> {
                 baseQuantity: 1,
                 size: 30.0,
                 cart: CartVM(
-                  id: 0,
-                  userId: widget.post.merchantId,
-                  productId: widget.post.products.first.id,
-                  quantity: quantity,
-                  createdAt: DateTime.now(), // to change
-                  updatedAt: DateTime.now(), // to change
+                  merchant: CartMerchantVM(
+                    id: widget.post.merchantId,
+                    username: widget.post.merchant.username,
+                    profileImage: widget.post.merchant.profileImage,
+                  ),
+                  items: [
+                    CartItemVM(
+                      id: widget.post.products.first.id,
+                      name: widget.post.products.first.name,
+                      price: widget.post.products.first.price,
+                      image: widget.post.products.first.imageUrls.first,
+                      userId: widget.post.merchantId,
+                      productId: widget.post.products.first.id,
+                      quantity: 1,
+                      availableQuantity: widget.post.products.first.quantity,
+                      createdAt: DateTime.now(),
+                      updatedAt: DateTime.now(),
+                    ),
+                  ],
                 ),
               ),
             ),

@@ -59,14 +59,14 @@ class _ProductSection extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(10),
             child: Image(
-              image: AssetImage(cart.productImageUrl ?? ''),
+              image: AssetImage(cart.items.first.image ?? ''),
               fit: BoxFit.cover,
               width: double.infinity,
             ),
           ),
           const SizedBox(height: 12),
           Text(
-            cart.productName ?? '',
+            cart.items.first.name ?? '',
             style: theme.textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.bold,
             ),
@@ -75,7 +75,7 @@ class _ProductSection extends StatelessWidget {
           Row(
             children: [
               Text(
-                cart.merchantName ?? '',
+                cart.merchant.username ?? '',
                 style: const TextStyle(
                   fontWeight: FontWeight.w500,
                   fontSize: 16,
@@ -91,7 +91,7 @@ class _ProductSection extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            cart.productPrice.toString(),
+            cart.items.first.price.toString(),
             style: TextStyle(
               color: theme.colorScheme.primary,
               fontSize: 20,
@@ -99,7 +99,10 @@ class _ProductSection extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          AddAndRemoveButton(cart: cart, baseQuantity: cart.quantity),
+          AddAndRemoveButton(
+            cart: cart,
+            baseQuantity: cart.items.first.quantity,
+          ),
         ],
       ),
     );
@@ -210,7 +213,9 @@ class _OrderSummarySection extends StatelessWidget {
   Widget build(BuildContext context) {
     double deliveryFee = 5.00;
     double price =
-        double.tryParse(cart.productPrice.toString().replaceAll('\$', '')) ??
+        double.tryParse(
+          cart.items.first.price.toString().replaceAll('\$', ''),
+        ) ??
         0.0;
     return Padding(
       padding: const EdgeInsets.all(12),
@@ -224,10 +229,7 @@ class _OrderSummarySection extends StatelessWidget {
           const SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text("Subtotal:"),
-              Text(cart.productPrice.toString()),
-            ],
+            children: [const Text("Subtotal:"), Text(price.toString())],
           ),
           const SizedBox(height: 6),
           Row(

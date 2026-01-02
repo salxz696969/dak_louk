@@ -107,9 +107,11 @@ class _PostItemState extends State<PostItem> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  Image.asset(
-                    widget.post.promoMedias?.first.url ?? '',
-                    fit: BoxFit.contain,
+                  Positioned.fill(
+                    child: Image.asset(
+                      widget.post.promoMedias!.first.url,
+                      fit: BoxFit.cover,
+                    ),
                   ),
                   // Play button overlay for videos
 

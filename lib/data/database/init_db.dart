@@ -534,7 +534,8 @@ Future<void> insertMockData(Database db) async {
     for (int j = 0; j < numMedia; j++) {
       await db.insert(Tables.productMedias.tableName, {
         Tables.productMedias.cols.productId: productId,
-        Tables.productMedias.cols.url: productImages[rand.nextInt(productImages.length)],
+        Tables.productMedias.cols.url:
+            productImages[rand.nextInt(productImages.length)],
         Tables.productMedias.cols.mediaType: 'image',
         Tables.productMedias.cols.createdAt: now,
         Tables.productMedias.cols.updatedAt: now,
@@ -584,7 +585,8 @@ Future<void> insertMockData(Database db) async {
     for (int j = 0; j < numMedia; j++) {
       await db.insert(Tables.promoMedias.tableName, {
         Tables.promoMedias.cols.postId: postId,
-        Tables.promoMedias.cols.url: promoImages[rand.nextInt(promoImages.length)],
+        Tables.promoMedias.cols.url:
+            promoImages[rand.nextInt(promoImages.length)],
         Tables.promoMedias.cols.mediaType: 'image',
         Tables.promoMedias.cols.createdAt: now,
         Tables.promoMedias.cols.updatedAt: now,

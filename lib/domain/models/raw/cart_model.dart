@@ -5,8 +5,8 @@ class CartModel extends Cacheable {
   final int userId;
   final int productId;
   final int quantity;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+  final String createdAt;
+  final String updatedAt;
 
   CartModel({
     required this.id,

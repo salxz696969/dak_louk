@@ -1,5 +1,6 @@
 import 'package:dak_louk/core/auth/app_session.dart';
 import 'package:dak_louk/core/utils/error.dart';
+import 'package:dak_louk/data/repositories/cart_repo.dart';
 import 'package:dak_louk/data/repositories/merchant_repo.dart';
 import 'package:dak_louk/data/repositories/product_repo.dart';
 import 'package:dak_louk/data/repositories/product_media_repo.dart';
@@ -30,6 +31,7 @@ class PostService {
       ProductCategoryRepository();
   final ProductCategoryMapsRepository _productCategoryMapsRepository =
       ProductCategoryMapsRepository();
+  final CartRepository _cartRepository = CartRepository();
 
   // Business logic methods migrated from PostRepository
   PostService() {
@@ -190,13 +192,23 @@ class PostService {
                 }
               }
 
+              final isAddedToCart = await _cartRepository.queryThisTable(
+                where: Clauses.where
+                    .eq(Tables.carts.cols.productId, product.id)
+                    .clause,
+                args: Clauses.where
+                    .eq(Tables.carts.cols.productId, product.id)
+                    .args,
+              );
+
               postProducts.add(
                 PostProductVM(
                   id: product.id,
                   name: product.name,
                   imageUrls: productMedias.map((media) => media.url).toList(),
-                  price: product.price.toStringAsFixed(2),
-                  quantity: product.quantity.toString(),
+                  price: (product.price * 100).truncate() / 100,
+                  quantity: product.quantity,
+                  isAddedToCart: isAddedToCart.isNotEmpty,
                   description: product.description ?? '',
                   category: category,
                 ),
@@ -210,7 +222,7 @@ class PostService {
             name: merchant.username,
             profileImage: merchant.profileImage,
             username: merchant.username,
-            rating: merchant.rating,
+            rating: (merchant.rating * 100).truncate() / 100,
           );
 
           // Calculate likes and saves for this post
@@ -536,15 +548,24 @@ class PostService {
               }
             }
 
+            final isAddedToCart = await _cartRepository.queryThisTable(
+              where: Clauses.where
+                  .eq(Tables.carts.cols.productId, product.id)
+                  .clause,
+              args: Clauses.where
+                  .eq(Tables.carts.cols.productId, product.id)
+                  .args,
+            );
             postProducts.add(
               PostProductVM(
                 id: product.id,
                 name: product.name,
                 imageUrls: productMedias.map((media) => media.url).toList(),
-                price: product.price.toStringAsFixed(2),
-                quantity: product.quantity.toString(),
+                price: (product.price * 100).truncate() / 100,
+                quantity: product.quantity,
                 description: product.description ?? '',
                 category: category,
+                isAddedToCart: isAddedToCart.isNotEmpty,
               ),
             );
           }

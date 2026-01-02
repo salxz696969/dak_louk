@@ -1,6 +1,5 @@
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/domain/services/cart_service.dart';
-import 'package:dak_louk/ui/widgets/add_and_remove_button.dart';
 import 'package:flutter/material.dart';
 
 class ProductItem extends StatefulWidget {
@@ -86,15 +85,12 @@ class _AddToCartButton extends StatefulWidget {
 }
 
 class _AddToCartButtonState extends State<_AddToCartButton> {
-  late int cartId;
-  late bool isAdded;
   final CartService _cartService = CartService();
-
+  bool isAddedToCart = false;
   @override
   void initState() {
     super.initState();
-    isAdded = false;
-    cartId = 0;
+    isAddedToCart = widget.product.isAddedToCart;
   }
 
   void onAdd() async {
@@ -104,8 +100,7 @@ class _AddToCartButtonState extends State<_AddToCartButton> {
       );
       if (cart != null) {
         setState(() {
-          cartId = cart.id;
-          isAdded = true;
+          isAddedToCart = true;
         });
       }
     } catch (e) {
@@ -118,7 +113,7 @@ class _AddToCartButtonState extends State<_AddToCartButton> {
 
   @override
   Widget build(BuildContext context) {
-    if (!isAdded) {
+    if (!isAddedToCart) {
       return SizedBox(
         width: double.infinity,
         child: ElevatedButton(
@@ -141,15 +136,34 @@ class _AddToCartButtonState extends State<_AddToCartButton> {
 
     return SizedBox(
       width: double.infinity,
-      child: AddAndRemoveButton(
-        baseQuantity: 1,
-        cart: CartVM(
-          id: cartId,
-          userId: 0, // This should be current user ID
-          productId: widget.product.id,
-          quantity: 1,
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
+      child: ElevatedButton(
+        onPressed: () => {},
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Theme.of(context).primaryColor,
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          padding: const EdgeInsets.symmetric(vertical: 8),
+        ),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.secondary,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.check_circle, color: Colors.white),
+              const SizedBox(width: 8),
+              Text(
+                'Added to Cart',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

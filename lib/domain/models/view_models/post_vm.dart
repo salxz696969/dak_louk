@@ -66,10 +66,11 @@ class PostProductVM {
   final int id;
   final String name;
   final List<String> imageUrls;
-  final String price;
-  final String quantity;
+  final double price;
+  final int quantity;
   final String description;
   final ProductCategory category;
+  final bool isAddedToCart;
 
   PostProductVM({
     required this.id,
@@ -79,7 +80,26 @@ class PostProductVM {
     required this.quantity,
     required this.description,
     required this.category,
+    required this.isAddedToCart,
   });
+
+  factory PostProductVM.fromRaw(
+    ProductModel raw, {
+    required List<String> mediaUrls,
+    required ProductCategory category,
+    required bool isAddedToCart,
+  }) {
+    return PostProductVM(
+      id: raw.id,
+      name: raw.name,
+      imageUrls: mediaUrls,
+      price: raw.price,
+      quantity: raw.quantity,
+      description: raw.description ?? '',
+      category: category,
+      isAddedToCart: isAddedToCart,
+    );
+  }
 }
 
 class PostMerchantVM {
