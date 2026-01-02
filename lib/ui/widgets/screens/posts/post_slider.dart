@@ -1,6 +1,5 @@
 import 'package:dak_louk/domain/models/models.dart';
-import 'package:dak_louk/ui/screens/product_info_screen.dart';
-import 'package:dak_louk/ui/widgets/common/add_and_remove_button.dart';
+import 'package:dak_louk/ui/screens/post_detail_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -69,7 +68,7 @@ class _SimilarItemCardState extends State<_SimilarItemCard> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ProductInfoScreen(post: widget.post),
+            builder: (context) => PostDetailScreen(postId: widget.post.id),
           ),
         );
       },
@@ -88,34 +87,8 @@ class _SimilarItemCardState extends State<_SimilarItemCard> {
                   AspectRatio(
                     aspectRatio: 4 / 3,
                     child: Image(
-                      image: AssetImage(
-                        widget.post.promoMedias?.first.url ?? '',
-                      ),
+                      image: AssetImage(widget.post.primaryMediaUrl ?? ''),
                       fit: BoxFit.cover,
-                    ),
-                  ),
-                  Positioned(
-                    top: 8,
-                    right: 8,
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        color: Color.fromARGB(190, 0, 0, 0),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8.0,
-                          vertical: 4.0,
-                        ),
-                        child: Text(
-                          '${widget.post.products.first.quantity} left', // to change
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
                     ),
                   ),
                 ],
@@ -157,7 +130,7 @@ class _SimilarItemCardState extends State<_SimilarItemCard> {
                           Row(
                             children: [
                               Text(
-                                widget.post.merchant.username, // to change
+                                widget.post.merchant.rating.toString(),
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: Colors.grey[200],
@@ -171,21 +144,6 @@ class _SimilarItemCardState extends State<_SimilarItemCard> {
                               ),
                             ],
                           ),
-                        ],
-                      ),
-                      const Spacer(),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            "\$${widget.post.products.first.price}", // to change
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
-                          ),
-                          const SizedBox(height: 15),
                         ],
                       ),
                     ],
@@ -206,83 +164,6 @@ class _SimilarItemCardState extends State<_SimilarItemCard> {
                         ),
                       ),
                       const SizedBox(width: 10),
-                      SizedBox(
-                        height: 25,
-                        child: isAdded
-                            ? DecoratedBox(
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(20.0),
-                                  border: Border.all(
-                                    color: Colors.white,
-                                    width: 1.5,
-                                  ),
-                                ),
-                                child: AddAndRemoveButton(
-                                  baseQuantity: 1,
-                                  size: 25.0,
-                                  cart: CartVM(
-                                    merchant: CartMerchantVM(
-                                      id: widget.post.merchantId,
-                                      username: widget.post.merchant.username,
-                                      profileImage:
-                                          widget.post.merchant.profileImage,
-                                    ),
-                                    items: [
-                                      CartItemVM(
-                                        id: widget.post.products.first.id,
-                                        userId: widget.post.merchantId,
-                                        productId:
-                                            widget.post.products.first.id,
-                                        name: widget.post.products.first.name,
-                                        price:
-                                            double.tryParse(
-                                              widget.post.products.first.price
-                                                  .toString()
-                                                  .replaceAll('\$', ''),
-                                            ) ??
-                                            0.0,
-                                        image: widget
-                                            .post
-                                            .products
-                                            .first
-                                            .imageUrls
-                                            .first,
-                                        quantity: 1,
-                                        availableQuantity:
-                                            widget.post.products.first.quantity,
-                                        createdAt: DateTime.now(),
-                                        updatedAt: DateTime.now(),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              )
-                            : DecoratedBox(
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(20.0),
-                                  border: Border.all(
-                                    color: Colors.white,
-                                    width: 1.5,
-                                  ),
-                                ),
-                                child: InkWell(
-                                  onTap: () {
-                                    setState(() {
-                                      isAdded = true;
-                                    });
-                                  },
-                                  child: Icon(
-                                    CupertinoIcons.add_circled_solid,
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.secondary,
-                                    size: 25.0,
-                                  ),
-                                ),
-                              ),
-                      ),
                     ],
                   ),
                 ],

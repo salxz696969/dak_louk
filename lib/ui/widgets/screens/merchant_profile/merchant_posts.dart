@@ -1,5 +1,6 @@
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/domain/services/merchant_service.dart';
+import 'package:dak_louk/ui/screens/post_detail_screen.dart';
 import 'package:flutter/material.dart';
 
 class MerchantPosts extends StatelessWidget {
@@ -53,14 +54,14 @@ class _PhotoContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      // onTap: () {
-      //   Navigator.push(
-      //     context,
-      //     MaterialPageRoute(
-      //       builder: (context) => ProductInfoScreen(post: post),
-      //     ),
-      //   );
-      // },
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PostDetailScreen(postId: post.id),
+          ),
+        );
+      },
       child: Stack(
         children: [
           Positioned.fill(
