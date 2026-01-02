@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:dak_louk/data/tables/tables.dart';
+import 'package:dak_louk/core/utils/hash.dart';
 import 'package:sqflite/sqflite.dart';
 
 Future<void> initDb(Database db) async {
@@ -7,9 +8,13 @@ Future<void> initDb(Database db) async {
   await db.execute('''
       CREATE TABLE ${Tables.users.tableName} (
         ${Tables.users.cols.id} INTEGER PRIMARY KEY AUTOINCREMENT,
-        ${Tables.users.cols.username} TEXT UNIQUE NOT NULL,
+        ${Tables.users.cols.username} TEXT NOT NULL,
+        ${Tables.users.cols.email} TEXT UNIQUE NOT NULL,
         ${Tables.users.cols.passwordHash} TEXT NOT NULL,
         ${Tables.users.cols.profileImageUrl} TEXT,
+        ${Tables.users.cols.phone} TEXT,
+        ${Tables.users.cols.address} TEXT,
+        ${Tables.users.cols.notes} TEXT,
         ${Tables.users.cols.bio} TEXT,
         ${Tables.users.cols.createdAt} TEXT NOT NULL,
         ${Tables.users.cols.updatedAt} TEXT NOT NULL
@@ -22,8 +27,11 @@ Future<void> initDb(Database db) async {
         ${Tables.merchants.cols.id} INTEGER PRIMARY KEY AUTOINCREMENT,
         ${Tables.merchants.cols.userId} INTEGER NOT NULL,
         ${Tables.merchants.cols.rating} REAL DEFAULT 0.0,
-        ${Tables.merchants.cols.businessName} TEXT,
-        ${Tables.merchants.cols.businessDescription} TEXT,
+        ${Tables.merchants.cols.username} TEXT NOT NULL,
+        ${Tables.merchants.cols.email} TEXT,
+        ${Tables.merchants.cols.bio} TEXT,
+        ${Tables.merchants.cols.profileImage} TEXT,
+        ${Tables.merchants.cols.passwordHash} TEXT,
         ${Tables.merchants.cols.createdAt} TEXT NOT NULL,
         ${Tables.merchants.cols.updatedAt} TEXT NOT NULL,
         FOREIGN KEY (${Tables.merchants.cols.userId}) REFERENCES ${Tables.users.tableName}(${Tables.users.cols.id}) ON DELETE CASCADE
@@ -248,7 +256,6 @@ Future<void> initDb(Database db) async {
         ${Tables.orderProducts.cols.orderId} INTEGER NOT NULL,
         ${Tables.orderProducts.cols.productId} INTEGER NOT NULL,
         ${Tables.orderProducts.cols.quantity} INTEGER DEFAULT 1,
-        ${Tables.orderProducts.cols.priceSnapshot} REAL NOT NULL,
         FOREIGN KEY (${Tables.orderProducts.cols.orderId}) REFERENCES ${Tables.orders.tableName}(${Tables.orders.cols.id}) ON DELETE CASCADE,
         FOREIGN KEY (${Tables.orderProducts.cols.productId}) REFERENCES ${Tables.products.tableName}(${Tables.products.cols.id}) ON DELETE CASCADE
       )
@@ -301,10 +308,10 @@ const productVideos = [
 ];
 
 const promoImages = [
-  'assets/promo/coffee1.jpg',
-  'assets/promo/coffee2.jpg',
-  'assets/promo/coffee3.jpg',
-  'assets/promo/coffee4.jpg',
+  'assets/images/coffee1.png',
+  'assets/images/coffee2.png',
+  'assets/images/coffee3.png',
+  'assets/images/coffee4.png',
 ];
 
 const promoVideos = [
@@ -407,6 +414,75 @@ final postCaptions = [
   "Honestly one of my favorites to sell",
 ];
 
+final addresses = [
+  '123 Main St, Springfield, IL 62704, USA',
+  '456 Elm Ave, Brooklyn, NY 11211, USA',
+  '789 Oak Blvd, Austin, TX 78702, USA',
+  '101 Pine Rd, San Francisco, CA 94107, USA',
+  '234 Maple St, Denver, CO 80205, USA',
+  '1781 Willow Ln, Seattle, WA 98103, USA',
+  '652 Cedar Dr, Portland, OR 97214, USA',
+  '350 Birch Pl, Miami, FL 33101, USA',
+  '72 Cherry Ct, Boston, MA 02118, USA',
+  '890 Aspen Cir, Columbus, OH 43215, USA',
+  '230 Magnolia Ave, Nashville, TN 37206, USA',
+  '400 Spruce Ter, Minneapolis, MN 55407, USA',
+  '385 Hickory Way, Raleigh, NC 27605, USA',
+  '2000 Sycamore St, Phoenix, AZ 85018, USA',
+  '1013 Palm Dr, Los Angeles, CA 90026, USA',
+  '9 Jasmine Blvd, Atlanta, GA 30308, USA',
+  '876 Poplar Park, Kansas City, MO 64108, USA',
+  '155 Redwood Ln, Salt Lake City, UT 84101, USA',
+  '545 Alder Blvd, Madison, WI 53703, USA',
+  '27 Dogwood Pl, Richmond, VA 23220, USA',
+];
+
+final notes = [
+  'Leave the package at front door.',
+  'Ring the doorbell twice, please.',
+  'Call before delivery.',
+  'Friendly golden retriever in the yard.',
+  'Gate code is 2458.',
+  'Apartment 3B, buzzer #042.',
+  'Please deliver after 5pm.',
+  'N/A',
+  'Please handle with care, fragile items.',
+  'Gate is usually open, come around back.',
+  'Deliveries to side entrance.',
+  'Someone home after 4pm.',
+  'Park on the street, driveway is narrow.',
+  'Package locker is in the lobby.',
+  'Mail slot is on the right side of the house.',
+  'No signature required.',
+  'Knock loudly, bell not working.',
+  'House is at the end of a long driveway.',
+  'Please text me if running late.',
+  'Use the service elevator for large items.',
+];
+
+final phoneNumbers = [
+  '217-555-3748',
+  '718-555-2339',
+  '512-555-9810',
+  '415-555-2256',
+  '303-555-8920',
+  '206-555-1123',
+  '503-555-4098',
+  '305-555-7210',
+  '617-555-3344',
+  '614-555-9099',
+  '615-555-6031',
+  '612-555-7878',
+  '919-555-1442',
+  '602-555-5550',
+  '323-555-7654',
+  '404-555-3322',
+  '816-555-2288',
+  '801-555-1017',
+  '608-555-4126',
+  '804-555-9890',
+];
+
 final bio = [
   'Passionate entrepreneur, coffee enthusiast, and lifelong learner...',
   'As a merchant, I believe in the power of community...',
@@ -451,7 +527,11 @@ Future<void> insertMockData(Database db) async {
   for (int i = 1; i <= 100; i++) {
     await db.insert(Tables.users.tableName, {
       Tables.users.cols.username: randomName(rand, i),
-      Tables.users.cols.passwordHash: 'hash_user$i',
+      Tables.users.cols.email: 'user$i@gmail.com',
+      Tables.users.cols.passwordHash: Hasher.sha256Hash('password$i'),
+      Tables.users.cols.phone: phoneNumbers[rand.nextInt(phoneNumbers.length)],
+      Tables.users.cols.address: addresses[rand.nextInt(addresses.length)],
+      Tables.users.cols.notes: notes[rand.nextInt(notes.length)],
       Tables.users.cols.profileImageUrl: profileImage,
       Tables.users.cols.bio: bio[rand.nextInt(bio.length)],
       Tables.users.cols.createdAt: now,
@@ -459,6 +539,23 @@ Future<void> insertMockData(Database db) async {
     });
   }
 
+  // 2️⃣ MERCHANTS (50 merchants)
+  for (int i = 1; i <= 50; i++) {
+    await db.insert(Tables.merchants.tableName, {
+      Tables.merchants.cols.userId: i,
+      Tables.merchants.cols.username: randomName(rand, i),
+      Tables.merchants.cols.email: 'merchant$i@gmail.com',
+      Tables.merchants.cols.bio: bio[rand.nextInt(bio.length)],
+      Tables.merchants.cols.passwordHash: Hasher.sha256Hash(
+        'merchantpassword$i',
+      ),
+      Tables.merchants.cols.rating:
+          (rand.nextDouble() * 2) + 3.0, // 3.0-5.0 rating
+      Tables.merchants.cols.profileImage: profileImage,
+      Tables.merchants.cols.createdAt: now,
+      Tables.merchants.cols.updatedAt: now,
+    });
+  }
   // 2️⃣ PRODUCT_CATEGORIES
   for (int i = 0; i < categories.length; i++) {
     await db.insert(Tables.productCategories.tableName, {
@@ -503,20 +600,17 @@ Future<void> insertMockData(Database db) async {
     }
   }
 
-  // 5️⃣ PRODUCT_MEDIAS (images/videos for products)
+  // 5️⃣ PRODUCT_MEDIAS (images only for products)
   for (int productId = 1; productId <= 200; productId++) {
-    // Each product gets 2-5 media files
+    // Each product gets 2-5 media files (all images)
     final numMedia = rand.nextInt(4) + 2;
 
     for (int j = 0; j < numMedia; j++) {
-      final isVideo = rand.nextBool() && j == 0; // First media might be video
-
       await db.insert(Tables.productMedias.tableName, {
         Tables.productMedias.cols.productId: productId,
-        Tables.productMedias.cols.url: isVideo
-            ? productVideos[rand.nextInt(productVideos.length)]
-            : productImages[rand.nextInt(productImages.length)],
-        Tables.productMedias.cols.mediaType: isVideo ? 'video' : 'image',
+        Tables.productMedias.cols.url:
+            productImages[rand.nextInt(productImages.length)],
+        Tables.productMedias.cols.mediaType: 'image',
         Tables.productMedias.cols.createdAt: now,
         Tables.productMedias.cols.updatedAt: now,
       });
@@ -557,20 +651,17 @@ Future<void> insertMockData(Database db) async {
     }
   }
 
-  // 8️⃣ PROMO_MEDIAS (promotional media for posts)
+  // 8️⃣ PROMO_MEDIAS (images only for promotional media in posts)
   for (int postId = 1; postId <= 150; postId++) {
-    // Each post gets 1-3 promotional media
+    // Each post gets 1-3 promotional media (all images)
     final numMedia = rand.nextInt(3) + 1;
 
     for (int j = 0; j < numMedia; j++) {
-      final isVideo = rand.nextBool() && j == 0;
-
       await db.insert(Tables.promoMedias.tableName, {
         Tables.promoMedias.cols.postId: postId,
-        Tables.promoMedias.cols.url: isVideo
-            ? promoVideos[rand.nextInt(promoVideos.length)]
-            : promoImages[rand.nextInt(promoImages.length)],
-        Tables.promoMedias.cols.mediaType: isVideo ? 'video' : 'image',
+        Tables.promoMedias.cols.url:
+            promoImages[rand.nextInt(promoImages.length)],
+        Tables.promoMedias.cols.mediaType: 'image',
         Tables.promoMedias.cols.createdAt: now,
         Tables.promoMedias.cols.updatedAt: now,
       });
@@ -612,7 +703,7 @@ Future<void> insertMockData(Database db) async {
     }
   }
 
-  // 1️⃣1️⃣ LIVE_STREAMS (merchant live streams)
+  // 1️⃣1️⃣ LIVE_STREAMS (merchant live streams -- retain videos here)
   for (int i = 1; i <= 50; i++) {
     final merchantId = rand.nextInt(50) + 1;
 
@@ -756,13 +847,11 @@ Future<void> insertMockData(Database db) async {
 
     for (int j = 0; j < numProducts; j++) {
       final productId = rand.nextInt(200) + 1;
-      final priceSnapshot = (rand.nextDouble() * 200) + 10;
 
       await db.insert(Tables.orderProducts.tableName, {
         Tables.orderProducts.cols.orderId: orderId,
         Tables.orderProducts.cols.productId: productId,
         Tables.orderProducts.cols.quantity: rand.nextInt(2) + 1,
-        Tables.orderProducts.cols.priceSnapshot: priceSnapshot,
       });
     }
   }

@@ -3,7 +3,7 @@ import 'package:dak_louk/ui/widgets/live_stream.dart';
 import 'package:flutter/material.dart';
 
 class FullScreenVideoScreen extends StatefulWidget {
-  final LiveStreamVM livestream;
+  final Future<LiveStreamVM> livestream;
 
   const FullScreenVideoScreen({super.key, required this.livestream});
 
@@ -20,7 +20,15 @@ class _FullScreenVideoScreenState extends State<FullScreenVideoScreen> {
         backgroundColor: Colors.transparent,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: LiveStream(livestream: widget.livestream),
+      body: FutureBuilder<LiveStreamVM>(
+        future: widget.livestream,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          return LiveStream(livestream: snapshot.data!);
+        },
+      ),
     );
   }
 }

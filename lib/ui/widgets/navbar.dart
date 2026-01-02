@@ -1,5 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:dak_louk/core/enums/tabs_enum.dart';
 
 class Navbar extends StatelessWidget {
   final ValueChanged<int> onNavigate;
@@ -13,51 +13,42 @@ class Navbar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tabs = Tabs.values;
+
     return BottomAppBar(
       color: Theme.of(context).colorScheme.primary,
-      height: 70,
+      height: 90,
       child: Padding(
-        padding: const EdgeInsets.only(right: 24.0, left: 24.0, top: 16.0),
+        padding: const EdgeInsets.only(left: 12.0, right: 12.0, top: 12.0, bottom: 0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            InkWell(
-              onTap: () => onNavigate(0),
-              child: Icon(
-                currentIndex == 0 ? Icons.home_filled : CupertinoIcons.home,
-                color: Colors.white,
-                size: 28,
+          children: List.generate(tabs.length, (index) {
+            final tab = tabs[index];
+            final isActive = index == currentIndex;
+
+            return InkWell(
+              onTap: () => onNavigate(index),
+              child: Column(
+                children: [
+                  Icon(
+                    tab.icon,
+                    size: 28,
+                    color: isActive
+                        ? Colors.white
+                        : Colors.white.withOpacity(0.6),
+                  ),
+                  Text(
+                    tab.label,
+                    style: TextStyle(
+                      color: isActive
+                          ? Colors.white
+                          : Colors.white.withOpacity(0.6),
+                    ),
+                  ),
+                ],
               ),
-            ),
-            InkWell(
-              onTap: () => onNavigate(1),
-              child: Icon(
-                currentIndex == 1
-                    ? CupertinoIcons.chat_bubble_fill
-                    : CupertinoIcons.chat_bubble,
-                color: Colors.white,
-                size: 28,
-              ),
-            ),
-            InkWell(
-              onTap: () => onNavigate(2),
-              child: Icon(
-                currentIndex == 2
-                    ? Icons.video_collection_rounded
-                    : Icons.video_collection_outlined,
-                color: Colors.white,
-                size: 28,
-              ),
-            ),
-            InkWell(
-              onTap: () => onNavigate(3),
-              child: Icon(
-                currentIndex == 3 ? Icons.settings : Icons.settings_outlined,
-                color: Colors.white,
-                size: 28,
-              ),
-            ),
-          ],
+            );
+          }),
         ),
       ),
     );

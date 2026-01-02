@@ -16,6 +16,7 @@ part 'raw/product_category_model.dart';
 part 'raw/order_model.dart';
 part 'raw/order_product_model.dart';
 part 'raw/post_model.dart';
+part 'raw/post_product_model.dart';
 part 'raw/post_like_model.dart';
 part 'raw/post_save_model.dart';
 part 'raw/follower_model.dart';
@@ -26,6 +27,7 @@ part 'raw/live_stream_model.dart';
 part 'raw/live_stream_chat_model.dart';
 part 'raw/review_model.dart';
 part 'raw/product_media_model.dart';
+part 'raw/product_category_map_model.dart';
 
 // View Models
 part 'view_models/cart_vm.dart';
@@ -40,7 +42,10 @@ part 'view_models/chat_room_vm.dart';
 part 'view_models/live_stream_vm.dart';
 part 'view_models/live_stream_chat_vm.dart';
 part 'view_models/review_vm.dart';
-
+part 'view_models/merchant_vm.dart';
+part 'view_models/merchant_profile/merchant_posts_vm.dart';
+part 'view_models/merchant_profile/merchant_livestreams_vm.dart';
+part 'view_models/merchant_profile/merchant_products_vm.dart';
 part 'dto/cart_dto.dart';
 part 'dto/product_dto.dart';
 part 'dto/order_dto.dart';
@@ -52,3 +57,7 @@ part 'dto/live_stream_dto.dart';
 part 'dto/live_stream_chat_dto.dart';
 part 'dto/review_dto.dart';
 part 'dto/user_dto.dart';
+
+// Auth DTOs
+part 'dto/auth/log_in_dto.dart';
+part 'dto/auth/sign_up_dto.dart';

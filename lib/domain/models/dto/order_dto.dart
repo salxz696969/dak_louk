@@ -2,9 +2,25 @@ part of domain;
 
 class CreateOrderDTO {
   final int merchantId;
-  final String status;
+  final String? address;
+  final String? phone;
+  final String? notes;
+  final List<CreateOrderProductDTO> orderItems;
 
-  CreateOrderDTO({required this.merchantId, this.status = 'waiting'});
+  CreateOrderDTO({
+    required this.merchantId,
+    this.address,
+    this.phone,
+    this.notes,
+    required this.orderItems,
+  });
+}
+
+class CreateOrderProductDTO {
+  final int productId;
+  final int quantity;
+
+  CreateOrderProductDTO({required this.productId, required this.quantity});
 }
 
 class UpdateOrderDTO {

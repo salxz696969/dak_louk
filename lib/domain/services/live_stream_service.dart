@@ -20,35 +20,24 @@ class LiveStreamService {
     }
   }
 
-  // Business logic methods migrated from LiveStreamRepository
-  Future<List<LiveStreamVM>> getAllLiveStreamsByUserId(
-    int userId,
-    int limit,
-  ) async {
+  Future<LiveStreamVM> getLiveStreamById(int id) async {
     try {
-      final statement = Clauses.where.eq(
-        Tables.liveStreams.cols.merchantId,
-        userId,
-      );
-      final liveStreams = await _liveStreamRepository.queryThisTable(
-        where: statement.clause,
-        args: statement.args,
-        limit: limit,
-      );
-
-      if (liveStreams.isNotEmpty) {
-        // Populate relations like in the original DAO
-        final enrichedLiveStreams = await Future.wait(
-          liveStreams.map((liveStream) async {
-            return LiveStreamVM.fromRaw(liveStream);
-          }),
-        );
-
-        return enrichedLiveStreams;
+      final liveStream = await _liveStreamRepository.getById(id);
+      if (liveStream != null) {
+        return LiveStreamVM.fromRaw(liveStream);
       }
-      throw Exception('No LiveStreams found');
+      throw AppError(
+        type: ErrorType.NOT_FOUND,
+        message: 'Live stream not found',
+      );
     } catch (e) {
-      rethrow;
+      if (e is AppError) {
+        rethrow;
+      }
+      throw AppError(
+        type: ErrorType.DB_ERROR,
+        message: 'Failed to get live stream',
+      );
     }
   }
 
@@ -104,27 +93,6 @@ class LiveStreamService {
       throw AppError(
         type: ErrorType.DB_ERROR,
         message: 'Failed to create live stream',
-      );
-    }
-  }
-
-  Future<LiveStreamVM?> getLiveStreamById(int id) async {
-    try {
-      final newLiveStream = await _liveStreamRepository.getById(id);
-      if (newLiveStream != null) {
-        return LiveStreamVM.fromRaw(newLiveStream);
-      }
-      throw AppError(
-        type: ErrorType.NOT_FOUND,
-        message: 'Live stream not found',
-      );
-    } catch (e) {
-      if (e is AppError) {
-        rethrow;
-      }
-      throw AppError(
-        type: ErrorType.DB_ERROR,
-        message: 'Failed to get live stream',
       );
     }
   }

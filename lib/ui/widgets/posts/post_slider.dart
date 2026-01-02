@@ -88,7 +88,9 @@ class _SimilarItemCardState extends State<_SimilarItemCard> {
                   AspectRatio(
                     aspectRatio: 4 / 3,
                     child: Image(
-                      image: AssetImage(widget.post.mediaUrls?.first ?? ''),
+                      image: AssetImage(
+                        widget.post.promoMedias?.first.url ?? '',
+                      ),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -106,7 +108,7 @@ class _SimilarItemCardState extends State<_SimilarItemCard> {
                           vertical: 4.0,
                         ),
                         child: Text(
-                          '${widget.post.productNames?.first ?? '0'} left', // to change
+                          '${widget.post.products.first.quantity} left', // to change
                           style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
@@ -136,7 +138,7 @@ class _SimilarItemCardState extends State<_SimilarItemCard> {
                       CircleAvatar(
                         radius: 18,
                         backgroundImage: AssetImage(
-                          widget.post.merchantProfileImage ?? '',
+                          widget.post.merchant.profileImage,
                         ),
                       ),
                       const SizedBox(width: 6),
@@ -144,7 +146,7 @@ class _SimilarItemCardState extends State<_SimilarItemCard> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            widget.post.merchantName ?? '',
+                            widget.post.merchant.name,
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
@@ -155,7 +157,7 @@ class _SimilarItemCardState extends State<_SimilarItemCard> {
                           Row(
                             children: [
                               Text(
-                                widget.post.merchantName ?? '', // to change
+                                widget.post.merchant.username, // to change
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: Colors.grey[200],
@@ -176,7 +178,7 @@ class _SimilarItemCardState extends State<_SimilarItemCard> {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            "\$${widget.post.productNames?.first ?? '0'}", // to change
+                            "\$${widget.post.products.first.price}", // to change
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
@@ -220,12 +222,39 @@ class _SimilarItemCardState extends State<_SimilarItemCard> {
                                   baseQuantity: 1,
                                   size: 25.0,
                                   cart: CartVM(
-                                    id: 0,
-                                    userId: widget.post.merchantId,
-                                    productId: widget.post.id,
-                                    quantity: 1,
-                                    createdAt: DateTime.now(),
-                                    updatedAt: DateTime.now(),
+                                    merchant: CartMerchantVM(
+                                      id: widget.post.merchantId,
+                                      username: widget.post.merchant.username,
+                                      profileImage:
+                                          widget.post.merchant.profileImage,
+                                    ),
+                                    items: [
+                                      CartItemVM(
+                                        id: widget.post.products.first.id,
+                                        userId: widget.post.merchantId,
+                                        productId:
+                                            widget.post.products.first.id,
+                                        name: widget.post.products.first.name,
+                                        price:
+                                            double.tryParse(
+                                              widget.post.products.first.price
+                                                  .toString()
+                                                  .replaceAll('\$', ''),
+                                            ) ??
+                                            0.0,
+                                        image: widget
+                                            .post
+                                            .products
+                                            .first
+                                            .imageUrls
+                                            .first,
+                                        quantity: 1,
+                                        availableQuantity:
+                                            widget.post.products.first.quantity,
+                                        createdAt: DateTime.now(),
+                                        updatedAt: DateTime.now(),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               )

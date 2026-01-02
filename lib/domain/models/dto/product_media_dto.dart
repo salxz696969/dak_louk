@@ -16,8 +16,5 @@ class UpdateProductMediaDTO {
   final String? url;
   final String? mediaType;
 
-  UpdateProductMediaDTO({
-    this.url,
-    this.mediaType,
-  });
+  UpdateProductMediaDTO({this.url, this.mediaType});
 }

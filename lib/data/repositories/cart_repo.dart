@@ -13,8 +13,8 @@ class CartRepository extends BaseRepository<CartModel> {
       userId: map[Tables.carts.cols.userId] as int,
       productId: map[Tables.carts.cols.productId] as int,
       quantity: map[Tables.carts.cols.quantity] as int,
-      createdAt: map[Tables.carts.cols.createdAt] as DateTime,
-      updatedAt: map[Tables.carts.cols.updatedAt] as DateTime,
+      createdAt: map[Tables.carts.cols.createdAt] as String,
+      updatedAt: map[Tables.carts.cols.updatedAt] as String,
     );
   }
 

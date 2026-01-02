@@ -1,6 +1,7 @@
 part of domain;
 
 enum ProductCategory {
+  all('all'),
   vehicles('vehicles'),
   property('property'),
   electronics('electronics'),

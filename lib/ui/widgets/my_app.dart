@@ -1,3 +1,5 @@
+import 'package:dak_louk/core/auth/app_session.dart';
+import 'package:dak_louk/ui/screens/auth_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:dak_louk/ui/widgets/base_scaffold.dart';
 
@@ -13,11 +15,12 @@ class MyApp extends StatelessWidget {
           seedColor: const Color.fromARGB(255, 99, 175, 76),
           primary: const Color.fromARGB(255, 34, 99, 51),
           secondary: const Color.fromARGB(255, 56, 141, 32),
-          
         ),
         useMaterial3: true,
       ),
-      home: const BaseScaffold(),
+      home: AppSession.instance.isLoggedIn
+          ? const BaseScaffold()
+          : const AuthScreen(),
     );
   }
 }

@@ -1,17 +1,52 @@
 import 'package:dak_louk/domain/models/models.dart';
-import 'package:dak_louk/ui/widgets/add_and_remove_button.dart';
+import 'package:dak_louk/domain/services/order_service.dart';
 import 'package:dak_louk/ui/widgets/appbar.dart';
+import 'package:dak_louk/ui/widgets/checkout/checkout_card.dart';
+import 'package:dak_louk/ui/widgets/checkout/checkout_form.dart';
 import 'package:flutter/material.dart';
 
 class CheckoutScreen extends StatefulWidget {
-  final CartVM cart;
-  const CheckoutScreen({super.key, required this.cart});
+  final List<CartVM> carts;
+
+  const CheckoutScreen({super.key, required this.carts});
 
   @override
   State<CheckoutScreen> createState() => _CheckoutScreenState();
 }
 
 class _CheckoutScreenState extends State<CheckoutScreen> {
+  final OrderService _orderService = OrderService();
+  void _handleCompleteOrder(
+    String? address,
+    String? phone,
+    String? notes,
+  ) async {
+    final dtos = <CreateOrderDTO>[];
+    for (final cart in widget.carts) {
+      dtos.add(
+        CreateOrderDTO(
+          merchantId: cart.merchant.id,
+          address: address,
+          phone: phone,
+          notes: notes,
+          orderItems: cart.items
+              .map(
+                (item) => CreateOrderProductDTO(
+                  productId: item.productId,
+                  quantity: item.quantity,
+                ),
+              )
+              .toList(),
+        ),
+      );
+    }
+    await _orderService.createOrders(dtos);
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Order created successfully')));
+    Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,268 +57,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(12),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _ProductSection(cart: widget.cart),
-            const SizedBox(height: 20),
-            _DeliveryInformationSection(),
-            const SizedBox(height: 20),
-            _OrderSummarySection(cart: widget.cart),
-            const SizedBox(height: 20),
-            _ProceedButton(),
-            const SizedBox(height: 20),
+            for (final cart in widget.carts) ...[
+              CheckoutCard(cart: cart),
+              const SizedBox(height: 20),
+            ],
+            CheckoutForm(onComplete: _handleCompleteOrder),
+            const SizedBox(height: 24),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _ProductSection extends StatelessWidget {
-  final CartVM cart;
-  const _ProductSection({required this.cart});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: Image(
-              image: AssetImage(cart.productImageUrl ?? ''),
-              fit: BoxFit.cover,
-              width: double.infinity,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            cart.productName ?? '',
-            style: theme.textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Row(
-            children: [
-              Text(
-                cart.merchantName ?? '',
-                style: const TextStyle(
-                  fontWeight: FontWeight.w500,
-                  fontSize: 16,
-                ),
-              ),
-              const SizedBox(width: 8),
-              // Text(
-              //   cart.merchantRating.toString(),
-              //   style: TextStyle(fontSize: 12, color: Colors.grey[700]),
-              // ),
-              const Icon(Icons.star, size: 12, color: Colors.amber),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            cart.productPrice.toString(),
-            style: TextStyle(
-              color: theme.colorScheme.primary,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 12),
-          AddAndRemoveButton(cart: cart, baseQuantity: cart.quantity),
-        ],
-      ),
-    );
-  }
-}
-
-class _DeliveryInformationSection extends StatelessWidget {
-  final _formKey = GlobalKey<FormState>();
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _addressController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _notesController = TextEditingController();
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "Delivery Information",
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 8),
-        Padding(
-          padding: const EdgeInsets.all(12),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("Full Name"),
-                const SizedBox(height: 6),
-                TextFormField(
-                  controller: _nameController,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your full name';
-                    }
-                    return null;
-                  },
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    hintText: 'Enter your full name...',
-                    hintStyle: TextStyle(color: Colors.grey[500]),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text("Address"),
-                const SizedBox(height: 6),
-                TextFormField(
-                  controller: _addressController,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your address';
-                    }
-                    return null;
-                  },
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    hintText: 'Enter your address...',
-                    hintStyle: TextStyle(color: Colors.grey[500]),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text("Phone Number"),
-                const SizedBox(height: 6),
-                TextFormField(
-                  controller: _phoneController,
-                  validator: (value) {
-                    if (value == null ||
-                        value.isEmpty ||
-                        !RegExp(r'^\+?[0-9]{7,15}$').hasMatch(value)) {
-                      return 'Please enter a valid phone number';
-                    }
-                    return null;
-                  },
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    hintText: 'Enter your phone number...',
-                    hintStyle: TextStyle(color: Colors.grey[500]),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text("Delivery Notes (optional)"),
-                const SizedBox(height: 6),
-                TextFormField(
-                  controller: _notesController,
-                  maxLines: 3,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    hintText: 'Any special instructions for delivery...',
-                    hintStyle: TextStyle(color: Colors.grey[500]),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _OrderSummarySection extends StatelessWidget {
-  final CartVM cart;
-  const _OrderSummarySection({required this.cart});
-
-  @override
-  Widget build(BuildContext context) {
-    double deliveryFee = 5.00;
-    double price =
-        double.tryParse(cart.productPrice.toString().replaceAll('\$', '')) ??
-        0.0;
-    return Padding(
-      padding: const EdgeInsets.all(12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            "Order Summary",
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text("Subtotal:"),
-              Text(cart.productPrice.toString()),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text("Delivery Fee:"),
-              Text("\$${deliveryFee.toString()}"),
-            ],
-          ),
-          const Divider(height: 24),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                "Total:",
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              Text(
-                "\$${(price + deliveryFee).toString()}",
-                style: TextStyle(
-                  fontSize: 30,
-                  color: Theme.of(context).colorScheme.primary,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ProceedButton extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primary,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      height: 50,
-      child: InkWell(
-        onTap: () {
-          // Handle payment
-        },
-        child: const Center(
-          child: Text(
-            'Proceed to Payment',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
         ),
       ),
     );
