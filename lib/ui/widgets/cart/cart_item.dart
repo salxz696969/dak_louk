@@ -1,12 +1,11 @@
 import 'package:dak_louk/domain/models/models.dart';
-import 'package:dak_louk/domain/services/cart_service.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:dak_louk/ui/widgets/cart/quantity_chooser.dart';
 import 'package:flutter/material.dart';
 
 class CartItem extends StatefulWidget {
   final CartItemVM item;
-  final VoidCallback onRemoved;
-  final VoidCallback onQuantityChanged;
+  final Function(int) onRemoved;
+  final Function(int, int) onQuantityChanged;
 
   const CartItem({
     super.key,
@@ -20,47 +19,9 @@ class CartItem extends StatefulWidget {
 }
 
 class _CartItemState extends State<CartItem> {
-  final CartService _cartService = CartService();
-  late int currentQuantity;
-  bool isLoading = false;
-
   @override
   void initState() {
     super.initState();
-    currentQuantity = widget.item.quantity;
-  }
-
-  Future<void> _handleQuantityChange(int newQuantity) async {
-    if (isLoading) return;
-
-    setState(() {
-      isLoading = true;
-    });
-
-    try {
-      // Update quantity
-      await _cartService.updateCart(
-        widget.item.id,
-        UpdateCartDTO(quantity: newQuantity),
-      );
-      setState(() {
-        currentQuantity = newQuantity;
-      });
-      widget.onQuantityChanged();
-    } catch (e) {
-      // Show error snackbar
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to update cart: ${e.toString()}')),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          isLoading = false;
-        });
-      }
-    }
   }
 
   @override
@@ -119,47 +80,13 @@ class _CartItemState extends State<CartItem> {
                   const SizedBox(height: 8),
 
                   // Quantity Controls
-                  Row(
-                    children: [
-                      InkWell(
-                        onTap: isLoading
-                            ? null
-                            : () => _handleQuantityChange(currentQuantity - 1),
-                        child: Icon(
-                          CupertinoIcons.minus_circle_fill,
-                          size: 28,
-                          color: isLoading
-                              ? Colors.grey
-                              : Theme.of(context).colorScheme.secondary,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Text(
-                        currentQuantity.toString(),
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      InkWell(
-                        onTap:
-                            isLoading ||
-                                currentQuantity >= widget.item.availableQuantity
-                            ? null
-                            : () => _handleQuantityChange(currentQuantity + 1),
-                        child: Icon(
-                          CupertinoIcons.add_circled_solid,
-                          size: 28,
-                          color:
-                              isLoading ||
-                                  currentQuantity >=
-                                      widget.item.availableQuantity
-                              ? Colors.grey
-                              : Theme.of(context).colorScheme.secondary,
-                        ),
-                      ),
-                    ],
+                  QuantityChooser(
+                    cartId: widget.item.id,
+                    quantity: widget.item.quantity,
+                    availableQuantity: widget.item.availableQuantity,
+                    onQuantityChanged: (cartId, newQuantity) =>
+                        widget.onQuantityChanged(cartId, newQuantity),
+                    onDelete: (cartId) => widget.onRemoved(cartId),
                   ),
                 ],
               ),

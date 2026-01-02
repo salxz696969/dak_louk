@@ -1,15 +1,18 @@
 import 'package:dak_louk/domain/models/models.dart';
+import 'package:dak_louk/domain/services/cart_service.dart';
 import 'package:dak_louk/ui/widgets/cart/cart_item.dart';
 import 'package:flutter/material.dart';
 
 class CartItemWrapper extends StatefulWidget {
   final CartVM cart;
-  final VoidCallback onChanged;
+  final Function(int, int) onQuantityChanged;
+  final Function(int) onRemoved;
 
   const CartItemWrapper({
     super.key,
     required this.cart,
-    required this.onChanged,
+    required this.onQuantityChanged,
+    required this.onRemoved,
   });
 
   @override
@@ -18,6 +21,7 @@ class CartItemWrapper extends StatefulWidget {
 
 class _CartItemWrapperState extends State<CartItemWrapper> {
   late List<CartItemVM> items;
+  CartService _cartService = CartService();
 
   @override
   void initState() {
@@ -25,11 +29,8 @@ class _CartItemWrapperState extends State<CartItemWrapper> {
     items = List.from(widget.cart.items);
   }
 
-  void _handleItemRemoved(int index) {
-    setState(() {
-      items.removeAt(index);
-    });
-    widget.onChanged();
+  void _handleItemRemoved(int cartId) {
+    widget.onRemoved(cartId);
   }
 
   void _handlePlaceOrder() {
@@ -48,8 +49,9 @@ class _CartItemWrapperState extends State<CartItemWrapper> {
     );
   }
 
-  void _handleQuantityChanged() {
-    widget.onChanged();
+  void _handleQuantityChanged(int cartId, int newQuantity) {
+    _cartService.updateCart(cartId, UpdateCartDTO(quantity: newQuantity));
+    widget.onQuantityChanged(cartId, newQuantity);
   }
 
   @override
@@ -127,8 +129,9 @@ class _CartItemWrapperState extends State<CartItemWrapper> {
             itemBuilder: (context, index) {
               return CartItem(
                 item: items[index],
-                onRemoved: () => _handleItemRemoved(index),
-                onQuantityChanged: () => _handleQuantityChanged(),
+                onRemoved: (cartId) => _handleItemRemoved(cartId),
+                onQuantityChanged: (cartId, newQuantity) =>
+                    _handleQuantityChanged(cartId, newQuantity),
               );
             },
           ),

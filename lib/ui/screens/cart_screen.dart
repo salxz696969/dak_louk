@@ -31,6 +31,16 @@ class _CartScreenState extends State<CartScreen> {
     });
   }
 
+  void _removeCart(int id) {
+    _cartService.deleteCart(id);
+    _loadCarts();
+  }
+
+  void _updateCart(int id, int quantity) {
+    _cartService.updateCart(id, UpdateCartDTO(quantity: quantity));
+    _loadCarts();
+  }
+
   double _calculateSubTotal(List<CartVM> carts) {
     double total = 0.0;
     for (final cart in carts) {
@@ -114,7 +124,12 @@ class _CartScreenState extends State<CartScreen> {
                 itemCount: carts.length,
                 itemBuilder: (context, index) {
                   final cart = carts[index];
-                  return CartItemWrapper(cart: cart, onChanged: _loadCarts);
+                  return CartItemWrapper(
+                    cart: cart,
+                    onQuantityChanged: (id, quantity) =>
+                        _updateCart(id, quantity),
+                    onRemoved: (id) => _removeCart(id),
+                  );
                 },
               ),
               Positioned(

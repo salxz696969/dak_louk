@@ -139,16 +139,12 @@ class _AddToCartButtonState extends State<_AddToCartButton> {
       child: ElevatedButton(
         onPressed: () => {},
         style: ElevatedButton.styleFrom(
-          backgroundColor: Theme.of(context).primaryColor,
+          backgroundColor: Theme.of(context).colorScheme.secondary,
           foregroundColor: Colors.white,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           padding: const EdgeInsets.symmetric(vertical: 8),
         ),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.secondary,
-            borderRadius: BorderRadius.circular(8),
-          ),
+        child: Expanded(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
