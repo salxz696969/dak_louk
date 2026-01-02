@@ -765,7 +765,7 @@ Future<void> insertMockData(Database db) async {
 
     try {
       await db.insert(Tables.chatRooms.tableName, {
-        Tables.chatRooms.cols.userId: userId,
+        Tables.chatRooms.cols.userId: 1, // for easy testing
         Tables.chatRooms.cols.merchantId: merchantId,
         Tables.chatRooms.cols.createdAt: now,
         Tables.chatRooms.cols.updatedAt: now,

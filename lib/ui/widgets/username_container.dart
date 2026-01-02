@@ -1,4 +1,3 @@
-import 'package:dak_louk/domain/services/chat_service.dart';
 import 'package:dak_louk/domain/services/chat_room_service.dart';
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/ui/screens/chat_screen.dart';
@@ -91,20 +90,7 @@ class UsernameContainer extends StatelessWidget {
                   MaterialPageRoute(
                     builder: (context) => ChatScreen(
                       targetUserName: username,
-                      chatService: ChatService().getChatsByChatRoomId(
-                        chatRoomId,
-                      ),
-                    ),
-                  ),
-                );
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ChatScreen(
-                      targetUserName: username,
-                      chatService: ChatService().getChatsByChatRoomId(
-                        chatRoomId,
-                      ),
+                      chatRoomId: chatRoomId,
                     ),
                   ),
                 );
