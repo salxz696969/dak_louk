@@ -1,9 +1,11 @@
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/domain/services/chat_service.dart';
+import 'package:dak_louk/ui/widgets/screens/chat/chat_input.dart';
 import 'package:flutter/material.dart';
 
 class Chat extends StatefulWidget {
-  Chat({super.key});
+  final int chatRoomId;
+  Chat({super.key, required this.chatRoomId});
 
   @override
   State<Chat> createState() => _ChatState();
@@ -39,10 +41,17 @@ class _ChatState extends State<Chat> {
     });
   }
 
+  Future<void> _handleSend(String text) async {
+    await _chatService.createChat(
+      CreateChatDTO(chatRoomId: widget.chatRoomId, text: text),
+    );
+    _scrollToBottom();
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<ChatVM>>(
-      future: _chatService.getChatsByChatRoomId(1),
+      future: _chatService.getChatsByChatRoomId(widget.chatRoomId),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -74,10 +83,9 @@ class _ChatState extends State<Chat> {
                   itemCount: chats.length,
                   itemBuilder: (context, index) {
                     final chat = chats[index];
-                    final isMe = chat.senderId == 1;
 
                     return Align(
-                      alignment: isMe
+                      alignment: chat.isMine
                           ? Alignment.centerRight
                           : Alignment.centerLeft,
                       child: ConstrainedBox(
@@ -91,17 +99,33 @@ class _ChatState extends State<Chat> {
                             horizontal: 12,
                           ),
                           decoration: BoxDecoration(
-                            color: isMe
+                            color: chat.isMine
                                 ? Theme.of(context).colorScheme.secondary
                                 : Colors.grey.shade600,
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          child: Text(
-                            chat.text,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                            ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                chat.text,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              Text(
+                                chat.createdAt.toLocal().toString().split(
+                                  " ",
+                                )[0],
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 8,
+                                  fontWeight: FontWeight.w300,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
@@ -110,61 +134,7 @@ class _ChatState extends State<Chat> {
                 ),
               ),
             ),
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 16,
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: _controller,
-                        decoration: InputDecoration(
-                          hintText: "Message...",
-                          filled: true,
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 14,
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(24),
-                            borderSide: BorderSide.none,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    InkWell(
-                      borderRadius: BorderRadius.circular(24),
-                      onTap: () async {
-                        final CreateChatDTO newChat = CreateChatDTO(
-                          chatRoomId: chats.first.chatRoomId,
-                          text: _controller.text,
-                        );
-                        await _chatService.createChat(newChat);
-                        setState(() {
-                          _controller.clear();
-                        });
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Theme.of(context).colorScheme.primary,
-                        ),
-                        child: Icon(
-                          Icons.send_rounded,
-                          size: 24,
-                          color: Theme.of(context).colorScheme.onPrimary,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            ChatInput(onSend: (text) => _handleSend(text)),
           ],
         );
       },

@@ -113,9 +113,7 @@ class ChatService {
           result.map((chat) async {
             return ChatVM.fromRaw(
               chat,
-              senderName: '',
-              senderProfileImage: '',
-              isFromCurrentUser: false,
+              isMine: chat.senderId == AppSession.instance.userId,
             );
           }),
         );
@@ -133,9 +131,7 @@ class ChatService {
             createdAt: DateTime.now(),
             updatedAt: DateTime.now(),
           ),
-          senderName: '',
-          senderProfileImage: '',
-          isFromCurrentUser: false,
+          isMine: false,
         ),
       ];
     } catch (e) {
@@ -215,9 +211,7 @@ class ChatService {
         final chat = result.first;
         return ChatVM.fromRaw(
           chat,
-          senderName: '',
-          senderProfileImage: '',
-          isFromCurrentUser: false,
+          isMine: chat.senderId == AppSession.instance.userId,
         );
       }
       throw Exception('Chat not found');

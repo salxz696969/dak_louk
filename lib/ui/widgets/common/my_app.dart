@@ -1,7 +1,7 @@
 import 'package:dak_louk/core/auth/app_session.dart';
 import 'package:dak_louk/ui/screens/auth_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:dak_louk/ui/widgets/base_scaffold.dart';
+import 'package:dak_louk/ui/widgets/common/base_scaffold.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

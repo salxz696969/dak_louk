@@ -1,86 +1,27 @@
 import 'package:dak_louk/core/auth/app_session.dart';
 import 'package:dak_louk/core/utils/error.dart';
-import 'package:dak_louk/data/repositories/user_repo.dart';
-import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/core/utils/orm.dart';
+import 'package:dak_louk/data/repositories/post_repo.dart';
+import 'package:dak_louk/data/repositories/post_like_repo.dart';
+import 'package:dak_louk/data/repositories/post_save_repo.dart';
+import 'package:dak_louk/data/repositories/promo_media_repo.dart';
+import 'package:dak_louk/data/repositories/user_repo.dart';
 import 'package:dak_louk/data/tables/tables.dart';
+import 'package:dak_louk/domain/models/models.dart';
 
 class UserService {
-  late final currentUserId;
+  late int currentUserId;
   final UserRepository _userRepository = UserRepository();
+  final PostRepository _postRepository = PostRepository();
+  final PostLikeRepository _postLikeRepository = PostLikeRepository();
+  final PostSaveRepository _postSaveRepository = PostSaveRepository();
+  final PromoMediaRepository _promoMediaRepository = PromoMediaRepository();
+
   UserService() {
     if (AppSession.instance.isLoggedIn) {
-      currentUserId = AppSession.instance.userId;
+      currentUserId = AppSession.instance.userId!;
     } else {
       throw AppError(type: ErrorType.UNAUTHORIZED, message: 'Unauthorized');
-    }
-  }
-
-  // Business logic methods migrated from UserRepository
-  Future<UserModel?> getUserByUsername(String username) async {
-    try {
-      final statement = Clauses.where.eq(Tables.users.cols.username, username);
-      final result = await _userRepository.queryThisTable(
-        where: statement.clause,
-        args: statement.args,
-      );
-      if (result.isNotEmpty) {
-        return result.first;
-      }
-      throw AppError(type: ErrorType.NOT_FOUND, message: 'User not found');
-    } catch (e) {
-      if (e is AppError) {
-        rethrow;
-      }
-      throw AppError(
-        type: ErrorType.DB_ERROR,
-        message: 'Failed to get user by username',
-      );
-    }
-  }
-
-  Future<UserVM?> createUser(CreateUserDTO dto) async {
-    try {
-      final isAvailable = await getUserByUsername(dto.username);
-      if (isAvailable != null) {
-        throw AppError(
-          type: ErrorType.ALREADY_EXISTS,
-          message: 'Username already exists',
-        );
-      }
-      final userModel = UserModel(
-        id: 0,
-        username: dto.username,
-        passwordHash: dto.passwordHash,
-        profileImageUrl: dto.profileImageUrl,
-        bio: dto.bio,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-      );
-      final id = await _userRepository.insert(userModel);
-      if (id > 0) {
-        final newUser = await _userRepository.getById(id);
-        if (newUser != null) {
-          return UserVM.fromRaw(newUser);
-        }
-      }
-      throw AppError(type: ErrorType.NOT_FOUND, message: 'User not found');
-    } catch (e) {
-      if (e is AppError) {
-        rethrow;
-      }
-      throw AppError(
-        type: ErrorType.DB_ERROR,
-        message: 'Failed to create user',
-      );
-    }
-  }
-
-  Future<void> deleteUser(int userId) async {
-    try {
-      await _userRepository.delete(userId);
-    } catch (e) {
-      rethrow;
     }
   }
 
@@ -96,9 +37,94 @@ class UserService {
     }
   }
 
-  Future<List<UserModel>> getAllUsers() async {
+  Future<UserProfileVM> getUserProfile() async {
     try {
-      return await _userRepository.getAll();
+      final user = await _userRepository.getById(currentUserId);
+      if (user != null) {
+        // Compose the UserProfileVM manually since there is no fromRaw
+        return UserProfileVM(
+          id: user.id,
+          username: user.username,
+          profileImageUrl: user.profileImageUrl ?? '',
+          bio: user.bio ?? '',
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt,
+        );
+      } else {
+        throw AppError(type: ErrorType.NOT_FOUND, message: 'User not found');
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // Returns a list of liked posts for the current user.
+  Future<List<UserProfileLikedSavedPostsVM>> getLikedPosts() async {
+    try {
+      final likedPosts = await _postLikeRepository.queryThisTable(
+        where: Clauses.where
+            .eq(Tables.postLikes.cols.userId, currentUserId)
+            .clause,
+        args: Clauses.where
+            .eq(Tables.postLikes.cols.userId, currentUserId)
+            .args,
+      );
+      final userLikedPosts = <UserProfileLikedSavedPostsVM>[];
+      for (final like in likedPosts) {
+        final post = await _postRepository.getById(like.postId);
+        final media = await _promoMediaRepository.queryThisTable(
+          where: Clauses.where
+              .eq(Tables.promoMedias.cols.postId, post!.id)
+              .clause,
+          args: Clauses.where.eq(Tables.promoMedias.cols.postId, post.id).args,
+        );
+        if (post != null && media.isNotEmpty) {
+          userLikedPosts.add(
+            UserProfileLikedSavedPostsVM(
+              id: post.id,
+              caption: post.caption ?? '',
+              imageUrl: media.first.url,
+            ),
+          );
+        }
+      }
+      return userLikedPosts;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // Returns a list of saved posts for the current user.
+  Future<List<UserProfileLikedSavedPostsVM>> getSavedPosts() async {
+    try {
+      final savedPosts = await _postSaveRepository.queryThisTable(
+        where: Clauses.where
+            .eq(Tables.postSaves.cols.userId, currentUserId)
+            .clause,
+        args: Clauses.where
+            .eq(Tables.postSaves.cols.userId, currentUserId)
+            .args,
+      );
+      final userSavedPosts = <UserProfileLikedSavedPostsVM>[];
+      for (final save in savedPosts) {
+        final post = await _postRepository.getById(save.postId);
+        final media = await _promoMediaRepository.queryThisTable(
+          where: Clauses.where
+              .eq(Tables.promoMedias.cols.postId, post!.id)
+              .clause,
+          args: Clauses.where.eq(Tables.promoMedias.cols.postId, post.id).args,
+        );
+        if (post != null && media.isNotEmpty) {
+          userSavedPosts.add(
+            UserProfileLikedSavedPostsVM(
+              id: post.id,
+              caption: post.caption ?? '',
+              imageUrl: media.first.url,
+            ),
+          );
+        }
+      }
+      return userSavedPosts;
     } catch (e) {
       rethrow;
     }

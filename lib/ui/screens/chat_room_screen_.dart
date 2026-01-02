@@ -1,8 +1,6 @@
 import 'package:dak_louk/domain/services/chat_room_service.dart';
-import 'package:dak_louk/domain/services/chat_service.dart';
 import 'package:dak_louk/domain/models/models.dart';
-import 'package:dak_louk/ui/screens/chat_screen.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:dak_louk/ui/widgets/screens/chatroom/chatroom_tile.dart';
 import 'package:flutter/material.dart';
 
 class ChatRoomScreen extends StatelessWidget {
@@ -10,78 +8,23 @@ class ChatRoomScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<ChatRoomVM>>(
-      future: ChatRoomService().getAllChatRooms(),
+    final ChatRoomService _chatRoomService = ChatRoomService();
+    return FutureBuilder<List<ChatRoomVM?>>(
+      future: _chatRoomService.getAllChatRooms(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
           return Center(child: Text('Error: \\${snapshot.error}'));
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return const Center(child: Text('No posts found.'));
+          return const Center(child: Text('No chat rooms found.'));
         }
-        final chatRooms = snapshot.data!;
+        final chatRooms = snapshot.data! as List<ChatRoomVM>;
         return ListView.builder(
           itemCount: chatRooms.length,
           itemBuilder: (context, index) {
             final chatRoom = chatRooms[index];
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12.0),
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(color: Colors.grey.shade300),
-                  ),
-                ),
-                child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundImage: AssetImage(
-                      chatRoom.targetUserProfileImage ?? '',
-                    ),
-                  ),
-                  title: Text(
-                    chatRoom.targetUserName ?? '',
-                    style: TextStyle(
-                      fontWeight: chatRoom.hasUnreadMessages
-                          ? FontWeight.normal
-                          : FontWeight.bold,
-                    ),
-                  ),
-                  subtitle: chatRoom.hasUnreadMessages
-                      ? Text(
-                          'You: ${chatRoom.lastMessage}',
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                        )
-                      : Text(
-                          chatRoom.lastMessage ?? '',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                        ),
-                  trailing: chatRoom.hasUnreadMessages
-                      ? null
-                      : Icon(
-                          Icons.circle,
-                          color: Theme.of(context).colorScheme.secondary,
-                          size: 12,
-                        ),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ChatScreen(
-                          targetUserName: chatRoom.targetUserName ?? '',
-                          chatService: ChatService().getChatsByChatRoomId(
-                            chatRoom.id,
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            );
+            return ChatroomTile(chatRoom: chatRoom);
           },
         );
       },

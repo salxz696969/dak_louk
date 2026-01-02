@@ -25,6 +25,7 @@ part 'raw/chat_room_model.dart';
 part 'raw/promo_media_model.dart';
 part 'raw/live_stream_model.dart';
 part 'raw/live_stream_chat_model.dart';
+part 'raw/live_stream_product_model.dart';
 part 'raw/review_model.dart';
 part 'raw/product_media_model.dart';
 part 'raw/product_category_map_model.dart';
@@ -46,6 +47,10 @@ part 'view_models/merchant_vm.dart';
 part 'view_models/merchant_profile/merchant_posts_vm.dart';
 part 'view_models/merchant_profile/merchant_livestreams_vm.dart';
 part 'view_models/merchant_profile/merchant_products_vm.dart';
+part 'view_models/profile/user_profile_vm.dart';
+part 'view_models/profile/user_profile_liked_saved_posts_vm.dart';
+part 'view_models/live_stream_products_vm.dart';
+
 part 'dto/cart_dto.dart';
 part 'dto/product_dto.dart';
 part 'dto/order_dto.dart';
