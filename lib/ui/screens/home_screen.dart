@@ -1,5 +1,5 @@
 import 'package:dak_louk/domain/services/post_service.dart';
-import 'package:dak_louk/ui/widgets/category_bar.dart';
+import 'package:dak_louk/ui/widgets/posts/category_bar.dart';
 import 'package:dak_louk/ui/widgets/posts/post_item.dart';
 import 'package:dak_louk/ui/widgets/posts/product_item.dart';
 import 'package:dak_louk/domain/models/models.dart';

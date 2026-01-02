@@ -4,7 +4,7 @@ import 'package:dak_louk/ui/widgets/add_and_remove_button.dart';
 import 'package:dak_louk/ui/widgets/appbar.dart';
 import 'package:dak_louk/ui/widgets/posts/product_photo_slider.dart';
 import 'package:dak_louk/ui/widgets/posts/post_slider.dart';
-import 'package:dak_louk/ui/widgets/username_container.dart';
+import 'package:dak_louk/ui/widgets/posts/username_container.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
