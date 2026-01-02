@@ -58,7 +58,6 @@ class OrderProductVM extends Cacheable {
   final int orderId;
   final int productId;
   final int quantity;
-  final double priceSnapshot;
 
   // Related primitive data
   final String? productName;
@@ -69,7 +68,6 @@ class OrderProductVM extends Cacheable {
     required this.orderId,
     required this.productId,
     required this.quantity,
-    required this.priceSnapshot,
     this.productName,
     this.productImageUrl,
   });
@@ -84,12 +82,8 @@ class OrderProductVM extends Cacheable {
       orderId: raw.orderId,
       productId: raw.productId,
       quantity: raw.quantity,
-      priceSnapshot: raw.priceSnapshot,
       productName: productName,
       productImageUrl: productImageUrl,
     );
   }
-
-  // Simple getters
-  double get totalPrice => priceSnapshot * quantity;
 }

@@ -22,12 +22,17 @@ class _SignUpState extends State<SignUp> {
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController bioController = TextEditingController();
 
+  final TextEditingController phoneController = TextEditingController();
+  final TextEditingController addressController = TextEditingController();
+
   void _handleSubmit() {
     if (_formKey.currentState!.validate()) {
       final dto = SignUpDTO(
         username: usernameController.text,
         email: emailController.text,
         password: passwordController.text,
+        phone: phoneController.text,
+        address: addressController.text,
         profileImageUrl: profileImageUrl,
         bio: bioController.text,
       );
@@ -108,6 +113,41 @@ class _SignUpState extends State<SignUp> {
               ),
               keyboardType: TextInputType.emailAddress,
               validator: Validator.validateEmail,
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: phoneController,
+              decoration: InputDecoration(
+                labelText: 'Phone',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                prefixIcon: const Icon(Icons.phone),
+              ),
+              keyboardType: TextInputType.phone,
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Phone is required';
+                }
+                return null;
+              },
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: addressController,
+              decoration: InputDecoration(
+                labelText: 'Address',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                prefixIcon: const Icon(Icons.home),
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Address is required';
+                }
+                return null;
+              },
             ),
             const SizedBox(height: 16),
             TextFormField(

@@ -5,6 +5,8 @@ class UserModel extends Cacheable {
   final String username;
   final String passwordHash;
   final String? profileImageUrl;
+  final String? phone;
+  final String? address;
   final String? bio;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -15,6 +17,8 @@ class UserModel extends Cacheable {
     required this.passwordHash,
     this.profileImageUrl,
     this.bio,
+    this.phone,
+    this.address,
     required this.createdAt,
     required this.updatedAt,
   });

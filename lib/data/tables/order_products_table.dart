@@ -13,10 +13,8 @@ class OrderProductsCols extends BaseCols {
   static const String orderIdCol = 'order_id';
   static const String productIdCol = 'product_id';
   static const String quantityCol = 'quantity';
-  static const String priceSnapshotCol = 'price_snapshot';
 
   String get orderId => orderIdCol;
   String get productId => productIdCol;
   String get quantity => quantityCol;
-  String get priceSnapshot => priceSnapshotCol;
 }

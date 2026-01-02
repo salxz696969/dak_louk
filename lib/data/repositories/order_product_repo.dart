@@ -13,7 +13,6 @@ class OrderProductRepository extends BaseRepository<OrderProductModel> {
       orderId: map[Tables.orderProducts.cols.orderId] as int,
       productId: map[Tables.orderProducts.cols.productId] as int,
       quantity: map[Tables.orderProducts.cols.quantity] as int,
-      priceSnapshot: (map[Tables.orderProducts.cols.priceSnapshot] as num).toDouble(),
     );
   }
 
@@ -24,7 +23,6 @@ class OrderProductRepository extends BaseRepository<OrderProductModel> {
       Tables.orderProducts.cols.orderId: model.orderId,
       Tables.orderProducts.cols.productId: model.productId,
       Tables.orderProducts.cols.quantity: model.quantity,
-      Tables.orderProducts.cols.priceSnapshot: model.priceSnapshot,
     };
   }
 }

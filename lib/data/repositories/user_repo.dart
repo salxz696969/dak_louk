@@ -16,6 +16,8 @@ class UserRepository extends BaseRepository<UserModel> {
       passwordHash: user[Tables.users.cols.passwordHash] as String,
       profileImageUrl: user[Tables.users.cols.profileImageUrl] as String?,
       bio: user[Tables.users.cols.bio] as String?,
+      phone: user[Tables.users.cols.phone] as String?,
+      address: user[Tables.users.cols.address] as String?,
       createdAt: DateTime.parse(user[Tables.users.cols.createdAt] as String),
       updatedAt: DateTime.parse(user[Tables.users.cols.updatedAt] as String),
     );
@@ -30,6 +32,8 @@ class UserRepository extends BaseRepository<UserModel> {
       Tables.users.cols.passwordHash: user.passwordHash,
       Tables.users.cols.profileImageUrl: user.profileImageUrl,
       Tables.users.cols.bio: user.bio,
+      Tables.users.cols.phone: user.phone,
+      Tables.users.cols.address: user.address,
       Tables.users.cols.createdAt: user.createdAt.toIso8601String(),
       Tables.users.cols.updatedAt: user.updatedAt.toIso8601String(),
     };

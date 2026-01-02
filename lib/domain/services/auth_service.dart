@@ -13,6 +13,8 @@ class AuthService {
       password: dto.password,
       profileImageUrl: dto.profileImageUrl,
       bio: dto.bio,
+      phone: dto.phone,
+      address: dto.address,
     );
   }
 
