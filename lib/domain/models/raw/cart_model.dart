@@ -1,4 +1,4 @@
-part of domain;
+part of models;
 
 class CartModel extends Cacheable {
   final int id;

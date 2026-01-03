@@ -9,12 +9,16 @@ import 'package:dak_louk/data/tables/tables.dart';
 class ChatService {
   final ChatRepository _chatRepository = ChatRepository();
   final ChatRoomRepository _chatRoomRepository = ChatRoomRepository();
-  late final currentUserId;
+  late final currentMerchantId;
   ChatService() {
-    if (AppSession.instance.isLoggedIn) {
-      currentUserId = AppSession.instance.userId;
+    if (AppSession.instance.isLoggedIn &&
+        AppSession.instance.merchantId != null) {
+      currentMerchantId = AppSession.instance.merchantId;
     } else {
-      throw AppError(type: ErrorType.UNAUTHORIZED, message: 'Unauthorized');
+      throw AppError(
+        type: ErrorType.UNAUTHORIZED,
+        message: 'Unauthorized - No merchant session',
+      );
     }
   }
   // Migrated from ChatDao.insertChat
@@ -22,7 +26,7 @@ class ChatService {
     try {
       final chatModel = ChatModel(
         id: 0,
-        senderId: currentUserId,
+        senderId: currentMerchantId,
         text: dto.text,
         chatRoomId: dto.chatRoomId,
         createdAt: DateTime.now(),
@@ -63,7 +67,7 @@ class ChatService {
   //     );
   //     final targetStatement2 = Clauses.where.eq(
   //       Tables.chatRooms.cols.merchantId,
-  //       currentUserId,
+  //       currentMerchantId,
   //     );
   //     final orStatement2 = Clauses.where.and([
   //       userStatement2,
@@ -139,84 +143,76 @@ class ChatService {
     }
   }
 
-  // Migrated from ChatDao.updateChat
-  Future<int> updateChat(int id, UpdateChatDTO dto) async {
-    try {
-      final chat = await _chatRepository.getById(id);
-      if (chat == null) {
-        throw AppError(type: ErrorType.NOT_FOUND, message: 'Chat not found');
-      }
-      if (chat.senderId != currentUserId) {
-        throw AppError(type: ErrorType.UNAUTHORIZED, message: 'Unauthorized');
-      }
-      final chatModel = ChatModel(
-        id: id,
-        senderId: currentUserId,
-        text: dto.text ?? chat.text,
-        chatRoomId: chat.chatRoomId,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-      );
-      return await _chatRepository.update(chatModel);
-    } catch (e) {
-      if (e is AppError) {
-        rethrow;
-      }
-      throw AppError(
-        type: ErrorType.DB_ERROR,
-        message: 'Failed to update chat',
-      );
-    }
+  // // Migrated from ChatDao.deleteChat
+  // Future<int> deleteChat(int id) async {
+  //   try {
+  //     final chat = await _chatRepository.getById(id);
+  //     if (chat == null) {
+  //       throw AppError(type: ErrorType.NOT_FOUND, message: 'Chat not found');
+  //     }
+  //     if (chat.senderId != currentMerchantId) {
+  //       throw AppError(type: ErrorType.UNAUTHORIZED, message: 'Unauthorized');
+  //     }
+  //     return await _chatRepository.delete(id);
+  //   } catch (e) {
+  //     if (e is AppError) {
+  //       rethrow;
+  //     }
+  //     throw AppError(
+  //       type: ErrorType.DB_ERROR,
+  //       message: 'Failed to delete chat',
+  //     );
+  //   }
+  // }
+
+  // // Migrated from ChatDao.getLatestChatByChatRoomId
+  // Future<ChatVM> getLatestChatByChatRoomId(int chatRoomId) async {
+  //   try {
+  //     final statement = Clauses.where.eq(
+  //       Tables.chats.cols.chatRoomId,
+  //       chatRoomId,
+  //     );
+  //     final orderByStmt = Clauses.orderBy.desc(Tables.chats.cols.createdAt);
+
+  //     final result = await _chatRepository.queryThisTable(
+  //       where: statement.clause,
+  //       args: statement.args,
+  //       orderBy: orderByStmt.clause,
+  //       limit: 1,
+  //     );
+
+  //     if (result.isNotEmpty) {
+  //       final chat = result.first;
+  //       return ChatVM.fromRaw(
+  //         chat,
+  //         isMine: chat.senderId == AppSession.instance.userId,
+  //       );
+  //     }
+  //     throw Exception('Chat not found');
+  //   } catch (e) {
+  //     rethrow;
+  //   }
+  // }
+
+  // Additional CRUD methods
+
+  Future<List<ChatVM>> getAllChats() async {
+    // Placeholder - implement later
+    throw UnimplementedError('getAllChats not implemented');
   }
 
-  // Migrated from ChatDao.deleteChat
-  Future<int> deleteChat(int id) async {
-    try {
-      final chat = await _chatRepository.getById(id);
-      if (chat == null) {
-        throw AppError(type: ErrorType.NOT_FOUND, message: 'Chat not found');
-      }
-      if (chat.senderId != currentUserId) {
-        throw AppError(type: ErrorType.UNAUTHORIZED, message: 'Unauthorized');
-      }
-      return await _chatRepository.delete(id);
-    } catch (e) {
-      if (e is AppError) {
-        rethrow;
-      }
-      throw AppError(
-        type: ErrorType.DB_ERROR,
-        message: 'Failed to delete chat',
-      );
-    }
+  Future<ChatVM?> getChatById(int id) async {
+    // Placeholder - implement later
+    throw UnimplementedError('getChatById not implemented');
   }
 
-  // Migrated from ChatDao.getLatestChatByChatRoomId
-  Future<ChatVM> getLatestChatByChatRoomId(int chatRoomId) async {
-    try {
-      final statement = Clauses.where.eq(
-        Tables.chats.cols.chatRoomId,
-        chatRoomId,
-      );
-      final orderByStmt = Clauses.orderBy.desc(Tables.chats.cols.createdAt);
+  Future<ChatVM?> updateChat(int id, UpdateChatDTO dto) async {
+    // Placeholder - implement later
+    throw UnimplementedError('updateChat not implemented');
+  }
 
-      final result = await _chatRepository.queryThisTable(
-        where: statement.clause,
-        args: statement.args,
-        orderBy: orderByStmt.clause,
-        limit: 1,
-      );
-
-      if (result.isNotEmpty) {
-        final chat = result.first;
-        return ChatVM.fromRaw(
-          chat,
-          isMine: chat.senderId == AppSession.instance.userId,
-        );
-      }
-      throw Exception('Chat not found');
-    } catch (e) {
-      rethrow;
-    }
+  Future<void> deleteChat(int id) async {
+    // Placeholder - implement later
+    throw UnimplementedError('deleteChat not implemented');
   }
 }

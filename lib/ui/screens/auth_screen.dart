@@ -1,7 +1,7 @@
 import 'package:dak_louk/core/enums/role_enum.dart';
 import 'package:dak_louk/domain/services/auth_service.dart';
 import 'package:dak_louk/domain/models/models.dart';
-import 'package:dak_louk/ui/widgets/common/merchant_scaffold.dart';
+import 'package:dak_louk/ui/widgets/merchant/merchant_scaffold.dart';
 import 'package:dak_louk/ui/widgets/user/user_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:dak_louk/ui/widgets/auth/log_in.dart';

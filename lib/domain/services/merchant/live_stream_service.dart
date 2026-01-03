@@ -7,16 +7,20 @@ import 'package:dak_louk/core/utils/orm.dart';
 import 'package:dak_louk/data/tables/tables.dart';
 
 class LiveStreamService {
-  late final currentUserId;
+  late final currentMerchantId;
   final LiveStreamRepository _liveStreamRepository = LiveStreamRepository();
   final LiveStreamChatRepository _liveStreamChatRepository =
       LiveStreamChatRepository();
 
   LiveStreamService() {
-    if (AppSession.instance.isLoggedIn) {
-      currentUserId = AppSession.instance.userId;
+    if (AppSession.instance.isLoggedIn &&
+        AppSession.instance.merchantId != null) {
+      currentMerchantId = AppSession.instance.merchantId;
     } else {
-      throw AppError(type: ErrorType.UNAUTHORIZED, message: 'Unauthorized');
+      throw AppError(
+        type: ErrorType.UNAUTHORIZED,
+        message: 'Unauthorized - No merchant session',
+      );
     }
   }
 
@@ -41,35 +45,12 @@ class LiveStreamService {
     }
   }
 
-  // Migrated from LiveStreamDao
-  Future<List<LiveStreamVM>> getAllLiveStreamsWithProducts(int limit) async {
-    try {
-      final liveStreams = await _liveStreamRepository.queryThisTable(
-        limit: limit,
-      );
-
-      if (liveStreams.isNotEmpty) {
-        // Populate relations like in the original DAO
-        final enrichedLiveStreams = await Future.wait(
-          liveStreams.map((liveStream) async {
-            return LiveStreamVM.fromRaw(liveStream);
-          }),
-        );
-
-        return enrichedLiveStreams;
-      }
-      throw Exception('No LiveStreams found');
-    } catch (e) {
-      rethrow;
-    }
-  }
-
   // Basic CRUD operations
   Future<LiveStreamVM?> createLiveStream(CreateLiveStreamDTO dto) async {
     try {
       final liveStreamModel = LiveStreamModel(
         id: 0,
-        merchantId: currentUserId,
+        merchantId: currentMerchantId,
         title: dto.title,
         streamUrl: dto.streamUrl,
         thumbnailUrl: dto.thumbnailUrl,
@@ -109,7 +90,7 @@ class LiveStreamService {
           message: 'Live stream not found',
         );
       }
-      if (liveStream.merchantId != currentUserId) {
+      if (liveStream.merchantId != currentMerchantId) {
         throw AppError(type: ErrorType.UNAUTHORIZED, message: 'Unauthorized');
       }
       final liveStreamModel = LiveStreamModel(

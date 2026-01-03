@@ -16,7 +16,7 @@ import 'package:dak_louk/core/utils/orm.dart';
 import 'package:dak_louk/data/tables/tables.dart';
 
 class PostService {
-  late final currentUserId;
+  late final currentMerchantId;
   final PostRepository _postRepository = PostRepository();
   final MerchantRepository _merchantRepository = MerchantRepository();
   final PostProductsRepository _postProductsRepository =
@@ -35,10 +35,14 @@ class PostService {
 
   // Business logic methods migrated from PostRepository
   PostService() {
-    if (AppSession.instance.isLoggedIn) {
-      currentUserId = AppSession.instance.userId;
+    if (AppSession.instance.isLoggedIn &&
+        AppSession.instance.merchantId != null) {
+      currentMerchantId = AppSession.instance.merchantId;
     } else {
-      throw AppError(type: ErrorType.UNAUTHORIZED, message: 'Unauthorized');
+      throw AppError(
+        type: ErrorType.UNAUTHORIZED,
+        message: 'Unauthorized - No merchant session',
+      );
     }
   }
 
@@ -188,10 +192,12 @@ class PostService {
               .where((save) => save.postId == post.id)
               .length;
           final isLiked = postLikes.any(
-            (like) => like.postId == post.id && like.userId == currentUserId,
+            (like) =>
+                like.postId == post.id && like.userId == currentMerchantId,
           );
           final isSaved = postSaves.any(
-            (save) => save.postId == post.id && save.userId == currentUserId,
+            (save) =>
+                save.postId == post.id && save.userId == currentMerchantId,
           );
 
           return PostVM.fromRaw(
@@ -225,7 +231,7 @@ class PostService {
       final id = await _postRepository.insert(
         PostModel(
           id: 0,
-          merchantId: currentUserId,
+          merchantId: currentMerchantId,
           caption: dto.caption,
           createdAt: DateTime.now(),
           updatedAt: DateTime.now(),
@@ -274,13 +280,13 @@ class PostService {
       if (post == null) {
         throw AppError(type: ErrorType.NOT_FOUND, message: 'Post not found');
       }
-      if (post.merchantId != currentUserId) {
+      if (post.merchantId != currentMerchantId) {
         throw AppError(type: ErrorType.UNAUTHORIZED, message: 'Unauthorized');
       }
       await _postRepository.update(
         PostModel(
           id: id,
-          merchantId: currentUserId,
+          merchantId: currentMerchantId,
           caption: dto.caption,
           createdAt: post.createdAt, // Keep original creation time
           updatedAt: DateTime.now(),
@@ -440,10 +446,10 @@ class PostService {
             .where((save) => save.postId == post.id)
             .length;
         final isLiked = postLikes.any(
-          (like) => like.postId == post.id && like.userId == currentUserId,
+          (like) => like.postId == post.id && like.userId == currentMerchantId,
         );
         final isSaved = postSaves.any(
-          (save) => save.postId == post.id && save.userId == currentUserId,
+          (save) => save.postId == post.id && save.userId == currentMerchantId,
         );
 
         return PostVM.fromRaw(

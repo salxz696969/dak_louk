@@ -1,4 +1,4 @@
-library domain;
+library models;
 
 // Cache
 part '../../data/cache/cacheable.dart';
@@ -31,37 +31,34 @@ part 'raw/product_media_model.dart';
 part 'raw/product_category_map_model.dart';
 
 // View Models
-part 'view_models/cart_vm.dart';
-part 'view_models/user_vm.dart';
-part 'view_models/product_vm.dart';
+part 'view_models/user/cart_vm.dart';
+part 'view_models/user/user_vm.dart';
+part 'view_models/merchant/product_vm.dart';
 part 'view_models/product_media_vm.dart';
 part 'view_models/promo_media_vm.dart';
-part 'view_models/order_vm.dart';
-part 'view_models/post_vm.dart';
-part 'view_models/chat_vm.dart';
-part 'view_models/chat_room_vm.dart';
-part 'view_models/live_stream_vm.dart';
-part 'view_models/live_stream_chat_vm.dart';
-part 'view_models/review_vm.dart';
-part 'view_models/merchant_vm.dart';
-part 'view_models/merchant_profile/merchant_posts_vm.dart';
-part 'view_models/merchant_profile/merchant_livestreams_vm.dart';
-part 'view_models/merchant_profile/merchant_products_vm.dart';
-part 'view_models/profile/user_profile_vm.dart';
-part 'view_models/profile/user_profile_liked_saved_posts_vm.dart';
-part 'view_models/live_stream_products_vm.dart';
+part 'view_models/user/order_vm.dart';
+part 'view_models/user/post_vm.dart';
+part 'view_models/user/chat_vm.dart';
+part 'view_models/user/chat_room_vm.dart';
+part 'view_models/user/live_stream_vm.dart';
+part 'view_models/user/live_stream_chat_vm.dart';
+part 'view_models/user/merchant_vm.dart';
+part 'view_models/user/merchant_profile/merchant_posts_vm.dart';
+part 'view_models/user/merchant_profile/merchant_livestreams_vm.dart';
+part 'view_models/user/merchant_profile/merchant_products_vm.dart';
+part 'view_models/user/profile/user_profile_vm.dart';
+part 'view_models/user/profile/user_profile_liked_saved_posts_vm.dart';
+part 'view_models/user/live_stream_products_vm.dart';
 
-part 'dto/cart_dto.dart';
-part 'dto/product_dto.dart';
-part 'dto/order_dto.dart';
-part 'dto/post_dto.dart';
-part 'dto/post_save_dto.dart';
-part 'dto/chat_dto.dart';
-part 'dto/chat_room_dto.dart';
-part 'dto/live_stream_dto.dart';
-part 'dto/live_stream_chat_dto.dart';
-part 'dto/review_dto.dart';
-part 'dto/user_dto.dart';
+part 'dto/user/cart_dto.dart';
+part 'dto/merchant/product_dto.dart';
+part 'dto/user/order_dto.dart';
+part 'dto/merchant/post_dto.dart';
+part 'dto/user/chat_dto.dart';
+part 'dto/user/chat_room_dto.dart';
+part 'dto/user/order_product_dto.dart';
+part 'dto/merchant/live_stream_dto.dart';
+part 'dto/user/live_stream_chat_dto.dart';
 
 // Auth DTOs
 part 'dto/auth/log_in_dto.dart';

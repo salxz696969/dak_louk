@@ -1,6 +1,6 @@
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/domain/services/user/order_service.dart';
-import 'package:dak_louk/ui/widgets/common/appbar.dart';
+import 'package:dak_louk/ui/widgets/user/appbar.dart';
 import 'package:dak_louk/ui/widgets/user/checkout/checkout_card.dart';
 import 'package:dak_louk/ui/widgets/user/checkout/checkout_form.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +31,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           notes: notes,
           orderItems: cart.items
               .map(
-                (item) => CreateOrderProductDTO(
+                (item) => OrderProductDTO(
                   productId: item.productId,
                   quantity: item.quantity,
                 ),

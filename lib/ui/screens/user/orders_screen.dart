@@ -1,6 +1,6 @@
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/domain/services/user/order_service.dart';
-import 'package:dak_louk/ui/widgets/common/appbar.dart';
+import 'package:dak_louk/ui/widgets/user/appbar.dart';
 import 'package:dak_louk/ui/widgets/user/orders/order_item.dart';
 import 'package:flutter/material.dart';
 
@@ -18,7 +18,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
   Widget build(BuildContext context) {
     return Expanded(
       child: FutureBuilder<List<OrderVM>>(
-        future: _orderService.getOrders(),
+        future: _orderService.getAllOrders(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());

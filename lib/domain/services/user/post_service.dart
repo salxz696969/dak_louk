@@ -264,35 +264,35 @@ class PostService {
     }
   }
 
-  // Basic CRUD operations
-  Future<PostVM?> createPost(CreatePostDTO dto) async {
-    try {
-      final id = await _postRepository.insert(
-        PostModel(
-          id: 0,
-          merchantId: currentUserId,
-          caption: dto.caption,
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now(),
-        ),
-      );
+  // // Basic CRUD operations
+  // Future<PostVM?> createPost(CreatePostDTO dto) async {
+  //   try {
+  //     final id = await _postRepository.insert(
+  //       PostModel(
+  //         id: 0,
+  //         merchantId: currentUserId,
+  //         caption: dto.caption,
+  //         createdAt: DateTime.now(),
+  //         updatedAt: DateTime.now(),
+  //       ),
+  //     );
 
-      final newPost = await _postRepository.getById(id);
-      if (newPost != null) {
-        final postVMs = await _buildPostVMs([newPost]);
-        return postVMs.isNotEmpty ? postVMs.first : null;
-      }
-      throw AppError(type: ErrorType.NOT_FOUND, message: 'Post not found');
-    } catch (e) {
-      if (e is AppError) {
-        rethrow;
-      }
-      throw AppError(
-        type: ErrorType.DB_ERROR,
-        message: 'Failed to create post',
-      );
-    }
-  }
+  //     final newPost = await _postRepository.getById(id);
+  //     if (newPost != null) {
+  //       final postVMs = await _buildPostVMs([newPost]);
+  //       return postVMs.isNotEmpty ? postVMs.first : null;
+  //     }
+  //     throw AppError(type: ErrorType.NOT_FOUND, message: 'Post not found');
+  //   } catch (e) {
+  //     if (e is AppError) {
+  //       rethrow;
+  //     }
+  //     throw AppError(
+  //       type: ErrorType.DB_ERROR,
+  //       message: 'Failed to create post',
+  //     );
+  //   }
+  // }
 
   Future<PostVM?> getPostById(int id) async {
     try {
@@ -313,66 +313,66 @@ class PostService {
     }
   }
 
-  Future<PostVM?> updatePost(int id, UpdatePostDTO dto) async {
-    try {
-      final post = await _postRepository.getById(id);
-      if (post == null) {
-        throw AppError(type: ErrorType.NOT_FOUND, message: 'Post not found');
-      }
-      if (post.merchantId != currentUserId) {
-        throw AppError(type: ErrorType.UNAUTHORIZED, message: 'Unauthorized');
-      }
-      await _postRepository.update(
-        PostModel(
-          id: id,
-          merchantId: currentUserId,
-          caption: dto.caption,
-          createdAt: post.createdAt, // Keep original creation time
-          updatedAt: DateTime.now(),
-        ),
-      );
-      final updatedPost = await _postRepository.getById(id);
-      if (updatedPost != null) {
-        final postVMs = await _buildPostVMs([updatedPost]);
-        return postVMs.isNotEmpty ? postVMs.first : null;
-      }
-      throw AppError(type: ErrorType.NOT_FOUND, message: 'Post not found');
-    } catch (e) {
-      if (e is AppError) {
-        rethrow;
-      }
-      throw AppError(
-        type: ErrorType.DB_ERROR,
-        message: 'Failed to update post',
-      );
-    }
-  }
+  // Future<PostVM?> updatePost(int id, UpdatePostDTO dto) async {
+  //   try {
+  //     final post = await _postRepository.getById(id);
+  //     if (post == null) {
+  //       throw AppError(type: ErrorType.NOT_FOUND, message: 'Post not found');
+  //     }
+  //     if (post.merchantId != currentUserId) {
+  //       throw AppError(type: ErrorType.UNAUTHORIZED, message: 'Unauthorized');
+  //     }
+  //     await _postRepository.update(
+  //       PostModel(
+  //         id: id,
+  //         merchantId: currentUserId,
+  //         caption: dto.caption,
+  //         createdAt: post.createdAt, // Keep original creation time
+  //         updatedAt: DateTime.now(),
+  //       ),
+  //     );
+  //     final updatedPost = await _postRepository.getById(id);
+  //     if (updatedPost != null) {
+  //       final postVMs = await _buildPostVMs([updatedPost]);
+  //       return postVMs.isNotEmpty ? postVMs.first : null;
+  //     }
+  //     throw AppError(type: ErrorType.NOT_FOUND, message: 'Post not found');
+  //   } catch (e) {
+  //     if (e is AppError) {
+  //       rethrow;
+  //     }
+  //     throw AppError(
+  //       type: ErrorType.DB_ERROR,
+  //       message: 'Failed to update post',
+  //     );
+  //   }
+  // }
 
-  Future<void> deletePost(int postId) async {
-    try {
-      // Delete associated media first
-      final statement = Clauses.where.eq(
-        Tables.promoMedias.cols.postId,
-        postId,
-      );
-      final promoMedias = await _promoMediaRepository.queryThisTable(
-        where: statement.clause,
-        args: statement.args,
-      );
-      for (final promoMedia in promoMedias) {
-        await _promoMediaRepository.delete(promoMedia.id);
-      }
-      await _postRepository.delete(postId);
-    } catch (e) {
-      if (e is AppError) {
-        rethrow;
-      }
-      throw AppError(
-        type: ErrorType.DB_ERROR,
-        message: 'Failed to delete post',
-      );
-    }
-  }
+  // Future<void> deletePost(int postId) async {
+  //   try {
+  //     // Delete associated media first
+  //     final statement = Clauses.where.eq(
+  //       Tables.promoMedias.cols.postId,
+  //       postId,
+  //     );
+  //     final promoMedias = await _promoMediaRepository.queryThisTable(
+  //       where: statement.clause,
+  //       args: statement.args,
+  //     );
+  //     for (final promoMedia in promoMedias) {
+  //       await _promoMediaRepository.delete(promoMedia.id);
+  //     }
+  //     await _postRepository.delete(postId);
+  //   } catch (e) {
+  //     if (e is AppError) {
+  //       rethrow;
+  //     }
+  //     throw AppError(
+  //       type: ErrorType.DB_ERROR,
+  //       message: 'Failed to delete post',
+  //     );
+  //   }
+  // }
 
   Future<List<PostVM>> getSimilarPosts(int postId) async {
     try {

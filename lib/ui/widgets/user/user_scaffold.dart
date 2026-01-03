@@ -5,7 +5,7 @@ import 'package:dak_louk/ui/screens/user/chat_room_screen_.dart';
 import 'package:dak_louk/ui/screens/user/live_stream_screen.dart';
 import 'package:dak_louk/ui/screens/user/profile_screen.dart';
 import 'package:dak_louk/ui/screens/user/cart_screen.dart';
-import 'package:dak_louk/ui/widgets/common/appbar.dart';
+import 'package:dak_louk/ui/widgets/user/appbar.dart';
 import 'package:dak_louk/ui/widgets/common/navbar.dart';
 import 'package:dak_louk/core/enums/tabs_enum.dart';
 

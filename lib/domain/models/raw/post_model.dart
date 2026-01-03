@@ -1,4 +1,4 @@
-part of domain;
+part of models;
 
 class PostModel extends Cacheable {
   final int id;

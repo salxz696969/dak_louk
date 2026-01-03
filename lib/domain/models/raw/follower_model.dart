@@ -1,4 +1,4 @@
-part of domain;
+part of models;
 
 class FollowerModel extends Cacheable {
   final int id;

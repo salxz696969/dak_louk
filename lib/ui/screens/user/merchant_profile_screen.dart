@@ -1,5 +1,5 @@
 import 'package:dak_louk/domain/models/models.dart';
-import 'package:dak_louk/ui/widgets/common/appbar.dart';
+import 'package:dak_louk/ui/widgets/user/appbar.dart';
 import 'package:dak_louk/ui/widgets/user/merchant_profile/merchant_info.dart';
 import 'package:dak_louk/ui/widgets/user/merchant_profile/merchant_livestreams.dart';
 import 'package:dak_louk/ui/widgets/user/merchant_profile/merchant_posts.dart';

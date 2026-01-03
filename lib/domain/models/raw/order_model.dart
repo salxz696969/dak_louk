@@ -1,4 +1,4 @@
-part of domain;
+part of models;
 
 class OrderModel extends Cacheable {
   final int id;
@@ -17,4 +17,3 @@ class OrderModel extends Cacheable {
     required this.updatedAt,
   });
 }
-

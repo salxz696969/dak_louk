@@ -12,7 +12,7 @@ import 'package:dak_louk/core/auth/app_session.dart';
 import 'package:dak_louk/core/utils/error.dart';
 
 class OrderService {
-  late final currentUserId;
+  late final currentMerchantId;
   final OrderRepository _orderRepository = OrderRepository();
   final OrderProductRepository _orderProductRepository =
       OrderProductRepository();
@@ -21,100 +21,43 @@ class OrderService {
   final ProductRepository _productRepository = ProductRepository();
   final ProductMediaRepository _productMediaRepository =
       ProductMediaRepository();
+
   OrderService() {
-    if (AppSession.instance.isLoggedIn) {
-      currentUserId = AppSession.instance.userId;
+    if (AppSession.instance.isLoggedIn &&
+        AppSession.instance.merchantId != null) {
+      currentMerchantId = AppSession.instance.merchantId;
     } else {
-      throw AppError(type: ErrorType.UNAUTHORIZED, message: 'Unauthorized');
+      throw AppError(
+        type: ErrorType.UNAUTHORIZED,
+        message: 'Unauthorized - No merchant session',
+      );
     }
   }
 
-  // Business logic methods migrated from ProductProgressRepository
-  Future<List<OrderVM>> getOrders() async {
-    try {
-      final statement = Clauses.where.eq(
-        Tables.orders.cols.userId,
-        currentUserId,
-      );
+  // CRUD Operations for Orders
 
-      final orders = await _orderRepository.queryThisTable(
-        where: statement.clause,
-        args: statement.args,
-        orderBy: Clauses.orderBy.desc(Tables.orders.cols.createdAt).clause,
-      );
+  Future<List<OrderVM>> getAllOrders() async {
+    // Placeholder - implement later
+    throw UnimplementedError('getAllOrders not implemented');
+  }
 
-      final List<OrderVM> enrichedOrders = [];
-      for (final order in orders) {
-        try {
-          final merchant = await _merchantRepository.getById(order.merchantId);
+  Future<OrderVM?> getOrderById(int id) async {
+    // Placeholder - implement later
+    throw UnimplementedError('getOrderById not implemented');
+  }
 
-          final orderProductModels = await _orderProductRepository
-              .queryThisTable(
-                where: Clauses.where
-                    .eq(Tables.orderProducts.cols.orderId, order.id)
-                    .clause,
-                args: Clauses.where
-                    .eq(Tables.orderProducts.cols.orderId, order.id)
-                    .args,
-              );
+  Future<OrderVM?> createOrder(CreateOrderDTO dto) async {
+    // Placeholder - implement later
+    throw UnimplementedError('createOrder not implemented');
+  }
 
-          int totalPrice = 0;
-          final orderProductsVM = <OrderProductVM>[];
+  Future<OrderVM?> updateOrder(int id, UpdateOrderDTO dto) async {
+    // Placeholder - implement later
+    throw UnimplementedError('updateOrder not implemented');
+  }
 
-          for (final op in orderProductModels) {
-            final products = await _productRepository.queryThisTable(
-              where: Clauses.where
-                  .eq(Tables.products.cols.id, op.productId)
-                  .clause,
-              args: Clauses.where
-                  .eq(Tables.products.cols.id, op.productId)
-                  .args,
-            );
-            final product = products.isNotEmpty ? products.first : null;
-            if (product == null) {
-              continue;
-            }
-
-            final medias = await _productMediaRepository.queryThisTable(
-              where: Clauses.where
-                  .eq(Tables.productMedias.cols.productId, product.id)
-                  .clause,
-              args: Clauses.where
-                  .eq(Tables.productMedias.cols.productId, product.id)
-                  .args,
-            );
-            final productMedia = medias.isNotEmpty ? medias.first : null;
-
-            totalPrice += (product.price * op.quantity).toInt();
-
-            orderProductsVM.add(
-              OrderProductVM.fromRaw(
-                op,
-                productName: product.name,
-                productImageUrl: productMedia != null ? productMedia.url : '',
-              ),
-            );
-          }
-
-          final orderVM = OrderVM.fromRaw(
-            order,
-            merchantName: merchant?.username ?? '',
-            merchantProfileImage: merchant?.profileImage ?? '',
-            products: orderProductsVM,
-            totalPrice: totalPrice,
-          );
-          enrichedOrders.add(orderVM);
-        } catch (orderEx) {
-          rethrow;
-        }
-      }
-
-      return enrichedOrders;
-    } catch (e, stack) {
-      if (e is AppError) {
-        rethrow;
-      }
-      throw AppError(type: ErrorType.DB_ERROR, message: 'Failed to get orders');
-    }
+  Future<void> deleteOrder(int id) async {
+    // Placeholder - implement later
+    throw UnimplementedError('deleteOrder not implemented');
   }
 }

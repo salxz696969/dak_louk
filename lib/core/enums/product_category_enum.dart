@@ -1,4 +1,4 @@
-part of domain;
+part of models;
 
 enum ProductCategory {
   all('all'),

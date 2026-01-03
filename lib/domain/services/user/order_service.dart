@@ -30,7 +30,7 @@ class OrderService {
   }
 
   // Business logic methods migrated from ProductProgressRepository
-  Future<List<OrderVM>> getOrders() async {
+  Future<List<OrderVM>> getAllOrders() async {
     try {
       final statement = Clauses.where.eq(
         Tables.orders.cols.userId,

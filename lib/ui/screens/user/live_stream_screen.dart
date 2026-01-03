@@ -16,7 +16,7 @@ class _LiveStreamScreenState extends State<LiveStreamScreen> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<LiveStreamVM>>(
-      future: _liveStreamService.getAllLiveStreamsWithProducts(20),
+      future: _liveStreamService.getAllLiveStreams(20),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());

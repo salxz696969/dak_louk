@@ -8,7 +8,7 @@ import 'package:dak_louk/core/utils/orm.dart';
 import 'package:dak_louk/data/tables/tables.dart';
 
 class LiveStreamProductsService {
-  late final currentUserId;
+  late final currentMerchantId;
   final LiveStreamProductRepository _liveStreamProductRepository =
       LiveStreamProductRepository();
   final ProductRepository _productRepository = ProductRepository();
@@ -16,10 +16,14 @@ class LiveStreamProductsService {
       ProductMediaRepository();
 
   LiveStreamProductsService() {
-    if (AppSession.instance.isLoggedIn) {
-      currentUserId = AppSession.instance.userId;
+    if (AppSession.instance.isLoggedIn &&
+        AppSession.instance.merchantId != null) {
+      currentMerchantId = AppSession.instance.merchantId;
     } else {
-      throw AppError(type: ErrorType.UNAUTHORIZED, message: 'Unauthorized');
+      throw AppError(
+        type: ErrorType.UNAUTHORIZED,
+        message: 'Unauthorized - No merchant session',
+      );
     }
   }
 
@@ -95,5 +99,25 @@ class LiveStreamProductsService {
         message: 'Failed to get live stream products',
       );
     }
+  }
+
+  Future<LiveStreamProductsVM?> createLiveStreamProduct(
+    String dto, // to change
+  ) async {
+    // Placeholder - implement later
+    throw UnimplementedError('createLiveStreamProduct not implemented');
+  }
+
+  Future<LiveStreamProductsVM?> updateLiveStreamProduct(
+    int id,
+    String dto, // to change
+  ) async {
+    // Placeholder - implement later
+    throw UnimplementedError('updateLiveStreamProduct not implemented');
+  }
+
+  Future<void> deleteLiveStreamProduct(int id) async {
+    // Placeholder - implement later
+    throw UnimplementedError('deleteLiveStreamProduct not implemented');
   }
 }
