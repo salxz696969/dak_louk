@@ -796,67 +796,67 @@ Future<void> insertMockData(Database db) async {
     }
   }
 
-  //! for dev purposes: remove seeded carts and orders so that these things come naturally
+  // ! for dev purposes: remove seeded carts and orders so that these things come naturally
 
-  // // 1️⃣6️⃣ CARTS (user shopping carts)
-  // for (int userId = 51; userId <= 100; userId++) {
-  //   // Regular users only
-  //   final numItems = rand.nextInt(5) + 1; // 1-5 items per cart
-  //   final cartProducts = <int>{};
+  // 1️⃣6️⃣ CARTS (user shopping carts)
+  for (int userId = 51; userId <= 100; userId++) {
+    // Regular users only
+    final numItems = rand.nextInt(5) + 1; // 1-5 items per cart
+    final cartProducts = <int>{};
 
-  //   for (int j = 0; j < numItems; j++) {
-  //     int productId;
-  //     do {
-  //       productId = rand.nextInt(200) + 1;
-  //     } while (cartProducts.contains(productId));
+    for (int j = 0; j < numItems; j++) {
+      int productId;
+      do {
+        productId = rand.nextInt(200) + 1;
+      } while (cartProducts.contains(productId));
 
-  //     cartProducts.add(productId);
+      cartProducts.add(productId);
 
-  //     await db.insert(Tables.carts.tableName, {
-  //       Tables.carts.cols.userId: userId,
-  //       Tables.carts.cols.productId: productId,
-  //       Tables.carts.cols.quantity: rand.nextInt(3) + 1,
-  //       Tables.carts.cols.createdAt: now,
-  //       Tables.carts.cols.updatedAt: now,
-  //     });
-  //   }
-  // }
+      await db.insert(Tables.carts.tableName, {
+        Tables.carts.cols.userId: userId,
+        Tables.carts.cols.productId: productId,
+        Tables.carts.cols.quantity: rand.nextInt(3) + 1,
+        Tables.carts.cols.createdAt: now,
+        Tables.carts.cols.updatedAt: now,
+      });
+    }
+  }
 
-  // // 1️⃣7️⃣ ORDERS (purchase orders)
-  // for (int i = 1; i <= 80; i++) {
-  //   final userId = rand.nextInt(50) + 51; // Regular user
-  //   final merchantId = rand.nextInt(50) + 1; // Merchant
-  //   final statuses = [
-  //     'waiting',
-  //     'accepted',
-  //     'delivering',
-  //     'completed',
-  //     'cancelled',
-  //   ];
+  // 1️⃣7️⃣ ORDERS (purchase orders)
+  for (int i = 1; i <= 80; i++) {
+    final userId = rand.nextInt(50) + 51; // Regular user
+    final merchantId = 1; // Merchant
+    final statuses = [
+      'waiting',
+      'accepted',
+      'delivering',
+      'completed',
+      'cancelled',
+    ];
 
-  //   await db.insert(Tables.orders.tableName, {
-  //     Tables.orders.cols.userId: userId,
-  //     Tables.orders.cols.merchantId: merchantId,
-  //     Tables.orders.cols.status: statuses[rand.nextInt(statuses.length)],
-  //     Tables.orders.cols.createdAt: now,
-  //     Tables.orders.cols.updatedAt: now,
-  //   });
-  // }
+    await db.insert(Tables.orders.tableName, {
+      Tables.orders.cols.userId: userId,
+      Tables.orders.cols.merchantId: merchantId,
+      Tables.orders.cols.status: statuses[rand.nextInt(statuses.length)],
+      Tables.orders.cols.createdAt: now,
+      Tables.orders.cols.updatedAt: now,
+    });
+  }
 
-  // // 1️⃣8️⃣ ORDER_PRODUCTS (products in orders)
-  // for (int orderId = 1; orderId <= 80; orderId++) {
-  //   final numProducts = rand.nextInt(3) + 1; // 1-3 products per order
+  // 1️⃣8️⃣ ORDER_PRODUCTS (products in orders)
+  for (int orderId = 1; orderId <= 80; orderId++) {
+    final numProducts = rand.nextInt(3) + 1; // 1-3 products per order
 
-  //   for (int j = 0; j < numProducts; j++) {
-  //     final productId = rand.nextInt(200) + 1;
+    for (int j = 0; j < numProducts; j++) {
+      final productId = rand.nextInt(200) + 1;
 
-  //     await db.insert(Tables.orderProducts.tableName, {
-  //       Tables.orderProducts.cols.orderId: orderId,
-  //       Tables.orderProducts.cols.productId: productId,
-  //       Tables.orderProducts.cols.quantity: rand.nextInt(2) + 1,
-  //     });
-  //   }
-  // }
+      await db.insert(Tables.orderProducts.tableName, {
+        Tables.orderProducts.cols.orderId: orderId,
+        Tables.orderProducts.cols.productId: productId,
+        Tables.orderProducts.cols.quantity: rand.nextInt(2) + 1,
+      });
+    }
+  }
 
   // 1️⃣9️⃣ REVIEWS (user reviews for merchants)
   for (int i = 1; i <= 100; i++) {
