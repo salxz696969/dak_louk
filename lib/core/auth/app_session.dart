@@ -21,7 +21,7 @@ class AppSession {
 
   static const _keyMerchantId = 'merchant_id';
   static const _keyMerchantUsername = 'merchant_username';
-  static const _keyMerchantProfileImage = 'merchant_profile_image';
+  static const _keyMerchantProfileImageUrl = 'merchant_profile_image_url';
 
   int? _userId;
   String? _username;
@@ -30,7 +30,8 @@ class AppSession {
 
   int? _merchantId;
   String? _merchantUsername;
-  String? _merchantProfileImage;
+  String? _merchantProfileImageUrl;
+
   Role? _role;
 
   bool get isLoggedIn => _userId != null;
@@ -43,19 +44,23 @@ class AppSession {
 
   int? get merchantId => _merchantId;
   String? get merchantUsername => _merchantUsername;
-  String? get merchantProfileImage => _merchantProfileImage;
+  String? get merchantProfileImageUrl => _merchantProfileImageUrl;
+
   Future<void> init() async {
     final prefs = await SharedPreferences.getInstance();
 
     _userId = prefs.getInt(_keyUserId);
     _username = prefs.getString(_keyUsername);
+    _merchantId = prefs.getInt(_keyMerchantId);
+    _merchantUsername = prefs.getString(_keyMerchantUsername);
+    _merchantProfileImageUrl = prefs.getString(_keyMerchantProfileImageUrl);
     final checkRole = prefs.getString(_keyRole);
     _role = checkRole != null ? Role.values.byName(checkRole) : null;
     _phone = prefs.getString(_keyPhone);
     _address = prefs.getString(_keyAddress);
   }
 
-  Future<void> login({required String email, required String password}) async {
+  Future<Role?> login({required String email, required String password}) async {
     final passwordHash = Hasher.sha256Hash(password);
     final user = await _userRepository.getUserByEmailAndPassword(
       email,
@@ -65,32 +70,72 @@ class AppSession {
       email,
       passwordHash,
     );
+    // either the user is null or the merchant is null never both and both null on incorrect
     if (user == null && merchant == null) {
-      throw AppError(type: ErrorType.NOT_FOUND, message: 'User not found');
+      return null;
     }
-    // either the user is null or the merchant is null never both
+    final prefs = await SharedPreferences.getInstance();
+
     if (user != null) {
+      // Standard user login
       _userId = user.id;
       _username = user.username;
       _role = Role.user;
       _phone = user.phone;
       _address = user.address;
+
+      _merchantId = null;
+      _merchantUsername = null;
+      _merchantProfileImageUrl = null;
+
+      await prefs.setInt(_keyUserId, _userId!);
+      await prefs.setString(_keyUsername, _username!);
+      await prefs.setString(_keyRole, _role!.name);
+      await prefs.setString(_keyPhone, _phone!);
+      await prefs.setString(_keyAddress, _address!);
+
+      await prefs.remove(_keyMerchantId);
+      await prefs.remove(_keyMerchantUsername);
+      await prefs.remove(_keyMerchantProfileImageUrl);
+
+      return Role.user;
     }
     if (merchant != null) {
+      // Merchant login, fill both sections
+      _userId = merchant.id;
+      _username = merchant.username;
+      _role = Role.merchant;
       _merchantId = merchant.id;
       _merchantUsername = merchant.username;
-      _merchantProfileImage = merchant.profileImage;
-      _role = Role.merchant;
+      _merchantProfileImageUrl = merchant.profileImage;
+
+      // You might want to also get additional merchant-specific data here in the future
+      await prefs.setInt(_keyUserId, _userId!);
+      await prefs.setString(_keyUsername, _username!);
+      await prefs.setString(_keyRole, _role!.name);
+
+      await prefs.setInt(_keyMerchantId, _merchantId!);
+      await prefs.setString(_keyMerchantUsername, _merchantUsername!);
+
+      if (_merchantProfileImageUrl != null) {
+        await prefs.setString(
+          _keyMerchantProfileImageUrl,
+          _merchantProfileImageUrl!,
+        );
+      } else {
+        await prefs.remove(_keyMerchantProfileImageUrl);
+      }
+
+      // Optional: clear user-specific fields if merchant is not also user
+      await prefs.remove(_keyPhone);
+      await prefs.remove(_keyAddress);
+      _phone = null;
+      _address = null;
+
+      return Role.merchant;
     }
-    final prefs = await SharedPreferences.getInstance();
-
-    await prefs.setInt(_keyUserId, _userId!);
-    await prefs.setString(_keyUsername, _username!);
-    await prefs.setString(_keyRole, _role!.name);
-
-    await prefs.setInt(_keyMerchantId, _merchantId!);
-    await prefs.setString(_keyMerchantUsername, _merchantUsername!);
-    await prefs.setString(_keyMerchantProfileImage, _merchantProfileImage!);
+    // fallback (should never reach)
+    return null;
   }
 
   Future<void> signUpUser({
@@ -131,12 +176,21 @@ class AppSession {
       _role = Role.user;
       _phone = phone;
       _address = address;
+
+      _merchantId = null;
+      _merchantUsername = null;
+      _merchantProfileImageUrl = null;
+
       final prefs = await SharedPreferences.getInstance();
       await prefs.setInt(_keyUserId, _userId!);
       await prefs.setString(_keyUsername, _username!);
       await prefs.setString(_keyRole, _role!.name);
       await prefs.setString(_keyPhone, _phone!);
       await prefs.setString(_keyAddress, _address!);
+
+      await prefs.remove(_keyMerchantId);
+      await prefs.remove(_keyMerchantUsername);
+      await prefs.remove(_keyMerchantProfileImageUrl);
     } else {
       throw AppError(
         type: ErrorType.DB_ERROR,
@@ -154,10 +208,18 @@ class AppSession {
     _phone = null;
     _address = null;
 
+    _merchantId = null;
+    _merchantUsername = null;
+    _merchantProfileImageUrl = null;
+
     await prefs.remove(_keyUserId);
     await prefs.remove(_keyUsername);
     await prefs.remove(_keyRole);
     await prefs.remove(_keyPhone);
     await prefs.remove(_keyAddress);
+
+    await prefs.remove(_keyMerchantId);
+    await prefs.remove(_keyMerchantUsername);
+    await prefs.remove(_keyMerchantProfileImageUrl);
   }
 }

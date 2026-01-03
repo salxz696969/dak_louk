@@ -1,4 +1,4 @@
-part of domain;
+part of models;
 
 class ProductCategoryMapModel extends Cacheable {
   final int id;

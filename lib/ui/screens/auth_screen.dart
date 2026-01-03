@@ -1,9 +1,11 @@
+import 'package:dak_louk/core/enums/role_enum.dart';
 import 'package:dak_louk/domain/services/auth_service.dart';
 import 'package:dak_louk/domain/models/models.dart';
-import 'package:dak_louk/ui/widgets/common/base_scaffold.dart';
+import 'package:dak_louk/ui/widgets/merchant/merchant_scaffold.dart';
+import 'package:dak_louk/ui/widgets/user/user_scaffold.dart';
 import 'package:flutter/material.dart';
-import 'package:dak_louk/ui/widgets/screens/auth/log_in.dart';
-import 'package:dak_louk/ui/widgets/screens/auth/sign_up.dart';
+import 'package:dak_louk/ui/widgets/auth/log_in.dart';
+import 'package:dak_louk/ui/widgets/auth/sign_up.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -19,16 +21,27 @@ class _AuthScreenState extends State<AuthScreen> {
     await _authService.signUpUser(dto);
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => const BaseScaffold()),
+      MaterialPageRoute(builder: (context) => const UserScaffold()),
     );
   }
 
   void handleLogIn(LogInDTO dto) async {
-    await _authService.login(dto);
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const BaseScaffold()),
-    );
+    final role = await _authService.login(dto);
+    if (role == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Invalid email or password')),
+      );
+    } else if (role == Role.user) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const UserScaffold()),
+      );
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const MerchantScaffold()),
+      );
+    }
   }
 
   void handleSwitchTab() {

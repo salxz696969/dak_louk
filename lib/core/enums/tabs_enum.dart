@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-enum Tabs {
+enum UserTabs {
   home('Home', Icons.home),
   live('Live', Icons.live_tv),
   orders('Orders', Icons.receipt_long),
@@ -10,13 +10,13 @@ enum Tabs {
   final String label;
   final IconData icon;
 
-  const Tabs(this.label, this.icon);
+  const UserTabs(this.label, this.icon);
 }
 
 enum MerchantTabs {
   orders('Orders', Icons.receipt_long),
   products('Products', Icons.shopping_bag),
-  posts('Reviews', Icons.photo_library),
+  posts('Posts', Icons.photo_library),
   live('Live', Icons.live_tv),
   chat('Chat', Icons.chat_bubble_outline);
 

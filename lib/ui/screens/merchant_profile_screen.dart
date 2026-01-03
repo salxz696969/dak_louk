@@ -1,10 +1,10 @@
 import 'package:dak_louk/domain/models/models.dart';
-import 'package:dak_louk/ui/widgets/common/appbar.dart';
-import 'package:dak_louk/ui/widgets/screens/merchant_profile/merchant_info.dart';
-import 'package:dak_louk/ui/widgets/screens/merchant_profile/merchant_livestreams.dart';
-import 'package:dak_louk/ui/widgets/screens/merchant_profile/merchant_posts.dart';
-import 'package:dak_louk/ui/widgets/screens/merchant_profile/merchant_products.dart';
-import 'package:dak_louk/ui/widgets/screens/merchant_profile/merchant_profile_tabs.dart';
+import 'package:dak_louk/ui/widgets/user/appbar.dart';
+import 'package:dak_louk/ui/widgets/user/merchant_profile/merchant_info.dart';
+import 'package:dak_louk/ui/widgets/user/merchant_profile/merchant_livestreams.dart';
+import 'package:dak_louk/ui/widgets/user/merchant_profile/merchant_posts.dart';
+import 'package:dak_louk/ui/widgets/user/merchant_profile/merchant_products.dart';
+import 'package:dak_louk/ui/widgets/user/merchant_profile/merchant_profile_tabs.dart';
 import 'package:flutter/material.dart';
 
 enum MerchantProfileTabsEnum {
@@ -59,7 +59,7 @@ class _MerchantProfileScreenState extends State<MerchantProfileScreen> {
 
             MerchantProfileTabs(
               selectedTab: selectedTab,
-              onTabSelected: onTabSelected,
+              onTabSelected: (tab) => onTabSelected(tab),
             ),
 
             const SizedBox(height: 16),

@@ -1,4 +1,4 @@
-part of domain;
+part of models;
 
 // This represents promo_medias table
 class PromoMediaModel extends Cacheable {

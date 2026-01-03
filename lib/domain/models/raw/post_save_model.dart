@@ -1,4 +1,4 @@
-part of domain;
+part of models;
 
 class PostSaveModel extends Cacheable {
   final int id;
@@ -14,5 +14,4 @@ class PostSaveModel extends Cacheable {
     required this.createdAt,
     required this.updatedAt,
   });
-
 }
