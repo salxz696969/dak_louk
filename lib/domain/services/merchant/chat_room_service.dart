@@ -56,7 +56,7 @@ class ChatRoomService {
             );
             if (chatRoomChats.isNotEmpty) {
               final latestChat = chatRoomChats.first;
-              final timeAgo = time_ago.timeAgo(latestChat.createdAt);
+              final timeAgo = time_ago.timeAgo(DateTime.parse(latestChat.createdAt));
               final latestText = latestChat.text;
               chatRoomsVM.add(
                 MerchantChatRoomVM.fromRaw(

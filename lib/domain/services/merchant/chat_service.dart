@@ -29,8 +29,8 @@ class ChatService {
         senderId: currentMerchantId,
         text: dto.text,
         chatRoomId: dto.chatRoomId,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
+        createdAt: DateTime.now().toIso8601String(),
+        updatedAt: DateTime.now().toIso8601String(),
       );
       return await _chatRepository.insert(chatModel);
     } catch (e) {
@@ -132,8 +132,8 @@ class ChatService {
             chatRoomId: chatRoomId,
             senderId: currentMerchantId,
             text: '',
-            createdAt: DateTime.now(),
-            updatedAt: DateTime.now(),
+            createdAt: DateTime.now().toIso8601String(),
+            updatedAt: DateTime.now().toIso8601String(),
           ),
           isMine: false,
         ),

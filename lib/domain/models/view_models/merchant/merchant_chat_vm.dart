@@ -20,8 +20,8 @@ class MerchantChatVM extends Cacheable {
       id: raw.id,
       isMine: isMine,
       text: raw.text,
-      createdAt: raw.createdAt,
-      updatedAt: raw.updatedAt,
+      createdAt: DateTime.parse(raw.createdAt),
+      updatedAt: DateTime.parse(raw.updatedAt),
     );
   }
 }

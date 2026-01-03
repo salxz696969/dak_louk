@@ -4,8 +4,8 @@ class ChatRoomModel extends Cacheable {
   final int id;
   final int userId;
   final int merchantId;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+  final String createdAt;
+  final String updatedAt;
 
   ChatRoomModel({
     required this.id,

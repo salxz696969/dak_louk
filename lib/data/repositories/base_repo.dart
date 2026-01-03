@@ -113,7 +113,7 @@ abstract class BaseRepository<T extends Cacheable>
       final db = await database;
       final cacheKey = _getBaseCacheKey();
       final map = toMap(model);
-      // maybe change
+      // remove id because auto increment
       map.remove(Tables.id);
       final id = await db.insert(tableName, map);
       if (id > 0) {

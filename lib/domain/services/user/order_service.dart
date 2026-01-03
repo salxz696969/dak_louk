@@ -146,7 +146,13 @@ class OrderService {
           orderProduct,
         );
         // delete prducts in cart
-        await _cartRepository.delete(item.productId);
+        final carts = await _cartRepository.getAll();
+        for (final cart in carts) {
+          if (cart.productId == item.productId &&
+              cart.userId == currentUserId) {
+            await _cartRepository.delete(cart.id);
+          }
+        }
         if (orderProductId <= 0) {
           throw AppError(
             type: ErrorType.DB_ERROR,

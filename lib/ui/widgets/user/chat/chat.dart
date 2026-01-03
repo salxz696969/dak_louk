@@ -15,11 +15,17 @@ class _ChatState extends State<Chat> {
   late TextEditingController _controller;
   late ScrollController _scrollController;
   final ChatService _chatService = ChatService();
+  List<ChatVM> _chats = [];
   @override
   void initState() {
     super.initState();
     _controller = TextEditingController();
     _scrollController = ScrollController();
+    _chatService.getChatsByChatRoomId(widget.chatRoomId).then((chats) {
+      setState(() {
+        _chats = chats;
+      });
+    });
   }
 
   @override
@@ -42,9 +48,14 @@ class _ChatState extends State<Chat> {
   }
 
   Future<void> _handleSend(String text) async {
-    await _chatService.createChat(
+    final newChat = await _chatService.createChat(
       CreateChatDTO(chatRoomId: widget.chatRoomId, text: text),
     );
+    if (newChat != null) {
+      setState(() {
+        _chats.add(newChat);
+      });
+    }
     _scrollToBottom();
   }
 
