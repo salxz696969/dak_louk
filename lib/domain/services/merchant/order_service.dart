@@ -10,6 +10,7 @@ import 'package:dak_louk/core/utils/orm.dart';
 import 'package:dak_louk/data/tables/tables.dart';
 import 'package:dak_louk/core/auth/app_session.dart';
 import 'package:dak_louk/core/utils/error.dart';
+import 'package:dak_louk/domain/services/user/user_service.dart';
 
 class OrderService {
   late final currentMerchantId;
@@ -36,7 +37,7 @@ class OrderService {
 
   // CRUD Operations for Orders
 
-  Future<List<OrderVM>> getAllOrders() async {
+  Future<List<OrderMerchantVM>> getAllOrders() async {
     try {
       final statement = Clauses.where
           .eq(Tables.orders.cols.merchantId, currentMerchantId)
@@ -57,11 +58,10 @@ class OrderService {
             .clause,
       );
 
-      final List<OrderVM> enrichedOrders = [];
+      final List<OrderMerchantVM> enrichedOrders = [];
       for (final order in orders) {
         try {
-          final merchant = await _merchantRepository.getById(order.merchantId);
-          final user = await _merchantRepository.getById(order.userId);
+          final user = await UserService().getUserById(order.userId);
           final orderProductModels = await _orderProductRepository
               .queryThisTable(
                 where: Clauses.where
@@ -73,7 +73,7 @@ class OrderService {
               );
 
           int totalPrice = 0;
-          final orderProductsVM = <OrderProductVM>[];
+          final orderProductsVM = <OrderProductMerchantVM>[];
 
           for (final op in orderProductModels) {
             final products = await _productRepository.queryThisTable(
@@ -102,7 +102,7 @@ class OrderService {
             totalPrice += (product.price * op.quantity).toInt();
 
             orderProductsVM.add(
-              OrderProductVM.fromRaw(
+              OrderProductMerchantVM.fromRaw(
                 op,
                 productName: product.name,
                 productImageUrl: productMedia != null ? productMedia.url : '',
@@ -110,12 +110,10 @@ class OrderService {
             );
           }
 
-          final orderVM = OrderVM.fromRaw(
+          final orderVM = OrderMerchantVM.fromRaw(
             order,
             username: user?.username ?? '',
-            userProfileImage: user?.profileImage ?? '',
-            merchantName: merchant?.username ?? '',
-            merchantProfileImage: merchant?.profileImage ?? '',
+            userProfileImage: user?.profileImageUrl ?? '',
             products: orderProductsVM,
             totalPrice: totalPrice,
           );

@@ -1,14 +1,22 @@
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/domain/services/user/post_like_service.dart';
 import 'package:dak_louk/domain/services/user/post_save_service.dart';
-import 'package:dak_louk/ui/widgets/user/posts/product_item.dart';
-import 'package:dak_louk/ui/widgets/user/posts/username_container.dart';
+import 'package:dak_louk/ui/widgets/merchant/posts/post_form.dart';
+import 'package:dak_louk/ui/widgets/merchant/products/product_item.dart';
+import 'package:dak_louk/ui/screens/user/merchant_profile_screen.dart';
 import 'package:flutter/material.dart';
 
 class PostItem extends StatefulWidget {
   final PostVM post;
+  final VoidCallback? onPostDeleted;
+  final void Function(PostVM updatedPost)? onPostUpdated;
 
-  const PostItem({super.key, required this.post});
+  const PostItem({
+    super.key,
+    required this.post,
+    this.onPostDeleted,
+    this.onPostUpdated,
+  });
 
   @override
   State<PostItem> createState() => _PostItemState();
@@ -72,23 +80,144 @@ class _PostItemState extends State<PostItem> {
     }
   }
 
+  void _showPostForm() {
+    showModalBottomSheet(
+      enableDrag: true,
+      isDismissible: true,
+      showDragHandle: true,
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: PostForm(
+          post: widget.post,
+          onSaved: (updatedPost) {
+            widget.onPostUpdated?.call(updatedPost);
+          },
+        ),
+      ),
+    );
+  }
+
+  Future<void> _deletePost() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Post'),
+        content: const Text('Are you sure you want to delete this post?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      widget.onPostDeleted?.call();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Username Container
-        UsernameContainer(
-          bio: widget.post.merchant.bio,
-          merchantId: widget.post.merchantId,
-          profile: AssetImage(
-            widget.post.merchant.profileImage.isNotEmpty
-                ? widget.post.merchant.profileImage
-                : 'assets/profiles/profile1.png',
+        // Merchant Header
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => MerchantProfileScreen(
+                        merchant: MerchantVM(
+                          id: widget.post.merchant.id,
+                          username: widget.post.merchant.username,
+                          rating: widget.post.merchant.rating,
+                          bio: widget.post.merchant.bio,
+                          profileImage: widget.post.merchant.profileImage,
+                          createdAt: DateTime.now(),
+                          updatedAt: DateTime.now(),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      backgroundImage: AssetImage(
+                        widget.post.merchant.profileImage,
+                      ),
+                      radius: 20,
+                    ),
+                    const SizedBox(width: 10),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.post.merchant.username,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            Text(
+                              widget.post.merchant.rating.toString(),
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey.shade600,
+                              ),
+                            ),
+                            const SizedBox(width: 2),
+                            const Icon(
+                              Icons.star,
+                              color: Colors.amber,
+                              size: 14,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              PopupMenuButton<String>(
+                icon: const Icon(Icons.more_horiz),
+                itemBuilder: (context) => const [
+                  PopupMenuItem(value: 'edit', child: Text('Edit')),
+                  PopupMenuItem(value: 'delete', child: Text('Delete')),
+                ],
+                onSelected: (value) {
+                  if (value == 'edit') {
+                    _showPostForm();
+                  } else if (value == 'delete') {
+                    _deletePost();
+                  }
+                },
+              ),
+            ],
           ),
-          username: widget.post.merchant.username,
-          rating: widget.post.merchant.rating.toString(),
         ),
+
+        const SizedBox(height: 12),
 
         // Promo Media (display first one)
         if (widget.post.promoMedias?.isNotEmpty ?? false)
@@ -113,35 +242,6 @@ class _PostItemState extends State<PostItem> {
                       fit: BoxFit.cover,
                     ),
                   ),
-                  // Play button overlay for videos
-
-                  // Promo text overlay
-                  // Positioned(
-                  //   bottom: 0,
-                  //   left: 0,
-                  //   right: 0,
-                  //   child: Container(
-                  //     padding: const EdgeInsets.all(16),
-                  //     decoration: BoxDecoration(
-                  //       gradient: LinearGradient(
-                  //         begin: Alignment.topCenter,
-                  //         end: Alignment.bottomCenter,
-                  //         colors: [
-                  //           Colors.transparent,
-                  //           Colors.black.withOpacity(0.7),
-                  //         ],
-                  //       ),
-                  //     ),
-                  //     child: Text(
-                  //       post.caption ?? 'Promo Video/Photos',
-                  //       style: const TextStyle(
-                  //         color: Colors.white,
-                  //         fontSize: 16,
-                  //         fontWeight: FontWeight.w600,
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ),
                 ],
               ),
             ),

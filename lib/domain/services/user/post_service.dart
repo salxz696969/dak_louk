@@ -265,34 +265,55 @@ class PostService {
   }
 
   // // Basic CRUD operations
-  // Future<PostVM?> createPost(CreatePostDTO dto) async {
-  //   try {
-  //     final id = await _postRepository.insert(
-  //       PostModel(
-  //         id: 0,
-  //         merchantId: currentUserId,
-  //         caption: dto.caption,
-  //         createdAt: DateTime.now(),
-  //         updatedAt: DateTime.now(),
-  //       ),
-  //     );
+  Future<PostVM?> createPost(CreatePostDTO dto) async {
+    try {
+      final id = await _postRepository.insert(
+        PostModel(
+          id: 0,
+          merchantId: currentUserId,
+          caption: dto.caption,
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+        ),
+      );
+      if (dto.product != null) {
+        for (final dt in dto.product!) {
+          final postProduct = await _postProductsRepository.insert(
+            PostProductModel(id: 0, postId: id, productId: dt.id),
+          );
+        }
+      }
 
-  //     final newPost = await _postRepository.getById(id);
-  //     if (newPost != null) {
-  //       final postVMs = await _buildPostVMs([newPost]);
-  //       return postVMs.isNotEmpty ? postVMs.first : null;
-  //     }
-  //     throw AppError(type: ErrorType.NOT_FOUND, message: 'Post not found');
-  //   } catch (e) {
-  //     if (e is AppError) {
-  //       rethrow;
-  //     }
-  //     throw AppError(
-  //       type: ErrorType.DB_ERROR,
-  //       message: 'Failed to create post',
-  //     );
-  //   }
-  // }
+      if (dto.promoMedia != null) {
+        for (final media in dto.promoMedia!) {
+          final promoMedia = await _promoMediaRepository.insert(
+            PromoMediaModel(
+              id: 0,
+              postId: id,
+              url: media.url,
+              createdAt: DateTime.now(),
+              updatedAt: DateTime.now(),
+            ),
+          );
+        }
+      }
+
+      final newPost = await _postRepository.getById(id);
+      if (newPost != null) {
+        final postVMs = await _buildPostVMs([newPost]);
+        return postVMs.isNotEmpty ? postVMs.first : null;
+      }
+      throw AppError(type: ErrorType.NOT_FOUND, message: 'Post not found');
+    } catch (e) {
+      if (e is AppError) {
+        rethrow;
+      }
+      throw AppError(
+        type: ErrorType.DB_ERROR,
+        message: 'Failed to create post',
+      );
+    }
+  }
 
   Future<PostVM?> getPostById(int id) async {
     try {

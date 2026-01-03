@@ -34,6 +34,7 @@ part 'raw/product_category_map_model.dart';
 part 'view_models/user/cart_vm.dart';
 part 'view_models/user/user_vm.dart';
 part 'view_models/merchant/product_vm.dart';
+part 'view_models/merchant/order_merchant_vm.dart';
 part 'view_models/product_media_vm.dart';
 part 'view_models/promo_media_vm.dart';
 part 'view_models/user/order_vm.dart';

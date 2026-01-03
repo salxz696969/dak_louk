@@ -13,7 +13,7 @@ class MerchantOrdersScreen extends StatefulWidget {
 class _MerchantOrdersScreenState extends State<MerchantOrdersScreen> {
   final OrderService _orderService = OrderService();
 
-  Future<void> _showStatusMenu(BuildContext context, OrderVM order) async {
+  Future<void> _showStatusMenu(BuildContext context, OrderMerchantVM order) async {
     final statuses = OrderStatusEnum.values
         .map((e) => e.name)
         .where(
@@ -179,7 +179,7 @@ class _MerchantOrdersScreenState extends State<MerchantOrdersScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<OrderVM>>(
+    return FutureBuilder<List<OrderMerchantVM>>(
       future: _orderService.getAllOrders(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
