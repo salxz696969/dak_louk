@@ -85,7 +85,11 @@ class _HorizontalProductCard extends StatelessWidget {
                         width: 80,
                         height: 80,
                         fit: BoxFit.cover,
-                        errorBuilder: (ctx, err, st) => const Icon(Icons.image, size: 40, color: Colors.grey),
+                        errorBuilder: (ctx, err, st) => const Icon(
+                          Icons.image,
+                          size: 40,
+                          color: Colors.grey,
+                        ),
                       )
                     : const Icon(Icons.image, size: 40, color: Colors.grey),
               ),
@@ -99,8 +103,8 @@ class _HorizontalProductCard extends StatelessWidget {
                   Text(
                     product.name,
                     style: const TextStyle(
-                      fontSize: 16, 
-                      fontWeight: FontWeight.w600
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -129,7 +133,7 @@ class _HorizontalProductCard extends StatelessWidget {
             const SizedBox(width: 12),
             _AddToCartButton(
               productId: product.id,
-              isAdded: product.isAddedToCart ?? false,
+              isAdded: product.isAddedToCart,
             ),
           ],
         ),
@@ -141,7 +145,11 @@ class _HorizontalProductCard extends StatelessWidget {
 class _AddToCartButton extends StatefulWidget {
   final int productId;
   final bool isAdded;
-  const _AddToCartButton({Key? key, required this.productId, required this.isAdded}) : super(key: key);
+  const _AddToCartButton({
+    Key? key,
+    required this.productId,
+    required this.isAdded,
+  }) : super(key: key);
 
   @override
   State<_AddToCartButton> createState() => _AddToCartButtonState();
@@ -188,7 +196,10 @@ class _AddToCartButtonState extends State<_AddToCartButton> {
               borderRadius: BorderRadius.circular(8),
             ),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
-            textStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+            textStyle: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+            ),
           ),
           child: const Text('Add to Cart'),
         ),
@@ -202,7 +213,11 @@ class _AddToCartButtonState extends State<_AddToCartButton> {
         icon: const Icon(Icons.check_circle, color: Colors.white, size: 18),
         label: const Text(
           'Added',
-          style: TextStyle(fontSize: 13, color: Colors.white, fontWeight: FontWeight.w600),
+          style: TextStyle(
+            fontSize: 13,
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+          ),
         ),
         style: ElevatedButton.styleFrom(
           backgroundColor: Theme.of(context).colorScheme.secondary,
