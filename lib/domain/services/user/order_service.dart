@@ -47,6 +47,7 @@ class OrderService {
       for (final order in orders) {
         try {
           final merchant = await _merchantRepository.getById(order.merchantId);
+          final user = await _merchantRepository.getById(order.userId);
 
           final orderProductModels = await _orderProductRepository
               .queryThisTable(
@@ -98,6 +99,8 @@ class OrderService {
 
           final orderVM = OrderVM.fromRaw(
             order,
+            username: user?.username ?? '',
+            userProfileImage: user?.profileImage ?? '',
             merchantName: merchant?.username ?? '',
             merchantProfileImage: merchant?.profileImage ?? '',
             products: orderProductsVM,

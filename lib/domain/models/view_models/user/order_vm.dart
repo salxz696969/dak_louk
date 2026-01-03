@@ -2,6 +2,8 @@ part of models;
 
 class OrderVM extends Cacheable {
   final int id;
+  final String username;
+  final String userProfileImage;
   final String merchantName;
   final String merchantProfileImage;
   final String status;
@@ -12,6 +14,8 @@ class OrderVM extends Cacheable {
 
   OrderVM({
     required this.id,
+    required this.username,
+    required this.userProfileImage,
     required this.merchantName,
     required this.merchantProfileImage,
     required this.status,
@@ -22,6 +26,8 @@ class OrderVM extends Cacheable {
 
   factory OrderVM.fromRaw(
     OrderModel raw, {
+    required String username,
+    required String userProfileImage,
     required String merchantName,
     required String merchantProfileImage,
     required List<OrderProductVM> products,
@@ -29,6 +35,8 @@ class OrderVM extends Cacheable {
   }) {
     return OrderVM(
       id: raw.id,
+      username: username,
+      userProfileImage: userProfileImage,
       merchantName: merchantName,
       merchantProfileImage: merchantProfileImage,
       status: raw.status,
