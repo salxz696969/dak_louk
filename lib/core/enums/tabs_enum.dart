@@ -16,7 +16,7 @@ enum UserTabs {
 enum MerchantTabs {
   orders('Orders', Icons.receipt_long),
   products('Products', Icons.shopping_bag),
-  posts('Reviews', Icons.photo_library),
+  posts('Posts', Icons.photo_library),
   live('Live', Icons.live_tv),
   chat('Chat', Icons.chat_bubble_outline);
 

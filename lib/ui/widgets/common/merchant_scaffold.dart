@@ -2,15 +2,13 @@ import 'package:dak_louk/core/auth/app_session.dart';
 import 'package:dak_louk/core/enums/tabs_enum.dart';
 import 'package:dak_louk/ui/screens/auth_screen.dart';
 import 'package:dak_louk/ui/widgets/common/merchant_app_bar.dart';
-import 'package:dak_louk/ui/widgets/screens/user/merchant_profile/merchant_profile_tabs.dart';
 import 'package:flutter/material.dart';
-import 'package:dak_louk/ui/widgets/common/appbar.dart';
 import 'package:dak_louk/ui/widgets/common/navbar.dart';
-import 'package:dak_louk/ui/widgets/screens/merchant/merchant_orders_screen.dart';
-import 'package:dak_louk/ui/widgets/screens/merchant/merchant_products_screen.dart';
-import 'package:dak_louk/ui/widgets/screens/merchant/merchant_posts_screen.dart';
-import 'package:dak_louk/ui/widgets/screens/merchant/merchant_live_screen.dart';
-import 'package:dak_louk/ui/widgets/screens/merchant/merchant_chat_screen.dart';
+import 'package:dak_louk/ui/screens/merchant/merchant_orders_screen.dart';
+import 'package:dak_louk/ui/screens/merchant/merchant_products_screen.dart';
+import 'package:dak_louk/ui/screens/merchant/merchant_posts_screen.dart';
+import 'package:dak_louk/ui/screens/merchant/merchant_live_screen.dart';
+import 'package:dak_louk/ui/screens/merchant/merchant_chat_screen.dart';
 
 /// Scaffold for merchant tabs: Orders / Products / Posts / Live / Chat.
 class MerchantScaffold extends StatefulWidget {
