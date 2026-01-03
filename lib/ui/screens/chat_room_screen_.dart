@@ -1,6 +1,6 @@
 import 'package:dak_louk/domain/services/chat_room_service.dart';
 import 'package:dak_louk/domain/models/models.dart';
-import 'package:dak_louk/ui/widgets/screens/chatroom/chatroom_tile.dart';
+import 'package:dak_louk/ui/widgets/screens/user/chatroom/chatroom_tile.dart';
 import 'package:flutter/material.dart';
 
 class ChatRoomScreen extends StatelessWidget {

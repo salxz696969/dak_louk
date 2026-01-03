@@ -1,7 +1,9 @@
 import 'package:dak_louk/core/auth/app_session.dart';
+import 'package:dak_louk/core/enums/role_enum.dart';
 import 'package:dak_louk/ui/screens/auth_screen.dart';
+import 'package:dak_louk/ui/widgets/common/merchant_scaffold.dart';
+import 'package:dak_louk/ui/widgets/screens/user/user_scaffold.dart';
 import 'package:flutter/material.dart';
-import 'package:dak_louk/ui/widgets/common/base_scaffold.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -19,7 +21,9 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: AppSession.instance.isLoggedIn
-          ? const BaseScaffold()
+          ? AppSession.instance.role == Role.merchant
+                ? const MerchantScaffold()
+                : const UserScaffold()
           : const AuthScreen(),
     );
   }

@@ -1,5 +1,5 @@
 import 'package:dak_louk/domain/models/models.dart';
-import 'package:dak_louk/ui/widgets/screens/cart/quantity_chooser.dart';
+import 'package:dak_louk/ui/widgets/screens/user/cart/quantity_chooser.dart';
 import 'package:flutter/material.dart';
 
 class CartItem extends StatefulWidget {

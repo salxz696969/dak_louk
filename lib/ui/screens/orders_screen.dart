@@ -1,7 +1,7 @@
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/domain/services/order_service.dart';
 import 'package:dak_louk/ui/widgets/common/appbar.dart';
-import 'package:dak_louk/ui/widgets/screens/orders/order_item.dart';
+import 'package:dak_louk/ui/widgets/screens/user/orders/order_item.dart';
 import 'package:flutter/material.dart';
 
 class OrdersScreen extends StatefulWidget {

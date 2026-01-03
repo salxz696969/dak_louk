@@ -1,8 +1,8 @@
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/domain/services/order_service.dart';
 import 'package:dak_louk/ui/widgets/common/appbar.dart';
-import 'package:dak_louk/ui/widgets/screens/checkout/checkout_card.dart';
-import 'package:dak_louk/ui/widgets/screens/checkout/checkout_form.dart';
+import 'package:dak_louk/ui/widgets/screens/user/checkout/checkout_card.dart';
+import 'package:dak_louk/ui/widgets/screens/user/checkout/checkout_form.dart';
 import 'package:flutter/material.dart';
 
 class CheckoutScreen extends StatefulWidget {

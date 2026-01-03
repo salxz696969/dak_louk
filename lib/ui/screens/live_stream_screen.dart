@@ -1,6 +1,6 @@
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/domain/services/live_stream_service.dart';
-import 'package:dak_louk/ui/widgets/screens/livestream/live_stream.dart';
+import 'package:dak_louk/ui/widgets/screens/user/livestream/live_stream.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 

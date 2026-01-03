@@ -1,5 +1,5 @@
 import 'package:dak_louk/ui/widgets/common/appbar.dart';
-import 'package:dak_louk/ui/widgets/screens/chat/chat.dart';
+import 'package:dak_louk/ui/widgets/screens/user/chat/chat.dart';
 import 'package:flutter/material.dart';
 
 class ChatScreen extends StatelessWidget {

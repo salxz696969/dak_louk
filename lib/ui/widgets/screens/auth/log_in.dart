@@ -23,9 +23,6 @@ class _LogInState extends State<LogIn> {
           password: passwordController.text,
         ),
       );
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Login successful')));
     }
   }
 

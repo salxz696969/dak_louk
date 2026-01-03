@@ -7,18 +7,19 @@ import 'package:dak_louk/ui/screens/profile_screen.dart';
 import 'package:dak_louk/ui/screens/cart_screen.dart';
 import 'package:dak_louk/ui/widgets/common/appbar.dart';
 import 'package:dak_louk/ui/widgets/common/navbar.dart';
+import 'package:dak_louk/core/enums/tabs_enum.dart';
 
 /// Simple tab scaffold for Home / Chat / Live / Settings.
-class BaseScaffold extends StatefulWidget {
+class UserScaffold extends StatefulWidget {
   final int initialIndex;
 
-  const BaseScaffold({super.key, this.initialIndex = 0});
+  const UserScaffold({super.key, this.initialIndex = 0});
 
   @override
-  State<BaseScaffold> createState() => _BaseScaffoldState();
+  State<UserScaffold> createState() => _UserScaffoldState();
 }
 
-class _BaseScaffoldState extends State<BaseScaffold> {
+class _UserScaffoldState extends State<UserScaffold> {
   static const List<Widget> _tabs = [
     HomeScreen(),
     LiveStreamScreen(),
@@ -48,6 +49,9 @@ class _BaseScaffoldState extends State<BaseScaffold> {
       ),
       body: _tabs[_currentIndex],
       bottomNavigationBar: Navbar(
+        tabs: UserTabs.values
+            .map((tab) => NavBarItems(label: tab.label, icon: tab.icon))
+            .toList(),
         currentIndex: _currentIndex,
         onNavigate: (index) => setState(() => _currentIndex = index),
       ),

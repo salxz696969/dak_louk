@@ -1,25 +1,37 @@
 import 'package:flutter/material.dart';
-import 'package:dak_louk/core/enums/tabs_enum.dart';
+
+class NavBarItems {
+  final String label;
+  final IconData icon;
+
+  const NavBarItems({required this.label, required this.icon});
+}
 
 class Navbar extends StatelessWidget {
   final ValueChanged<int> onNavigate;
   final int currentIndex;
+  final List<NavBarItems> tabs;
 
   const Navbar({
     super.key,
     required this.onNavigate,
     required this.currentIndex,
+    required this.tabs,
   });
 
   @override
   Widget build(BuildContext context) {
-    final tabs = Tabs.values;
 
     return BottomAppBar(
       color: Theme.of(context).colorScheme.primary,
       height: 90,
       child: Padding(
-        padding: const EdgeInsets.only(left: 12.0, right: 12.0, top: 12.0, bottom: 0),
+        padding: const EdgeInsets.only(
+          left: 12.0,
+          right: 12.0,
+          top: 12.0,
+          bottom: 0,
+        ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: List.generate(tabs.length, (index) {

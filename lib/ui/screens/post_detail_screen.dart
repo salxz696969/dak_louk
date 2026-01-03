@@ -1,8 +1,8 @@
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/domain/services/post_service.dart';
 import 'package:dak_louk/ui/widgets/common/appbar.dart';
-import 'package:dak_louk/ui/widgets/screens/posts/post_item.dart';
-import 'package:dak_louk/ui/widgets/screens/posts/post_slider.dart';
+import 'package:dak_louk/ui/widgets/screens/user/posts/post_item.dart';
+import 'package:dak_louk/ui/widgets/screens/user/posts/post_slider.dart';
 import 'package:flutter/material.dart';
 
 class PostDetailScreen extends StatefulWidget {

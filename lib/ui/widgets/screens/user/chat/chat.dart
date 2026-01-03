@@ -1,6 +1,6 @@
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/domain/services/chat_service.dart';
-import 'package:dak_louk/ui/widgets/screens/chat/chat_input.dart';
+import 'package:dak_louk/ui/widgets/screens/user/chat/chat_input.dart';
 import 'package:flutter/material.dart';
 
 class Chat extends StatefulWidget {

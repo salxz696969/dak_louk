@@ -1,9 +1,9 @@
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/domain/services/user_service.dart';
-import 'package:dak_louk/ui/widgets/screens/profile/profile_info.dart';
-import 'package:dak_louk/ui/widgets/screens/profile/profile_liked_posts.dart';
-import 'package:dak_louk/ui/widgets/screens/profile/profile_saved_posts.dart';
-import 'package:dak_louk/ui/widgets/screens/profile/profile_tabs.dart';
+import 'package:dak_louk/ui/widgets/screens/user/profile/profile_info.dart';
+import 'package:dak_louk/ui/widgets/screens/user/profile/profile_liked_posts.dart';
+import 'package:dak_louk/ui/widgets/screens/user/profile/profile_saved_posts.dart';
+import 'package:dak_louk/ui/widgets/screens/user/profile/profile_tabs.dart';
 import 'package:flutter/material.dart';
 
 // (1) PROFILE TABS ENUM
@@ -60,9 +60,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         final user = userSnapshot.data!;
         return Column(
           children: [
-            // If you want to keep the AppBar, you may return it here, 
-            // otherwise remove the _ProfileAppBar if you want absolutely no AppBar!
-            // _ProfileAppBar(title: user.username), // Optionally include as a widget (not as AppBar)
             const SizedBox(height: 30),
             ProfileInfo(
               username: user.username,
@@ -70,10 +67,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               bio: user.bio,
             ),
             const SizedBox(height: 24),
-            ProfileTabs(
-              selectedTab: selectedTab,
-              onTabSelected: onTabSelected,
-            ),
+            ProfileTabs(selectedTab: selectedTab, onTabSelected: onTabSelected),
             const SizedBox(height: 16),
             Builder(
               builder: (context) {
@@ -90,7 +84,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       } else if (snapshot.hasError) {
                         return Padding(
                           padding: const EdgeInsets.all(32),
-                          child: Center(child: Text('Error: ${snapshot.error}')),
+                          child: Center(
+                            child: Text('Error: ${snapshot.error}'),
+                          ),
                         );
                       }
                       final likedPosts = snapshot.data ?? [];
@@ -109,7 +105,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       } else if (snapshot.hasError) {
                         return Padding(
                           padding: const EdgeInsets.all(32),
-                          child: Center(child: Text('Error: ${snapshot.error}')),
+                          child: Center(
+                            child: Text('Error: ${snapshot.error}'),
+                          ),
                         );
                       }
                       final savedPosts = snapshot.data ?? [];
