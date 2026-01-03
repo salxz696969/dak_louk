@@ -4,6 +4,7 @@ import 'package:dak_louk/core/utils/time_ago.dart' as time_ago;
 import 'package:dak_louk/data/repositories/chat_repo.dart';
 import 'package:dak_louk/data/repositories/chat_room_repo.dart';
 import 'package:dak_louk/data/repositories/merchant_repo.dart';
+import 'package:dak_louk/data/repositories/user_repo.dart';
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/core/utils/orm.dart';
 import 'package:dak_louk/data/tables/tables.dart';
@@ -12,6 +13,7 @@ class ChatRoomService {
   late final currentMerchantId;
   final ChatRoomRepository _chatRoomRepository = ChatRoomRepository();
   final MerchantRepository _merchantRepository = MerchantRepository();
+  final UserRepository _userRepository = UserRepository();
   final ChatRepository _chatRepository = ChatRepository();
   ChatRoomService() {
     if (AppSession.instance.isLoggedIn &&
@@ -26,7 +28,7 @@ class ChatRoomService {
   }
 
   // Migrated from ChatRoomDao.getAllChatRoomsByMerchantId
-  Future<List<ChatRoomVM?>> getAllChatRooms() async {
+  Future<List<MerchantChatRoomVM?>> getAllChatRooms() async {
     try {
       final statement = Clauses.where.eq(
         Tables.chatRooms.cols.merchantId,
@@ -37,13 +39,11 @@ class ChatRoomService {
         args: statement.args,
         limit: 50,
       );
-      final chatRoomsVM = <ChatRoomVM>[];
+      final chatRoomsVM = <MerchantChatRoomVM>[];
       if (chatRooms.isNotEmpty) {
         for (final chatRoom in chatRooms) {
-          final merchant = await _merchantRepository.getById(
-            chatRoom.merchantId,
-          );
-          if (merchant != null) {
+          final user = await _userRepository.getById(chatRoom.userId);
+          if (user != null) {
             final chatRoomChats = await _chatRepository.queryThisTable(
               where: Clauses.where
                   .eq(Tables.chats.cols.chatRoomId, chatRoom.id)
@@ -59,10 +59,10 @@ class ChatRoomService {
               final timeAgo = time_ago.timeAgo(latestChat.createdAt);
               final latestText = latestChat.text;
               chatRoomsVM.add(
-                ChatRoomVM.fromRaw(
+                MerchantChatRoomVM.fromRaw(
                   chatRoom,
-                  merchantName: merchant.username,
-                  merchantProfileImage: merchant.profileImage,
+                  buyerName: user.username, // Using user info for merchants
+                  buyerProfileImage: user.profileImageUrl ?? '',
                   timeAgo: timeAgo,
                   latestText: latestText,
                 ),

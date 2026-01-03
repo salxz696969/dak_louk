@@ -100,7 +100,7 @@ class ChatService {
   // }
 
   // Migrated from ChatDao.getChatByChatRoomId
-  Future<List<ChatVM>> getChatsByChatRoomId(int chatRoomId) async {
+  Future<List<MerchantChatVM>> getChatsByChatRoomId(int chatRoomId) async {
     try {
       final statement = Clauses.where.eq(
         Tables.chats.cols.chatRoomId,
@@ -115,9 +115,9 @@ class ChatService {
         // Populate user information for each chat
         final enrichedChats = await Future.wait(
           result.map((chat) async {
-            return ChatVM.fromRaw(
+            return MerchantChatVM.fromRaw(
               chat,
-              isMine: chat.senderId == AppSession.instance.userId,
+              isMine: chat.senderId == currentMerchantId,
             );
           }),
         );
@@ -126,11 +126,11 @@ class ChatService {
 
       // Return empty chat as in DAO
       return [
-        ChatVM.fromRaw(
+        MerchantChatVM.fromRaw(
           ChatModel(
             id: 0,
             chatRoomId: chatRoomId,
-            senderId: 0,
+            senderId: currentMerchantId,
             text: '',
             createdAt: DateTime.now(),
             updatedAt: DateTime.now(),
@@ -196,23 +196,23 @@ class ChatService {
 
   // Additional CRUD methods
 
-  Future<List<ChatVM>> getAllChats() async {
-    // Placeholder - implement later
-    throw UnimplementedError('getAllChats not implemented');
-  }
+  // Future<List<ChatVM>> getAllChats() async {
+  //   // Placeholder - implement later
+  //   throw UnimplementedError('getAllChats not implemented');
+  // }
 
-  Future<ChatVM?> getChatById(int id) async {
-    // Placeholder - implement later
-    throw UnimplementedError('getChatById not implemented');
-  }
+  // Future<ChatVM?> getChatById(int id) async {
+  //   // Placeholder - implement later
+  //   throw UnimplementedError('getChatById not implemented');
+  // }
 
-  Future<ChatVM?> updateChat(int id, UpdateChatDTO dto) async {
-    // Placeholder - implement later
-    throw UnimplementedError('updateChat not implemented');
-  }
+  // Future<ChatVM?> updateChat(int id, UpdateChatDTO dto) async {
+  //   // Placeholder - implement later
+  //   throw UnimplementedError('updateChat not implemented');
+  // }
 
-  Future<void> deleteChat(int id) async {
-    // Placeholder - implement later
-    throw UnimplementedError('deleteChat not implemented');
-  }
+  // Future<void> deleteChat(int id) async {
+  //   // Placeholder - implement later
+  //   throw UnimplementedError('deleteChat not implemented');
+  // }
 }

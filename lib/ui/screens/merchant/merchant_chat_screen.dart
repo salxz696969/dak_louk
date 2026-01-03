@@ -1,27 +1,25 @@
+import 'package:dak_louk/ui/widgets/merchant/chats/chat.dart';
+import 'package:dak_louk/ui/widgets/merchant/merchant_app_bar.dart';
 import 'package:flutter/material.dart';
 
 class MerchantChatScreen extends StatelessWidget {
-  const MerchantChatScreen({super.key});
+  final String targetUserName;
+  final int chatRoomId;
+
+  const MerchantChatScreen({
+    super.key,
+    required this.targetUserName,
+    required this.chatRoomId,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.chat_bubble_outline, size: 64, color: Colors.grey),
-          SizedBox(height: 16),
-          Text(
-            'Messages',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 8),
-          Text(
-            'Communicate with your customers here',
-            style: TextStyle(fontSize: 16, color: Colors.grey),
-          ),
-        ],
+    return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: MerchantAppBar(title: targetUserName),
       ),
+      body: MerchantChat(chatRoomId: chatRoomId),
     );
   }
 }
