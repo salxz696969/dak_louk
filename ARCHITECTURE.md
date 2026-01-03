@@ -29,12 +29,12 @@ The app uses **three types of models** for different purposes:
 
 ### 🔍 Raw Models (`lib/domain/models/raw/`)
 
-**Purpose**: Pure database representation
+**What they are**: The exact row from your database table - truthful representation of what's stored
 
-- **Fields**: Exactly match database table columns
-- **No logic**: Only data, no methods or getters
-- **Optional fields**: None - all fields required
-- **Example**: `UserModel`, `ProductModel`, `OrderModel`
+- **Fields**: Match database columns exactly, no more, no less
+- **Optional fields**: None - everything the DB requires
+- **Methods**: Zero - just pure data storage
+- **Like**: The source data from your database, unchanged
 
 ```dart
 class ProductModel extends Cacheable {
@@ -46,66 +46,58 @@ class ProductModel extends Cacheable {
   final int quantity;
   final DateTime createdAt;
   final DateTime updatedAt;
-
-  // No methods, just data
+  // No methods - just holds what the DB gives us
 }
 ```
 
 ### 🎨 View Models (`lib/domain/models/view_models/`)
 
-**Purpose**: UI-ready data with presentation logic
+**What they are**: What the UI needs to render, read-only - like what a web API would send to the frontend
 
-- **Fields**: Flattened and UI-optimized
-- **Business logic**: Getters, computed properties
-- **Optional fields**: Many fields can be null for flexibility
-- **Composition**: May contain other VMs or be flat
-- **Example**: `PostVM`, `CartVM`, `OrderVM`
+- **Fields**: Flattened and UI-friendly, may combine multiple sources
+- **Optional fields**: Many can be null for flexibility
+- **Business logic**: Getters and computed properties for display
+- **Composition**: May contain other VMs or stay flat
+- **Like**: The final JSON a web API sends to display in the browser
 
 ```dart
 class PostVM extends Cacheable {
-  final PostMerchantVM merchant;    // Nested VM
-  final List<PostProductVM> products; // List of VMs
-  final int likesCount;             // Computed field
-  final bool isLiked;               // UI state
+  final PostMerchantVM merchant;    // Nested for UI convenience
+  final List<PostProductVM> products; // Easy to loop in UI
+  final int likesCount;             // Pre-computed for display
+  final bool isLiked;               // UI state for heart icon
 
-  // Business logic methods
-  bool get isPopular => likesCount > 100;
+  bool get isPopular => likesCount > 100; // UI logic
 }
 ```
 
 ### 📤 DTOs (`lib/domain/models/dto/`)
 
-**Purpose**: Data Transfer Objects for operations
+**What they are**: The data your API needs for create/update operations - input contracts
 
-- **Fields**: Only what APIs need
-- **No logic**: Pure data containers
-- **Validation**: Input validation ready
+- **Fields**: Only what the operation requires, nothing extra
+- **Optional fields**: Based on what's required vs optional for the operation
+- **Validation ready**: Perfect for form validation and API input
 - **Types**: `Create<Entity>DTO`, `Update<Entity>DTO`
-- **Example**: `CreateProductDTO`, `UpdateOrderDTO`
+- **Like**: The JSON payload your API expects in POST/PUT requests
 
 ```dart
 class CreateProductDTO {
-  final String name;
-  final String? description; // Optional for creation
-  final double price;
-  final int quantity;
-
-  // No methods, just data
+  final String name;           // Required for creation
+  final String? description;   // Optional for creation
+  final double price;          // Required
+  final int quantity;          // Required
+  // Only the fields needed to create a product
 }
 ```
 
-### Why Three Types?
+### Why This Separation Makes Sense
 
-1. **Raw Models** = Database truth
-2. **View Models** = UI presentation layer
-3. **DTOs** = API contracts
+- **Raw Models** = Your database's truth, never changes
+- **View Models** = Your UI's language, optimized for display
+- **DTOs** = Your API's contracts, validated input/output
 
-This separation allows:
-
-- **Database changes** without affecting UI
-- **UI changes** without affecting database
-- **API changes** without affecting business logic
-- **Easy testing** of each layer independently
+This means you can change your database schema without breaking the UI, update the UI without touching the database, and modify APIs without affecting business logic.
 
 ## 🔧 Services Layer
 
@@ -173,21 +165,35 @@ Clauses.where.eq(Tables.products.cols.merchantId, merchantId)
 
 ### Repository Pattern (`lib/data/repositories/`)
 
-Each entity has a repository with CRUD operations:
+Uses a generic `BaseRepository<T>` that handles most CRUD operations automatically:
+
+**Base Repository Methods** (ready to use):
+
+- `getById(int id)` - Get single record
+- `getAll()` - Get all records
+- `insert(T model)` - Create new record
+- `update(T model)` - Update existing record
+- `delete(int id)` - Delete record
+- `queryThisTable()` - Custom queries with filtering
+
+**What you implement per repository**:
 
 ```dart
 class ProductRepository extends BaseRepository<ProductModel> {
+  // Just these two methods - BaseRepository handles the rest!
   @override
   ProductModel fromMap(Map<String, dynamic> map) {
-    return ProductModel(/* map to object */);
+    return ProductModel(/* convert DB map to object */);
   }
 
   @override
   Map<String, dynamic> toMap(ProductModel model) {
-    return {/* object to map */};
+    return {/* convert object to DB map */};
   }
 }
 ```
+
+The BaseRepository uses generics so you can focus on just the data conversion logic.
 
 ## 🎯 Current Implementation Status
 
@@ -197,16 +203,26 @@ class ProductRepository extends BaseRepository<ProductModel> {
 - **User Side**: Full CRUD for products, posts, cart, orders
 - **Database Schema**: Complete SQLite setup with all tables
 - **UI Components**: Reusable widgets for products, posts, cart
+- **Architecture**: Clean layered structure with proper separation
 
-### 🚧 **Merchant Side** (Placeholders)
+### 🚧 **Current Focus: Merchant Side**
 
-- **Services**: Basic structure with placeholder implementations
-- **UI Screens**: Empty placeholder screens
-- **Integration**: Ready for implementation
+- **Services**: Structure ready, placeholder implementations
+- **UI Screens**: Placeholder screens created
+- **Next Steps**: Implement service methods and build UI to display merchant data
+- **Goal**: Complete the merchant dashboard and management features
 
 ### 🔄 **How to Add New Features**
 
-#### 1. **Add a New Entity** (e.g., Reviews)
+For new features, follow the same pattern:
+
+1. **If you need new tables**: Create new table columns, raw models, and repositories
+2. **For the current merchant side**: Repositories and models are already built - just implement the service methods and create the view models that services should return
+3. **UI**: Build screens that catch and render the service data nicely
+
+The architecture is designed to grow - when you need something new, you know exactly where it goes and how it connects.
+
+#### Adding a New Entity (when needed)
 
 **Step 1: Create Raw Model**
 
@@ -319,6 +335,37 @@ class ReviewsScreen extends StatelessWidget {
   }
 }
 ```
+
+## 💾 **Cache System**
+
+The app uses a Redis-style in-memory cache for performance:
+
+### How It Works
+
+- **Cacheable Objects**: All models extend `Cacheable` for cache support
+- **Automatic Caching**: Database results and service view models get cached automatically
+- **Key-Value Storage**: Simple key-value pairs like Redis
+- **TTL Support**: Cache entries can expire (not fully implemented in services yet)
+
+### Cache Layers
+
+1. **Database Cache**: Raw query results from repositories
+2. **Service Cache**: Processed view models from services (planned)
+3. **UI Cache**: Widget-level caching for expensive operations
+
+### Usage Example
+
+```dart
+// Automatic caching happens behind the scenes
+final products = await _productRepository.queryThisTable();
+// Results are cached for future calls
+
+// Service layer can cache view models too
+final productVMs = await _productService.getAllProducts();
+// This could cache the processed view models
+```
+
+The cache system prevents redundant database calls and speeds up repeated operations, just like how Redis caches web app data.
 
 ## 🚀 **Key Benefits**
 
