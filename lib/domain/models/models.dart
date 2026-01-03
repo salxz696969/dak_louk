@@ -51,6 +51,7 @@ part 'view_models/user/profile/user_profile_liked_saved_posts_vm.dart';
 part 'view_models/user/live_stream_products_vm.dart';
 part 'view_models/merchant/merchant_chat_room_vm.dart';
 part 'view_models/merchant/merchant_chat_vm.dart';
+part 'view_models/merchant/merchant_live_streams_vm.dart';
 
 part 'dto/user/cart_dto.dart';
 part 'dto/merchant/product_dto.dart';

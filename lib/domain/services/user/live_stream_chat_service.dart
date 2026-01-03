@@ -66,8 +66,8 @@ class LiveStreamChatService {
         text: dto.text,
         userId: currentUserId,
         liveStreamId: dto.liveStreamId,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
+        createdAt: DateTime.now().toIso8601String(),
+        updatedAt: DateTime.now().toIso8601String(),
       );
       final id = await _liveStreamChatRepository.insert(chatModel);
       if (id > 0) {

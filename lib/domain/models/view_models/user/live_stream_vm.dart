@@ -7,8 +7,8 @@ class LiveStreamVM extends Cacheable {
   final String streamUrl;
   final String? thumbnailUrl;
   final int viewCount;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+  final String createdAt;
+  final String updatedAt;
 
   // Related primitive data
   final String? merchantName;

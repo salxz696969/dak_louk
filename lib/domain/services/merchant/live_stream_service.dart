@@ -24,20 +24,36 @@ class LiveStreamService {
     }
   }
 
-  Future<LiveStreamVM> getLiveStreamById(int id) async {
+  Future<List<MerchantLiveStreamsVM>> getAllLiveStreams() async {
+    try {
+      final statement = Clauses.where.eq(
+        Tables.liveStreams.cols.merchantId,
+        currentMerchantId,
+      );
+      final liveStreams = await _liveStreamRepository.queryThisTable(
+        where: statement.clause,
+        args: statement.args,
+        orderBy: Clauses.orderBy.desc(Tables.liveStreams.cols.createdAt).clause,
+      );
+      return liveStreams
+          .map((stream) => MerchantLiveStreamsVM.fromRaw(stream))
+          .toList();
+    } catch (e) {
+      throw AppError(
+        type: ErrorType.DB_ERROR,
+        message: 'Failed to get all live streams',
+      );
+    }
+  }
+
+  Future<MerchantLiveStreamsVM?> getLiveStreamById(int id) async {
     try {
       final liveStream = await _liveStreamRepository.getById(id);
-      if (liveStream != null) {
-        return LiveStreamVM.fromRaw(liveStream);
+      if (liveStream != null && liveStream.merchantId == currentMerchantId) {
+        return MerchantLiveStreamsVM.fromRaw(liveStream);
       }
-      throw AppError(
-        type: ErrorType.NOT_FOUND,
-        message: 'Live stream not found',
-      );
+      return null;
     } catch (e) {
-      if (e is AppError) {
-        rethrow;
-      }
       throw AppError(
         type: ErrorType.DB_ERROR,
         message: 'Failed to get live stream',
@@ -46,7 +62,9 @@ class LiveStreamService {
   }
 
   // Basic CRUD operations
-  Future<LiveStreamVM?> createLiveStream(CreateLiveStreamDTO dto) async {
+  Future<MerchantLiveStreamsVM?> createLiveStream(
+    CreateLiveStreamDTO dto,
+  ) async {
     try {
       final liveStreamModel = LiveStreamModel(
         id: 0,
@@ -54,14 +72,14 @@ class LiveStreamService {
         title: dto.title,
         streamUrl: dto.streamUrl,
         thumbnailUrl: dto.thumbnailUrl,
-        viewCount: dto.viewCount,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
+        viewCount: 0,
+        createdAt: DateTime.now().toIso8601String(),
+        updatedAt: DateTime.now().toIso8601String(),
       );
       final id = await _liveStreamRepository.insert(liveStreamModel);
       final newLiveStream = await _liveStreamRepository.getById(id);
       if (newLiveStream != null) {
-        return LiveStreamVM.fromRaw(newLiveStream);
+        return MerchantLiveStreamsVM.fromRaw(newLiveStream);
       }
       throw AppError(
         type: ErrorType.NOT_FOUND,
@@ -78,20 +96,14 @@ class LiveStreamService {
     }
   }
 
-  Future<LiveStreamVM?> updateLiveStream(
+  Future<MerchantLiveStreamsVM?> updateLiveStream(
     int id,
     UpdateLiveStreamDTO dto,
   ) async {
     try {
       final liveStream = await _liveStreamRepository.getById(id);
-      if (liveStream == null) {
-        throw AppError(
-          type: ErrorType.NOT_FOUND,
-          message: 'Live stream not found',
-        );
-      }
-      if (liveStream.merchantId != currentMerchantId) {
-        throw AppError(type: ErrorType.UNAUTHORIZED, message: 'Unauthorized');
+      if (liveStream == null || liveStream.merchantId != currentMerchantId) {
+        return null;
       }
       final liveStreamModel = LiveStreamModel(
         id: id,
@@ -99,14 +111,14 @@ class LiveStreamService {
         title: dto.title ?? liveStream.title,
         streamUrl: dto.streamUrl ?? liveStream.streamUrl,
         thumbnailUrl: dto.thumbnailUrl ?? liveStream.thumbnailUrl,
-        viewCount: dto.viewCount ?? liveStream.viewCount,
+        viewCount: liveStream.viewCount,
         createdAt: liveStream.createdAt,
-        updatedAt: DateTime.now(),
+        updatedAt: DateTime.now().toIso8601String(),
       );
       await _liveStreamRepository.update(liveStreamModel);
       final newLiveStream = await _liveStreamRepository.getById(id);
       if (newLiveStream != null) {
-        return LiveStreamVM.fromRaw(newLiveStream);
+        return MerchantLiveStreamsVM.fromRaw(newLiveStream);
       }
       throw AppError(
         type: ErrorType.NOT_FOUND,
