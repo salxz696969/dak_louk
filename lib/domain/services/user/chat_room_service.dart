@@ -26,6 +26,8 @@ class ChatRoomService {
     }
   }
 
+  // ! not used in ui, but should be when theres no seeded data, should happen when we click the message icon oin a post or 
+  // ! merchant profile, if the getChatsByChatroom id or by merchant id create the chatroom
   // Migrated from ChatRoomDao.insertChatRoom
   Future<int> createChatRoom(CreateChatRoomDTO dto) async {
     try {

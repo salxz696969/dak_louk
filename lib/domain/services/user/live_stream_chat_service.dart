@@ -14,10 +14,12 @@ class LiveStreamChatService {
   final UserRepository _userRepository = UserRepository();
   final Cache _cache = Cache();
   late final String _baseCacheKey;
+  late final String merchantSideCacheKeyPattern;
   LiveStreamChatService() {
     if (AppSession.instance.isLoggedIn) {
       currentUserId = AppSession.instance.userId;
       _baseCacheKey = 'service:user:$currentUserId:live_stream_chat';
+      merchantSideCacheKeyPattern = 'service:merchant:*:live_stream:*';
     } else {
       throw AppError(type: ErrorType.UNAUTHORIZED, message: 'Unauthorized');
     }
@@ -97,6 +99,7 @@ class LiveStreamChatService {
             _cache.del(
               '$_baseCacheKey:getAllLiveStreamChatByLiveStreamId:${dto.liveStreamId}',
             );
+            _cache.delByPattern(merchantSideCacheKeyPattern);
             return LiveStreamChatVM.fromRaw(
               newChat,
               username: user.username,

@@ -26,11 +26,13 @@ class OrderService {
   final UserRepository _userRepository = UserRepository();
   final Cache _cache = Cache();
   late final String _baseCacheKey;
+  late final String merchantSideCacheKeyPattern;
 
   OrderService() {
     if (AppSession.instance.isLoggedIn) {
       currentUserId = AppSession.instance.userId;
       _baseCacheKey = 'service:user:$currentUserId:order';
+      merchantSideCacheKeyPattern = 'service:merchant:*:order:*';
     } else {
       throw AppError(type: ErrorType.UNAUTHORIZED, message: 'Unauthorized');
     }
@@ -182,5 +184,6 @@ class OrderService {
 
     // Invalidate cache
     _cache.del('$_baseCacheKey:getAllOrders');
+    _cache.delByPattern(merchantSideCacheKeyPattern);
   }
 }

@@ -11,11 +11,13 @@ class ChatService {
   final Cache _cache = Cache();
   late final currentUserId;
   late final String _baseCacheKey;
+  late final String merchantSideCacheKeyPattern;
 
   ChatService() {
     if (AppSession.instance.isLoggedIn) {
       currentUserId = AppSession.instance.userId;
       _baseCacheKey = 'service:user:$currentUserId:chat';
+      merchantSideCacheKeyPattern = 'service:merchant:*:chat:*';
     } else {
       throw AppError(type: ErrorType.UNAUTHORIZED, message: 'Unauthorized');
     }
@@ -37,6 +39,7 @@ class ChatService {
         if (newChat != null) {
           // Invalidate cache for this chat room
           _cache.del('$_baseCacheKey:getChatsByChatRoomId:${dto.chatRoomId}');
+          _cache.delByPattern(merchantSideCacheKeyPattern);
           return ChatVM.fromRaw(newChat, isMine: true);
         }
         throw AppError(type: ErrorType.NOT_FOUND, message: 'Chat not found');
