@@ -1,7 +1,6 @@
 import 'package:dak_louk/domain/services/user/post_service.dart';
 import 'package:dak_louk/ui/widgets/user/posts/category_bar.dart';
 import 'package:dak_louk/ui/widgets/user/posts/post_item.dart';
-import 'package:dak_louk/ui/widgets/user/posts/product_item.dart';
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:flutter/material.dart';
 

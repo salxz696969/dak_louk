@@ -91,20 +91,24 @@ class UserService {
       final userLikedPosts = <UserProfileLikedSavedPostsVM>[];
       for (final like in likedPosts) {
         final post = await _postRepository.getById(like.postId);
-        final media = await _promoMediaRepository.queryThisTable(
-          where: Clauses.where
-              .eq(Tables.promoMedias.cols.postId, post!.id)
-              .clause,
-          args: Clauses.where.eq(Tables.promoMedias.cols.postId, post.id).args,
-        );
-        if (post != null && media.isNotEmpty) {
-          userLikedPosts.add(
-            UserProfileLikedSavedPostsVM(
-              id: post.id,
-              caption: post.caption ?? '',
-              imageUrl: media.first.url,
-            ),
+        if (post != null) {
+          final media = await _promoMediaRepository.queryThisTable(
+            where: Clauses.where
+                .eq(Tables.promoMedias.cols.postId, post.id)
+                .clause,
+            args: Clauses.where
+                .eq(Tables.promoMedias.cols.postId, post.id)
+                .args,
           );
+          if (media.isNotEmpty) {
+            userLikedPosts.add(
+              UserProfileLikedSavedPostsVM(
+                id: post.id,
+                caption: post.caption ?? '',
+                imageUrl: media.first.url,
+              ),
+            );
+          }
         }
       }
       return userLikedPosts;
@@ -127,20 +131,25 @@ class UserService {
       final userSavedPosts = <UserProfileLikedSavedPostsVM>[];
       for (final save in savedPosts) {
         final post = await _postRepository.getById(save.postId);
-        final media = await _promoMediaRepository.queryThisTable(
-          where: Clauses.where
-              .eq(Tables.promoMedias.cols.postId, post!.id)
-              .clause,
-          args: Clauses.where.eq(Tables.promoMedias.cols.postId, post.id).args,
-        );
-        if (post != null && media.isNotEmpty) {
-          userSavedPosts.add(
-            UserProfileLikedSavedPostsVM(
-              id: post.id,
-              caption: post.caption ?? '',
-              imageUrl: media.first.url,
-            ),
+        if (post != null) {
+          final media = await _promoMediaRepository.queryThisTable(
+            where: Clauses.where
+                .eq(Tables.promoMedias.cols.postId, post.id)
+                .clause,
+            args: Clauses.where
+                .eq(Tables.promoMedias.cols.postId, post.id)
+                .args,
           );
+
+          if (media.isNotEmpty) {
+            userSavedPosts.add(
+              UserProfileLikedSavedPostsVM(
+                id: post.id,
+                caption: post.caption ?? '',
+                imageUrl: media.first.url,
+              ),
+            );
+          }
         }
       }
       return userSavedPosts;

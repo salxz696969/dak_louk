@@ -760,7 +760,7 @@ Future<void> insertMockData(Database db) async {
 
   // 1️⃣4️⃣ CHAT_ROOMS (private conversations)
   for (int i = 1; i <= 100; i++) {
-    final userId = rand.nextInt(50) + 51; // Regular user
+    // final userId = rand.nextInt(50) + 51; // Regular user
     final merchantId = rand.nextInt(50) + 1; // Merchant
 
     try {
