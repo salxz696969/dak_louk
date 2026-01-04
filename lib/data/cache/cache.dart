@@ -1,3 +1,4 @@
+import 'package:dak_louk/core/utils/error.dart';
 import 'package:dak_louk/domain/models/models.dart';
 
 // cache value is a wrapper class to wrap single and many, it has methods like single and many for the usage of the result of the get method
@@ -91,5 +92,47 @@ class Cache implements CacheInterface {
   @override
   int getSize() {
     return _cache.length;
+  }
+
+  // helper
+  // copied from base repo
+  // these are of type cacheable and not T like in base repo
+  // becuase it can return whatever (that is cacheble ) its dumber not tied to the class type
+  // used only in service layer to cache VMs
+
+   List<Cacheable> expectMany(CacheValue? value) {
+    if (value == null) {
+      throw AppError(
+        type: ErrorType.CACHE_ERROR,
+        message: 'Expected list cache',
+      );
+    }
+    final many = value.many;
+    if (many == null) {
+      throw AppError(
+        type: ErrorType.CACHE_ERROR,
+        message: 'Expected list cache',
+      );
+    }
+    return many.cast<Cacheable>();
+  }
+
+  Cacheable expectSingle(CacheValue? value) {
+    if (value == null) {
+      throw AppError(
+        type: ErrorType.CACHE_ERROR,
+        message: 'Expected single cache but got null',
+      );
+    }
+
+    final singleValue = value.single;
+    if (singleValue == null) {
+      throw AppError(
+        type: ErrorType.CACHE_ERROR,
+        message: 'Expected single cache but got ${value.runtimeType}',
+      );
+    }
+
+    return singleValue;
   }
 }

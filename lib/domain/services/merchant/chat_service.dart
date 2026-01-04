@@ -1,19 +1,21 @@
 import 'package:dak_louk/data/repositories/chat_repo.dart';
 import 'package:dak_louk/core/auth/app_session.dart';
 import 'package:dak_louk/core/utils/error.dart';
-import 'package:dak_louk/data/repositories/chat_room_repo.dart';
+import 'package:dak_louk/data/cache/cache.dart';
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/core/utils/orm.dart';
 import 'package:dak_louk/data/tables/tables.dart';
 
 class ChatService {
   final ChatRepository _chatRepository = ChatRepository();
-  final ChatRoomRepository _chatRoomRepository = ChatRoomRepository();
+  final Cache _cache = Cache();
   late final currentMerchantId;
+  late final String _baseCacheKey;
   ChatService() {
     if (AppSession.instance.isLoggedIn &&
         AppSession.instance.merchantId != null) {
       currentMerchantId = AppSession.instance.merchantId;
+      _baseCacheKey = 'service:merchant:$currentMerchantId:chat';
     } else {
       throw AppError(
         type: ErrorType.UNAUTHORIZED,
@@ -102,6 +104,12 @@ class ChatService {
   // Migrated from ChatDao.getChatByChatRoomId
   Future<List<MerchantChatVM>> getChatsByChatRoomId(int chatRoomId) async {
     try {
+      final cacheKey = '$_baseCacheKey:getChatsByChatRoomId:$chatRoomId';
+      if (_cache.exists(cacheKey)) {
+        final cached = _cache.get(cacheKey);
+        return _cache.expectMany(cached).cast<MerchantChatVM>().toList();
+      }
+
       final statement = Clauses.where.eq(
         Tables.chats.cols.chatRoomId,
         chatRoomId,
@@ -111,35 +119,46 @@ class ChatService {
         args: statement.args,
       );
 
+      final enrichedChats = <MerchantChatVM>[];
       if (result.isNotEmpty) {
         // Populate user information for each chat
-        final enrichedChats = await Future.wait(
-          result.map((chat) async {
-            return MerchantChatVM.fromRaw(
-              chat,
-              isMine: chat.senderId == currentMerchantId,
-            );
-          }),
+        enrichedChats.addAll(
+          await Future.wait(
+            result.map((chat) async {
+              return MerchantChatVM.fromRaw(
+                chat,
+                isMine: chat.senderId == currentMerchantId,
+              );
+            }),
+          ),
         );
-        return enrichedChats;
+      } else {
+        // Return empty chat as in DAO
+        enrichedChats.add(
+          MerchantChatVM.fromRaw(
+            ChatModel(
+              id: 0,
+              chatRoomId: chatRoomId,
+              senderId: currentMerchantId,
+              text: '',
+              createdAt: DateTime.now().toIso8601String(),
+              updatedAt: DateTime.now().toIso8601String(),
+            ),
+            isMine: false,
+          ),
+        );
       }
 
-      // Return empty chat as in DAO
-      return [
-        MerchantChatVM.fromRaw(
-          ChatModel(
-            id: 0,
-            chatRoomId: chatRoomId,
-            senderId: currentMerchantId,
-            text: '',
-            createdAt: DateTime.now().toIso8601String(),
-            updatedAt: DateTime.now().toIso8601String(),
-          ),
-          isMine: false,
-        ),
-      ];
+      _cache.set(cacheKey, Many(enrichedChats));
+      return enrichedChats;
     } catch (e) {
-      rethrow;
+      if (e is AppError) {
+        rethrow;
+      }
+      throw AppError(
+        type: ErrorType.DB_ERROR,
+        message: 'Failed to get chats by chat room id',
+      );
     }
   }
 

@@ -8,6 +8,7 @@ import 'package:dak_louk/data/tables/tables.dart';
 import 'package:dak_louk/core/auth/app_session.dart';
 import 'package:dak_louk/core/utils/error.dart';
 import 'package:dak_louk/domain/services/user/user_service.dart';
+import 'package:dak_louk/data/cache/cache.dart';
 
 class OrderService {
   late final currentMerchantId;
@@ -17,11 +18,14 @@ class OrderService {
   final ProductRepository _productRepository = ProductRepository();
   final ProductMediaRepository _productMediaRepository =
       ProductMediaRepository();
+  final Cache _cache = Cache();
+  late final String _baseCacheKey;
 
   OrderService() {
     if (AppSession.instance.isLoggedIn &&
         AppSession.instance.merchantId != null) {
       currentMerchantId = AppSession.instance.merchantId;
+      _baseCacheKey = 'service:merchant:$currentMerchantId:order';
     } else {
       throw AppError(
         type: ErrorType.UNAUTHORIZED,
@@ -34,6 +38,12 @@ class OrderService {
 
   Future<List<OrderMerchantVM>> getAllOrders() async {
     try {
+      final cacheKey = '$_baseCacheKey:getAllOrders';
+      if (_cache.exists(cacheKey)) {
+        final cached = _cache.get(cacheKey);
+        return _cache.expectMany(cached).cast<OrderMerchantVM>().toList();
+      }
+
       final statement = Clauses.where
           .eq(Tables.orders.cols.merchantId, currentMerchantId)
           .and([
@@ -118,8 +128,9 @@ class OrderService {
         }
       }
 
+      _cache.set(cacheKey, Many(enrichedOrders));
       return enrichedOrders;
-    } catch (e, stack) {
+    } catch (e) {
       if (e is AppError) {
         rethrow;
       }

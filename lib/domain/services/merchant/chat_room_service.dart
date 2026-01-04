@@ -1,9 +1,9 @@
 import 'package:dak_louk/core/auth/app_session.dart';
 import 'package:dak_louk/core/utils/error.dart';
 import 'package:dak_louk/core/utils/time_ago.dart' as time_ago;
+import 'package:dak_louk/data/cache/cache.dart';
 import 'package:dak_louk/data/repositories/chat_repo.dart';
 import 'package:dak_louk/data/repositories/chat_room_repo.dart';
-import 'package:dak_louk/data/repositories/merchant_repo.dart';
 import 'package:dak_louk/data/repositories/user_repo.dart';
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/core/utils/orm.dart';
@@ -12,13 +12,15 @@ import 'package:dak_louk/data/tables/tables.dart';
 class ChatRoomService {
   late final currentMerchantId;
   final ChatRoomRepository _chatRoomRepository = ChatRoomRepository();
-  final MerchantRepository _merchantRepository = MerchantRepository();
   final UserRepository _userRepository = UserRepository();
   final ChatRepository _chatRepository = ChatRepository();
+  final Cache _cache = Cache();
+  late final String _baseCacheKey;
   ChatRoomService() {
     if (AppSession.instance.isLoggedIn &&
         AppSession.instance.merchantId != null) {
       currentMerchantId = AppSession.instance.merchantId;
+      _baseCacheKey = 'service:merchant:$currentMerchantId:chat_room';
     } else {
       throw AppError(
         type: ErrorType.UNAUTHORIZED,
@@ -30,6 +32,11 @@ class ChatRoomService {
   // Migrated from ChatRoomDao.getAllChatRoomsByMerchantId
   Future<List<MerchantChatRoomVM?>> getAllChatRooms() async {
     try {
+      final cacheKey = '$_baseCacheKey:getAllChatRooms';
+      if (_cache.exists(cacheKey)) {
+        final cached = _cache.get(cacheKey);
+        return _cache.expectMany(cached).cast<MerchantChatRoomVM>().toList();
+      }
       final statement = Clauses.where.eq(
         Tables.chatRooms.cols.merchantId,
         currentMerchantId,
@@ -56,7 +63,9 @@ class ChatRoomService {
             );
             if (chatRoomChats.isNotEmpty) {
               final latestChat = chatRoomChats.first;
-              final timeAgo = time_ago.timeAgo(DateTime.parse(latestChat.createdAt));
+              final timeAgo = time_ago.timeAgo(
+                DateTime.parse(latestChat.createdAt),
+              );
               final latestText = latestChat.text;
               chatRoomsVM.add(
                 MerchantChatRoomVM.fromRaw(
@@ -71,6 +80,7 @@ class ChatRoomService {
           }
         }
       }
+      _cache.set(cacheKey, Many(chatRoomsVM));
       return chatRoomsVM;
     } catch (e) {
       if (e is AppError) {

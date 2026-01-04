@@ -6,6 +6,7 @@ import 'package:dak_louk/data/repositories/merchant_repo.dart';
 import 'package:dak_louk/data/repositories/product_media_repo.dart';
 import 'package:dak_louk/data/repositories/product_repo.dart';
 import 'package:dak_louk/data/repositories/user_repo.dart';
+import 'package:dak_louk/data/cache/cache.dart';
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/core/utils/orm.dart';
 import 'package:dak_louk/data/tables/tables.dart';
@@ -23,9 +24,13 @@ class OrderService {
   final ProductMediaRepository _productMediaRepository =
       ProductMediaRepository();
   final UserRepository _userRepository = UserRepository();
+  final Cache _cache = Cache();
+  late final String _baseCacheKey;
+
   OrderService() {
     if (AppSession.instance.isLoggedIn) {
       currentUserId = AppSession.instance.userId;
+      _baseCacheKey = 'service:user:$currentUserId:order';
     } else {
       throw AppError(type: ErrorType.UNAUTHORIZED, message: 'Unauthorized');
     }
@@ -34,6 +39,12 @@ class OrderService {
   // Business logic methods migrated from ProductProgressRepository
   Future<List<OrderVM>> getAllOrders() async {
     try {
+      final cacheKey = '$_baseCacheKey:getAllOrders';
+      if (_cache.exists(cacheKey)) {
+        final cached = _cache.get(cacheKey);
+        return _cache.expectMany(cached).cast<OrderVM>().toList();
+      }
+
       final statement = Clauses.where.eq(
         Tables.orders.cols.userId,
         currentUserId,
@@ -102,7 +113,8 @@ class OrderService {
           final orderVM = OrderVM.fromRaw(
             order,
             username: 'placeholder name',
-            userProfileImage: user?.profileImageUrl ?? 'assets/images/coffee1.png',
+            userProfileImage:
+                user?.profileImageUrl ?? 'assets/images/coffee1.png',
             merchantName: merchant?.username ?? '',
             merchantProfileImage: merchant?.profileImage ?? '',
             products: orderProductsVM,
@@ -114,8 +126,9 @@ class OrderService {
         }
       }
 
+      _cache.set(cacheKey, Many(enrichedOrders));
       return enrichedOrders;
-    } catch (e, stack) {
+    } catch (e) {
       if (e is AppError) {
         rethrow;
       }

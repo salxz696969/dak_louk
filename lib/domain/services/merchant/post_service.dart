@@ -2,6 +2,7 @@ import 'package:dak_louk/core/auth/app_session.dart';
 import 'package:dak_louk/core/enums/media_type_enum.dart';
 import 'package:dak_louk/core/media/media_model.dart';
 import 'package:dak_louk/core/utils/error.dart';
+import 'package:dak_louk/data/cache/cache.dart';
 import 'package:dak_louk/data/repositories/cart_repo.dart';
 import 'package:dak_louk/data/repositories/merchant_repo.dart';
 import 'package:dak_louk/data/repositories/product_repo.dart';
@@ -34,12 +35,15 @@ class PostService {
   final ProductCategoryMapsRepository _productCategoryMapsRepository =
       ProductCategoryMapsRepository();
   final CartRepository _cartRepository = CartRepository();
+  final Cache _cache = Cache();
+  late final String _baseCacheKey;
 
   // Business logic methods migrated from PostRepository
   PostService() {
     if (AppSession.instance.isLoggedIn &&
         AppSession.instance.merchantId != null) {
       currentMerchantId = AppSession.instance.merchantId;
+      _baseCacheKey = 'service:merchant:$currentMerchantId:post';
     } else {
       throw AppError(
         type: ErrorType.UNAUTHORIZED,
@@ -241,6 +245,13 @@ class PostService {
     int limit = 100,
   }) async {
     try {
+      final cacheKey =
+          '$_baseCacheKey:getAllPostsForCurrentMerchant:$category:$limit';
+      if (_cache.exists(cacheKey)) {
+        final cached = _cache.get(cacheKey);
+        return _cache.expectMany(cached).cast<PostVM>().toList();
+      }
+
       if (limit <= 0) limit = 100;
 
       List<PostModel> posts;
@@ -420,6 +431,7 @@ class PostService {
         }),
       );
 
+      _cache.set(cacheKey, Many(enrichedPosts));
       return enrichedPosts;
     } catch (e) {
       if (e is AppError) {

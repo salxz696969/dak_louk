@@ -2,6 +2,7 @@ import 'package:dak_louk/core/auth/app_session.dart';
 import 'package:dak_louk/core/utils/error.dart';
 import 'package:dak_louk/data/repositories/product_repo.dart';
 import 'package:dak_louk/data/repositories/product_media_repo.dart';
+import 'package:dak_louk/data/cache/cache.dart';
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/core/utils/orm.dart';
 import 'package:dak_louk/data/tables/tables.dart';
@@ -11,11 +12,14 @@ class ProductService {
   final ProductRepository _productRepository = ProductRepository();
   final ProductMediaRepository _productMediaRepository =
       ProductMediaRepository();
+  final Cache _cache = Cache();
+  late final String _baseCacheKey;
 
   ProductService() {
     if (AppSession.instance.isLoggedIn &&
         AppSession.instance.merchantId != null) {
       currentMerchantId = AppSession.instance.merchantId;
+      _baseCacheKey = 'service:merchant:$currentMerchantId:product';
     } else {
       throw AppError(
         type: ErrorType.UNAUTHORIZED,
@@ -63,6 +67,12 @@ class ProductService {
 
   Future<List<ProductVM>> getAllProductsForCurrentMerchant() async {
     try {
+      final cacheKey = '$_baseCacheKey:getAllProductsForCurrentMerchant';
+      if (_cache.exists(cacheKey)) {
+        final cached = _cache.get(cacheKey);
+        return _cache.expectMany(cached).cast<ProductVM>().toList();
+      }
+
       final statement = Clauses.where.eq(
         Tables.products.cols.merchantId,
         currentMerchantId,
@@ -96,8 +106,10 @@ class ProductService {
             : <String>[];
 
         final productVM = ProductVM.fromRaw(product, mediaUrls: mediaUrls);
-        productsWithMedia.add(productVM);
+        productsWithMedia.add(productVM        );
       }
+
+      _cache.set(cacheKey, Many(productsWithMedia));
       return productsWithMedia;
     } catch (e) {
       if (e is AppError) {

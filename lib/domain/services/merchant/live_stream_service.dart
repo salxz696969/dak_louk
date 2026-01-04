@@ -5,6 +5,7 @@ import 'package:dak_louk/data/repositories/live_stream_repo.dart';
 import 'package:dak_louk/data/repositories/live_stream_chat_repo.dart';
 import 'package:dak_louk/data/repositories/product_repo.dart';
 import 'package:dak_louk/data/repositories/product_media_repo.dart';
+import 'package:dak_louk/data/cache/cache.dart';
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/core/utils/orm.dart';
 import 'package:dak_louk/data/tables/tables.dart';
@@ -19,10 +20,14 @@ class LiveStreamService {
   final ProductRepository _productRepository = ProductRepository();
   final ProductMediaRepository _productMediaRepository =
       ProductMediaRepository();
+  final Cache _cache = Cache();
+  late final String _baseCacheKey;
+
   LiveStreamService() {
     if (AppSession.instance.isLoggedIn &&
         AppSession.instance.merchantId != null) {
       currentMerchantId = AppSession.instance.merchantId;
+      _baseCacheKey = 'service:merchant:$currentMerchantId:live_stream';
     } else {
       throw AppError(
         type: ErrorType.UNAUTHORIZED,
@@ -33,6 +38,11 @@ class LiveStreamService {
 
   Future<List<MerchantLiveStreamsVM>> getAllLiveStreams() async {
     try {
+      final cacheKey = '$_baseCacheKey:getAllLiveStreams';
+      if (_cache.exists(cacheKey)) {
+        final cached = _cache.get(cacheKey);
+        return _cache.expectMany(cached).cast<MerchantLiveStreamsVM>().toList();
+      }
       final statement = Clauses.where.eq(
         Tables.liveStreams.cols.merchantId,
         currentMerchantId,
@@ -111,6 +121,7 @@ class LiveStreamService {
         );
       }
 
+      _cache.set(cacheKey, Many(liveStreamsWithProducts));
       return liveStreamsWithProducts;
     } catch (e) {
       throw AppError(
