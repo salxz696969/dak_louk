@@ -1,30 +1,41 @@
-import 'dart:io';
-
 import 'package:dak_louk/core/enums/media_type_enum.dart';
 import 'package:dak_louk/core/media/media_picker_sheet.dart';
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/domain/services/merchant/product_service.dart';
 import 'package:flutter/material.dart';
 
-class ProductsCreateForm extends StatefulWidget {
+class ProductsUpdateForm extends StatefulWidget {
+  final ProductVM product;
   final void Function(ProductVM savedProduct)? onSaved;
 
-  const ProductsCreateForm({super.key, this.onSaved});
+  const ProductsUpdateForm({super.key, required this.product, this.onSaved});
 
   @override
-  State<ProductsCreateForm> createState() => _ProductsCreateFormState();
+  State<ProductsUpdateForm> createState() => _ProductsUpdateFormState();
 }
 
-class _ProductsCreateFormState extends State<ProductsCreateForm> {
+class _ProductsUpdateFormState extends State<ProductsUpdateForm> {
   final _formKey = GlobalKey<FormState>();
-  final _nameCtrl = TextEditingController();
-  final _descCtrl = TextEditingController();
-  final _priceCtrl = TextEditingController();
-  final _qtyCtrl = TextEditingController();
+  late final TextEditingController _nameCtrl;
+  late final TextEditingController _descCtrl;
+  late final TextEditingController _priceCtrl;
+  late final TextEditingController _qtyCtrl;
 
   bool _saving = false;
   final _service = ProductService();
   String? imageUrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameCtrl = TextEditingController(text: widget.product.name);
+    _descCtrl = TextEditingController(text: widget.product.description ?? '');
+    _priceCtrl = TextEditingController(text: widget.product.price.toString());
+    _qtyCtrl = TextEditingController(text: widget.product.quantity.toString());
+    imageUrl = widget.product.mediaUrls?.isNotEmpty ?? false
+        ? widget.product.mediaUrls!.first
+        : null;
+  }
 
   @override
   void dispose() {
@@ -52,8 +63,9 @@ class _ProductsCreateFormState extends State<ProductsCreateForm> {
     setState(() => _saving = true);
 
     try {
-      final result = await _service.createProduct(
-        CreateProductDTO(
+      final result = await _service.updateProduct(
+        widget.product.id,
+        UpdateProductDTO(
           name: _nameCtrl.text.trim(),
           description: _descCtrl.text.trim().isEmpty
               ? null
@@ -89,7 +101,7 @@ class _ProductsCreateFormState extends State<ProductsCreateForm> {
             const Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                'Add Product',
+                'Edit Product',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
             ),
@@ -106,17 +118,7 @@ class _ProductsCreateFormState extends State<ProductsCreateForm> {
                 ),
                 child: Row(
                   children: [
-                    imageUrl != null
-                        ? ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: Image.file(
-                              File(imageUrl!),
-                              width: 40,
-                              height: 40,
-                              fit: BoxFit.cover,
-                            ),
-                          )
-                        : const Icon(Icons.image, color: Colors.grey),
+                    const Icon(Icons.image, color: Colors.grey),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
@@ -196,7 +198,7 @@ class _ProductsCreateFormState extends State<ProductsCreateForm> {
                     ? const CircularProgressIndicator()
                     : const Center(
                         child: Text(
-                          'Create',
+                          'Update',
                           style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -212,4 +214,3 @@ class _ProductsCreateFormState extends State<ProductsCreateForm> {
     );
   }
 }
-

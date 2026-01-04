@@ -15,12 +15,8 @@ class LiveStreamRepository extends BaseRepository<LiveStreamModel> {
       title: map[Tables.liveStreams.cols.title] as String,
       thumbnailUrl: map[Tables.liveStreams.cols.thumbnailUrl] as String,
       viewCount: map[Tables.liveStreams.cols.viewCount] as int,
-      createdAt: DateTime.parse(
-        map[Tables.liveStreams.cols.createdAt] as String,
-      ),
-      updatedAt: DateTime.parse(
-        map[Tables.liveStreams.cols.updatedAt] as String,
-      ),
+      createdAt: map[Tables.liveStreams.cols.createdAt] as String,
+      updatedAt: map[Tables.liveStreams.cols.updatedAt] as String,
     );
   }
 
@@ -33,8 +29,8 @@ class LiveStreamRepository extends BaseRepository<LiveStreamModel> {
       Tables.liveStreams.cols.title: model.title,
       Tables.liveStreams.cols.thumbnailUrl: model.thumbnailUrl,
       Tables.liveStreams.cols.viewCount: model.viewCount,
-      Tables.liveStreams.cols.createdAt: model.createdAt.toIso8601String(),
-      Tables.liveStreams.cols.updatedAt: model.updatedAt.toIso8601String(),
+      Tables.liveStreams.cols.createdAt: model.createdAt,
+      Tables.liveStreams.cols.updatedAt: model.updatedAt,
     };
   }
 }

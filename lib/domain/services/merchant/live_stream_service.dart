@@ -1,7 +1,10 @@
 import 'package:dak_louk/core/auth/app_session.dart';
 import 'package:dak_louk/core/utils/error.dart';
+import 'package:dak_louk/data/repositories/live_stream_product_repo.dart';
 import 'package:dak_louk/data/repositories/live_stream_repo.dart';
 import 'package:dak_louk/data/repositories/live_stream_chat_repo.dart';
+import 'package:dak_louk/data/repositories/product_repo.dart';
+import 'package:dak_louk/data/repositories/product_media_repo.dart';
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/core/utils/orm.dart';
 import 'package:dak_louk/data/tables/tables.dart';
@@ -11,7 +14,11 @@ class LiveStreamService {
   final LiveStreamRepository _liveStreamRepository = LiveStreamRepository();
   final LiveStreamChatRepository _liveStreamChatRepository =
       LiveStreamChatRepository();
-
+  final LiveStreamProductRepository _liveStreamProductRepository =
+      LiveStreamProductRepository();
+  final ProductRepository _productRepository = ProductRepository();
+  final ProductMediaRepository _productMediaRepository =
+      ProductMediaRepository();
   LiveStreamService() {
     if (AppSession.instance.isLoggedIn &&
         AppSession.instance.merchantId != null) {
@@ -24,20 +31,103 @@ class LiveStreamService {
     }
   }
 
-  Future<LiveStreamVM> getLiveStreamById(int id) async {
+  Future<List<MerchantLiveStreamsVM>> getAllLiveStreams() async {
+    try {
+      final statement = Clauses.where.eq(
+        Tables.liveStreams.cols.merchantId,
+        currentMerchantId,
+      );
+
+      // Get all live streams for the merchant
+      final liveStreams = await _liveStreamRepository.queryThisTable(
+        where: statement.clause,
+        args: statement.args,
+        orderBy: Clauses.orderBy.desc(Tables.liveStreams.cols.createdAt).clause,
+      );
+
+      // Get all live stream products and their associated products
+      final liveStreamsWithProducts = <MerchantLiveStreamsVM>[];
+
+      for (final liveStream in liveStreams) {
+        // Get products for this live stream
+        final liveStreamProducts = await _liveStreamProductRepository
+            .queryThisTable(
+              where: Clauses.where
+                  .eq(
+                    Tables.liveStreamProducts.cols.liveStreamId,
+                    liveStream.id,
+                  )
+                  .clause,
+              args: Clauses.where
+                  .eq(
+                    Tables.liveStreamProducts.cols.liveStreamId,
+                    liveStream.id,
+                  )
+                  .args,
+            );
+
+        // Get product details for each live stream product
+        final products = <MerchantLiveStreamsProductsVM>[];
+        for (final liveStreamProduct in liveStreamProducts) {
+          final product = await _productRepository.queryThisTable(
+            where: Clauses.where
+                .eq(Tables.products.cols.id, liveStreamProduct.productId)
+                .clause,
+            args: Clauses.where
+                .eq(Tables.products.cols.id, liveStreamProduct.productId)
+                .args,
+          );
+
+          if (product.isNotEmpty) {
+            final productModel = product.first;
+            // Get product media
+            final productMedia = await _productMediaRepository.queryThisTable(
+              where: Clauses.where
+                  .eq(Tables.productMedias.cols.productId, productModel.id)
+                  .clause,
+              args: Clauses.where
+                  .eq(Tables.productMedias.cols.productId, productModel.id)
+                  .args,
+            );
+
+            final imageUrls = productMedia.isNotEmpty
+                ? productMedia.map((media) => media.url).toList()
+                : <String>[];
+
+            products.add(
+              MerchantLiveStreamsProductsVM.fromRaw(
+                liveStreamProduct,
+                name: productModel.name,
+                price: productModel.price,
+                quantity: productModel.quantity,
+                imageUrls: imageUrls,
+              ),
+            );
+          }
+        }
+
+        liveStreamsWithProducts.add(
+          MerchantLiveStreamsVM.fromRaw(liveStream, products: products),
+        );
+      }
+
+      return liveStreamsWithProducts;
+    } catch (e) {
+      throw AppError(
+        type: ErrorType.DB_ERROR,
+        message: 'Failed to get all live streams',
+      );
+    }
+  }
+
+  Future<MerchantLiveStreamsVM?> getLiveStreamById(int id) async {
     try {
       final liveStream = await _liveStreamRepository.getById(id);
-      if (liveStream != null) {
-        return LiveStreamVM.fromRaw(liveStream);
+      if (liveStream != null && liveStream.merchantId == currentMerchantId) {
+        return MerchantLiveStreamsVM.fromRaw(liveStream);
       }
-      throw AppError(
-        type: ErrorType.NOT_FOUND,
-        message: 'Live stream not found',
-      );
+      return null;
     } catch (e) {
-      if (e is AppError) {
-        rethrow;
-      }
       throw AppError(
         type: ErrorType.DB_ERROR,
         message: 'Failed to get live stream',
@@ -46,7 +136,9 @@ class LiveStreamService {
   }
 
   // Basic CRUD operations
-  Future<LiveStreamVM?> createLiveStream(CreateLiveStreamDTO dto) async {
+  Future<MerchantLiveStreamsVM?> createLiveStream(
+    CreateLiveStreamDTO dto,
+  ) async {
     try {
       final liveStreamModel = LiveStreamModel(
         id: 0,
@@ -54,14 +146,28 @@ class LiveStreamService {
         title: dto.title,
         streamUrl: dto.streamUrl,
         thumbnailUrl: dto.thumbnailUrl,
-        viewCount: dto.viewCount,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
+        viewCount: 0,
+        createdAt: DateTime.now().toIso8601String(),
+        updatedAt: DateTime.now().toIso8601String(),
       );
       final id = await _liveStreamRepository.insert(liveStreamModel);
+
+      // Add products if provided
+      if (dto.productIds != null && dto.productIds!.isNotEmpty) {
+        for (final productId in dto.productIds!) {
+          await _liveStreamProductRepository.insert(
+            LiveStreamProductModel(
+              id: 0,
+              liveStreamId: id,
+              productId: productId,
+            ),
+          );
+        }
+      }
+
       final newLiveStream = await _liveStreamRepository.getById(id);
       if (newLiveStream != null) {
-        return LiveStreamVM.fromRaw(newLiveStream);
+        return MerchantLiveStreamsVM.fromRaw(newLiveStream);
       }
       throw AppError(
         type: ErrorType.NOT_FOUND,
@@ -78,35 +184,56 @@ class LiveStreamService {
     }
   }
 
-  Future<LiveStreamVM?> updateLiveStream(
+  Future<MerchantLiveStreamsVM?> updateLiveStream(
     int id,
     UpdateLiveStreamDTO dto,
   ) async {
     try {
       final liveStream = await _liveStreamRepository.getById(id);
-      if (liveStream == null) {
-        throw AppError(
-          type: ErrorType.NOT_FOUND,
-          message: 'Live stream not found',
-        );
+      if (liveStream == null || liveStream.merchantId != currentMerchantId) {
+        return null;
       }
-      if (liveStream.merchantId != currentMerchantId) {
-        throw AppError(type: ErrorType.UNAUTHORIZED, message: 'Unauthorized');
-      }
+
       final liveStreamModel = LiveStreamModel(
         id: id,
         merchantId: liveStream.merchantId,
         title: dto.title ?? liveStream.title,
         streamUrl: dto.streamUrl ?? liveStream.streamUrl,
         thumbnailUrl: dto.thumbnailUrl ?? liveStream.thumbnailUrl,
-        viewCount: dto.viewCount ?? liveStream.viewCount,
+        viewCount: liveStream.viewCount,
         createdAt: liveStream.createdAt,
-        updatedAt: DateTime.now(),
+        updatedAt: DateTime.now().toIso8601String(),
       );
       await _liveStreamRepository.update(liveStreamModel);
+
+      // Delete old live stream products
+      final oldProductsStatement = Clauses.where.eq(
+        Tables.liveStreamProducts.cols.liveStreamId,
+        id,
+      );
+      final oldProducts = await _liveStreamProductRepository.queryThisTable(
+        where: oldProductsStatement.clause,
+        args: oldProductsStatement.args,
+      );
+      for (final product in oldProducts) {
+        await _liveStreamProductRepository.delete(product.id);
+      }
+
+      if (dto.productIds != null && dto.productIds!.isNotEmpty) {
+        for (final productId in dto.productIds!) {
+          await _liveStreamProductRepository.insert(
+            LiveStreamProductModel(
+              id: 0,
+              liveStreamId: id,
+              productId: productId,
+            ),
+          );
+        }
+      }
+
       final newLiveStream = await _liveStreamRepository.getById(id);
       if (newLiveStream != null) {
-        return LiveStreamVM.fromRaw(newLiveStream);
+        return MerchantLiveStreamsVM.fromRaw(newLiveStream);
       }
       throw AppError(
         type: ErrorType.NOT_FOUND,
@@ -125,7 +252,19 @@ class LiveStreamService {
 
   Future<void> deleteLiveStream(int liveStreamId) async {
     try {
-      // Delete associated chats first
+      final productStatement = Clauses.where.eq(
+        Tables.liveStreamProducts.cols.liveStreamId,
+        liveStreamId,
+      );
+      final products = await _liveStreamProductRepository.queryThisTable(
+        where: productStatement.clause,
+        args: productStatement.args,
+      );
+
+      for (final product in products) {
+        await _liveStreamProductRepository.delete(product.id);
+      }
+
       final chatStatement = Clauses.where.eq(
         Tables.liveStreamChats.cols.liveStreamId,
         liveStreamId,

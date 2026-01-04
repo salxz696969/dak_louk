@@ -1,13 +1,13 @@
 part of models;
 
-class ChatVM extends Cacheable {
+class MerchantChatVM extends Cacheable {
   final int id;
   final bool isMine;
   final String text;
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  ChatVM({
+  MerchantChatVM({
     required this.id,
     required this.text,
     required this.isMine,
@@ -15,8 +15,8 @@ class ChatVM extends Cacheable {
     required this.updatedAt,
   });
 
-  factory ChatVM.fromRaw(ChatModel raw, {required bool isMine}) {
-    return ChatVM(
+  factory MerchantChatVM.fromRaw(ChatModel raw, {required bool isMine}) {
+    return MerchantChatVM(
       id: raw.id,
       isMine: isMine,
       text: raw.text,

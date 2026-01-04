@@ -8,7 +8,7 @@ import 'package:dak_louk/ui/screens/merchant/merchant_orders_screen.dart';
 import 'package:dak_louk/ui/screens/merchant/merchant_products_screen.dart';
 import 'package:dak_louk/ui/screens/merchant/merchant_posts_screen.dart';
 import 'package:dak_louk/ui/screens/merchant/merchant_live_screen.dart';
-import 'package:dak_louk/ui/screens/merchant/merchant_chat_screen.dart';
+import 'package:dak_louk/ui/screens/merchant/merchant_chat_room_screen.dart';
 
 /// Scaffold for merchant tabs: Orders / Products / Posts / Live / Chat.
 class MerchantScaffold extends StatefulWidget {
@@ -26,7 +26,7 @@ class _MerchantScaffoldState extends State<MerchantScaffold> {
     MerchantProductsScreen(),
     MerchantPostsScreen(),
     MerchantLiveScreen(),
-    MerchantChatScreen(),
+    MerchantChatRoomScreen(),
   ];
 
   late int _currentIndex;

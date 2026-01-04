@@ -5,8 +5,8 @@ class ChatModel extends Cacheable {
   final int chatRoomId;
   final int senderId;
   final String text;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+  final String createdAt;
+  final String updatedAt;
 
   ChatModel({
     required this.id,

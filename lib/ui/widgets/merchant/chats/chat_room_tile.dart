@@ -1,9 +1,9 @@
 import 'package:dak_louk/domain/models/models.dart';
-import 'package:dak_louk/ui/screens/user/chat_screen.dart';
+import 'package:dak_louk/ui/screens/merchant/merchant_chat_screen.dart';
 import 'package:flutter/material.dart';
 
 class ChatroomTile extends StatelessWidget {
-  final ChatRoomVM chatRoom;
+  final MerchantChatRoomVM chatRoom;
   const ChatroomTile({super.key, required this.chatRoom});
 
   @override
@@ -16,11 +16,11 @@ class ChatroomTile extends StatelessWidget {
         ),
         child: ListTile(
           leading: CircleAvatar(
-            backgroundImage: AssetImage(chatRoom.merchantProfileImage),
+            backgroundImage: AssetImage(chatRoom.buyerProfileImage),
           ),
           title: Text(
-            chatRoom.merchantName,
-            style: TextStyle(fontWeight: FontWeight.normal),
+            chatRoom.buyerName, // This is actually the user name for merchants
+            style: const TextStyle(fontWeight: FontWeight.normal),
           ),
           subtitle: Text(
             chatRoom.latestText,
@@ -33,8 +33,9 @@ class ChatroomTile extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => ChatScreen(
-                  targetUserName: chatRoom.merchantName,
+                builder: (context) => MerchantChatScreen(
+                  targetUserName: chatRoom
+                      .buyerName, // This contains user info for merchants
                   chatRoomId: chatRoom.id,
                 ),
               ),

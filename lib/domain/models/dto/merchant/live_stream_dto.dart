@@ -6,13 +6,14 @@ class CreateLiveStreamDTO {
   final String title;
   final String streamUrl;
   final String? thumbnailUrl;
-  final int viewCount;
+
+  final List<int>? productIds;
 
   CreateLiveStreamDTO({
     required this.title,
     required this.streamUrl,
+    this.productIds,
     this.thumbnailUrl,
-    this.viewCount = 0,
   });
 }
 
@@ -20,12 +21,12 @@ class UpdateLiveStreamDTO {
   final String? title;
   final String? streamUrl;
   final String? thumbnailUrl;
-  final int? viewCount;
+  final List<int>? productIds;
 
   UpdateLiveStreamDTO({
     this.title,
     this.streamUrl,
     this.thumbnailUrl,
-    this.viewCount,
+    this.productIds,
   });
 }

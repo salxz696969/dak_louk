@@ -1,31 +1,27 @@
 import 'package:dak_louk/domain/models/models.dart';
-import 'package:dak_louk/domain/services/user/chat_service.dart';
-import 'package:dak_louk/ui/widgets/user/chat/chat_input.dart';
+import 'package:dak_louk/domain/services/merchant/chat_service.dart';
+import 'package:dak_louk/ui/widgets/merchant/chats/chat_input.dart';
 import 'package:flutter/material.dart';
 
-class Chat extends StatefulWidget {
+class MerchantChat extends StatefulWidget {
   final int chatRoomId;
-  Chat({super.key, required this.chatRoomId});
+
+  const MerchantChat({super.key, required this.chatRoomId});
 
   @override
-  State<Chat> createState() => _ChatState();
+  State<MerchantChat> createState() => _MerchantChatState();
 }
 
-class _ChatState extends State<Chat> {
+class _MerchantChatState extends State<MerchantChat> {
   late TextEditingController _controller;
   late ScrollController _scrollController;
   final ChatService _chatService = ChatService();
-  List<ChatVM> _chats = [];
+
   @override
   void initState() {
     super.initState();
     _controller = TextEditingController();
     _scrollController = ScrollController();
-    _chatService.getChatsByChatRoomId(widget.chatRoomId).then((chats) {
-      setState(() {
-        _chats = chats;
-      });
-    });
   }
 
   @override
@@ -48,20 +44,15 @@ class _ChatState extends State<Chat> {
   }
 
   Future<void> _handleSend(String text) async {
-    final newChat = await _chatService.createChat(
+    await _chatService.createChat(
       CreateChatDTO(chatRoomId: widget.chatRoomId, text: text),
     );
-    if (newChat != null) {
-      setState(() {
-        _chats.add(newChat);
-      });
-    }
     _scrollToBottom();
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<ChatVM>>(
+    return FutureBuilder<List<MerchantChatVM>>(
       future: _chatService.getChatsByChatRoomId(widget.chatRoomId),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -130,7 +121,7 @@ class _ChatState extends State<Chat> {
                                 chat.createdAt.toLocal().toString().split(
                                   " ",
                                 )[0],
-                                style: TextStyle(
+                                style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 8,
                                   fontWeight: FontWeight.w300,

@@ -1,39 +1,37 @@
 part of models;
 
-class OrderVM extends Cacheable {
+class OrderMerchantVM extends Cacheable {
   final int id;
-  final String merchantName;
-  final String merchantProfileImage;
-  final String status;
-  final List<OrderProductVM> products;
+  final String username;
+  final String userProfileImage;
+  final OrderStatusEnum status;
+  final List<OrderProductMerchantVM> products;
   final int totalPrice;
 
   final DateTime createdAt;
 
-  OrderVM({
+  OrderMerchantVM({
     required this.id,
-    required this.merchantName,
-    required this.merchantProfileImage,
+    required this.username,
+    required this.userProfileImage,
     required this.status,
     required this.products,
     required this.totalPrice,
     required this.createdAt,
   });
 
-  factory OrderVM.fromRaw(
+  factory OrderMerchantVM.fromRaw(
     OrderModel raw, {
     required String username,
     required String userProfileImage,
-    required String merchantName,
-    required String merchantProfileImage,
-    required List<OrderProductVM> products,
+    required List<OrderProductMerchantVM> products,
     required int totalPrice,
   }) {
-    return OrderVM(
+    return OrderMerchantVM(
       id: raw.id,
-      merchantName: merchantName,
-      merchantProfileImage: merchantProfileImage,
-      status: raw.status,
+      username: username,
+      userProfileImage: userProfileImage,
+      status: OrderStatusEnum.values.firstWhere((e) => e.name == raw.status),
       products: products,
       totalPrice: totalPrice,
       createdAt: raw.createdAt,
@@ -41,25 +39,25 @@ class OrderVM extends Cacheable {
   }
 }
 
-class OrderProductVM extends Cacheable {
+class OrderProductMerchantVM extends Cacheable {
   final int id;
   final String productName;
   final String productImageUrl;
   final int quantity;
 
-  OrderProductVM({
+  OrderProductMerchantVM({
     required this.id,
     required this.productName,
     required this.productImageUrl,
     required this.quantity,
   });
 
-  factory OrderProductVM.fromRaw(
+  factory OrderProductMerchantVM.fromRaw(
     OrderProductModel raw, {
     required String productName,
     required String productImageUrl,
   }) {
-    return OrderProductVM(
+    return OrderProductMerchantVM(
       id: raw.id,
       productName: productName,
       productImageUrl: productImageUrl,

@@ -5,6 +5,7 @@ import 'package:dak_louk/data/repositories/order_repo.dart';
 import 'package:dak_louk/data/repositories/merchant_repo.dart';
 import 'package:dak_louk/data/repositories/product_media_repo.dart';
 import 'package:dak_louk/data/repositories/product_repo.dart';
+import 'package:dak_louk/data/repositories/user_repo.dart';
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/core/utils/orm.dart';
 import 'package:dak_louk/data/tables/tables.dart';
@@ -21,6 +22,7 @@ class OrderService {
   final ProductRepository _productRepository = ProductRepository();
   final ProductMediaRepository _productMediaRepository =
       ProductMediaRepository();
+  final UserRepository _userRepository = UserRepository();
   OrderService() {
     if (AppSession.instance.isLoggedIn) {
       currentUserId = AppSession.instance.userId;
@@ -96,8 +98,11 @@ class OrderService {
             );
           }
 
+          final user = await _userRepository.getById(order.userId);
           final orderVM = OrderVM.fromRaw(
             order,
+            username: 'placeholder name',
+            userProfileImage: user?.profileImageUrl ?? 'assets/images/coffee1.png',
             merchantName: merchant?.username ?? '',
             merchantProfileImage: merchant?.profileImage ?? '',
             products: orderProductsVM,
@@ -146,7 +151,13 @@ class OrderService {
           orderProduct,
         );
         // delete prducts in cart
-        await _cartRepository.delete(item.productId);
+        final carts = await _cartRepository.getAll();
+        for (final cart in carts) {
+          if (cart.productId == item.productId &&
+              cart.userId == currentUserId) {
+            await _cartRepository.delete(cart.id);
+          }
+        }
         if (orderProductId <= 0) {
           throw AppError(
             type: ErrorType.DB_ERROR,

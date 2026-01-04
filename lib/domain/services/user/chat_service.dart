@@ -16,17 +16,43 @@ class ChatService {
     }
   }
   // Migrated from ChatDao.insertChat
-  Future<int> createChat(CreateChatDTO dto) async {
+  Future<ChatVM?> createChat(CreateChatDTO dto) async {
     try {
+      // Nicely log the incoming DTO
+      print(
+        '[ChatService] Creating chat with DTO: {\n'
+        '  chatRoomId: ${dto.chatRoomId},\n'
+        '  text: "${dto.text}"\n'
+        '}',
+      );
       final chatModel = ChatModel(
         id: 0,
         senderId: currentUserId,
         text: dto.text,
         chatRoomId: dto.chatRoomId,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
+        createdAt: DateTime.now().toIso8601String(),
+        updatedAt: DateTime.now().toIso8601String(),
       );
-      return await _chatRepository.insert(chatModel);
+      // Nicely log the model about to be inserted
+      print(
+        '[ChatService] Inserting ChatModel: {\n'
+        '  id: ${chatModel.id},\n'
+        '  senderId: ${chatModel.senderId},\n'
+        '  chatRoomId: ${chatModel.chatRoomId},\n'
+        '  text: "${chatModel.text}",\n'
+        '  createdAt: ${chatModel.createdAt},\n'
+        '  updatedAt: ${chatModel.updatedAt}\n'
+        '}',
+      );
+      final id = await _chatRepository.insert(chatModel);
+      if (id > 0) {
+        final newChat = await _chatRepository.getById(id);
+        if (newChat != null) {
+          return ChatVM.fromRaw(newChat, isMine: true);
+        }
+        throw AppError(type: ErrorType.NOT_FOUND, message: 'Chat not found');
+      }
+      return null;
     } catch (e) {
       if (e is AppError) {
         rethrow;
@@ -126,8 +152,8 @@ class ChatService {
             chatRoomId: chatRoomId,
             senderId: 0,
             text: '',
-            createdAt: DateTime.now(),
-            updatedAt: DateTime.now(),
+            createdAt: DateTime.now().toIso8601String(),
+            updatedAt: DateTime.now().toIso8601String(),
           ),
           isMine: false,
         ),

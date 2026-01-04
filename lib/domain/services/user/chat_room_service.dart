@@ -28,8 +28,8 @@ class ChatRoomService {
         id: 0,
         userId: currentUserId,
         merchantId: dto.merchantId,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
+        createdAt: DateTime.now().toIso8601String(),
+        updatedAt: DateTime.now().toIso8601String(),
       );
       return await _chatRoomRepository.insert(chatRoomModel);
     } catch (e) {
@@ -110,6 +110,7 @@ class ChatRoomService {
   // Migrated from ChatRoomDao.getAllChatRoomsByUserId
   Future<List<ChatRoomVM?>> getAllChatRooms() async {
     try {
+      print('getAllChatRooms: querying chat rooms for user $currentUserId');
       final statement = Clauses.where.eq(
         Tables.chatRooms.cols.userId,
         currentUserId,
@@ -119,9 +120,11 @@ class ChatRoomService {
         args: statement.args,
         limit: 50,
       );
+      print('getAllChatRooms: found ${chatRooms.length} chat rooms');
       final chatRoomsVM = <ChatRoomVM>[];
       if (chatRooms.isNotEmpty) {
         for (final chatRoom in chatRooms) {
+          print('getAllChatRooms: processing chatRoom.id=${chatRoom.id}');
           final merchant = await _merchantRepository.getById(
             chatRoom.merchantId,
           );
@@ -136,25 +139,32 @@ class ChatRoomService {
               limit: 1,
               orderBy: Clauses.orderBy.desc(Tables.chats.cols.createdAt).clause,
             );
+            print('getAllChatRooms: found ${chatRoomChats.length} chats in chatRoom.id=${chatRoom.id}');
             if (chatRoomChats.isNotEmpty) {
               final latestChat = chatRoomChats.first;
-              final timeAgo = time_ago.timeAgo(latestChat.createdAt);
+              final timeAgo = DateTime.parse(latestChat.createdAt);
               final latestText = latestChat.text;
+              print('getAllChatRooms: adding ChatRoomVM for chatRoom.id=${chatRoom.id} '
+                  'merchant=${merchant.username}, latestText="$latestText", timeAgo=${timeAgo}');
               chatRoomsVM.add(
                 ChatRoomVM.fromRaw(
                   chatRoom,
                   merchantName: merchant.username,
                   merchantProfileImage: merchant.profileImage,
-                  timeAgo: timeAgo,
+                  timeAgo: time_ago.timeAgo(timeAgo),
                   latestText: latestText,
                 ),
               );
             }
+          } else {
+            print('getAllChatRooms: merchant not found for merchantId=${chatRoom.merchantId}');
           }
         }
       }
+      print('getAllChatRooms: returning ${chatRoomsVM.length} ChatRoomVMs');
       return chatRoomsVM;
     } catch (e) {
+      print('getAllChatRooms: error - $e');
       if (e is AppError) {
         rethrow;
       }

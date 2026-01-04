@@ -1,5 +1,7 @@
 library models;
 
+import 'package:dak_louk/core/enums/order_status_enum.dart';
+
 // Cache
 part '../../data/cache/cacheable.dart';
 
@@ -34,6 +36,7 @@ part 'raw/product_category_map_model.dart';
 part 'view_models/user/cart_vm.dart';
 part 'view_models/user/user_vm.dart';
 part 'view_models/merchant/product_vm.dart';
+part 'view_models/merchant/order_merchant_vm.dart';
 part 'view_models/product_media_vm.dart';
 part 'view_models/promo_media_vm.dart';
 part 'view_models/user/order_vm.dart';
@@ -49,6 +52,9 @@ part 'view_models/user/merchant_profile/merchant_products_vm.dart';
 part 'view_models/user/profile/user_profile_vm.dart';
 part 'view_models/user/profile/user_profile_liked_saved_posts_vm.dart';
 part 'view_models/user/live_stream_products_vm.dart';
+part 'view_models/merchant/merchant_chat_room_vm.dart';
+part 'view_models/merchant/merchant_chat_vm.dart';
+part 'view_models/merchant/merchant_live_streams_vm.dart';
 
 part 'dto/user/cart_dto.dart';
 part 'dto/merchant/product_dto.dart';

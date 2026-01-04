@@ -5,8 +5,8 @@ class LiveStreamChatModel extends Cacheable {
   final int liveStreamId;
   final int userId;
   final String text;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+  final String createdAt;
+  final String updatedAt;
 
   LiveStreamChatModel({
     required this.id,
