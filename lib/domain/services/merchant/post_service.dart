@@ -37,6 +37,7 @@ class PostService {
   final CartRepository _cartRepository = CartRepository();
   final Cache _cache = Cache();
   late final String _baseCacheKey;
+  late final String userSideCacheKeyPattern;
 
   // Business logic methods migrated from PostRepository
   PostService() {
@@ -44,6 +45,7 @@ class PostService {
         AppSession.instance.merchantId != null) {
       currentMerchantId = AppSession.instance.merchantId;
       _baseCacheKey = 'service:merchant:$currentMerchantId:post';
+      userSideCacheKeyPattern = 'service:user:*:post:*';
     } else {
       throw AppError(
         type: ErrorType.UNAUTHORIZED,
@@ -484,6 +486,7 @@ class PostService {
           if (postVMs.isNotEmpty) {
             // Invalidate cache for all posts for current merchant
             _cache.del('$_baseCacheKey:getAllPostsForCurrentMerchant');
+            _cache.delByPattern(userSideCacheKeyPattern);
             return postVMs.first;
           }
         }
@@ -593,6 +596,7 @@ class PostService {
         if (postVMs.isNotEmpty) {
           _cache.del('$_baseCacheKey:getAllPostsForCurrentMerchant');
           _cache.del('$_baseCacheKey:getPostById:$id');
+          _cache.delByPattern(userSideCacheKeyPattern);
           return postVMs.first;
         }
       }
@@ -638,6 +642,7 @@ class PostService {
 
       _cache.del('$_baseCacheKey:getAllPostsForCurrentMerchant');
       _cache.del('$_baseCacheKey:getPostById:$postId');
+      _cache.delByPattern(userSideCacheKeyPattern);
     } catch (e) {
       if (e is AppError) {
         rethrow;

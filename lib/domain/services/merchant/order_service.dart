@@ -20,12 +20,14 @@ class OrderService {
       ProductMediaRepository();
   final Cache _cache = Cache();
   late final String _baseCacheKey;
+  late final String userSideCacheKeyPattern;
 
   OrderService() {
     if (AppSession.instance.isLoggedIn &&
         AppSession.instance.merchantId != null) {
       currentMerchantId = AppSession.instance.merchantId;
       _baseCacheKey = 'service:merchant:$currentMerchantId:order';
+      userSideCacheKeyPattern = 'service:user:*:order:*';
     } else {
       throw AppError(
         type: ErrorType.UNAUTHORIZED,
@@ -160,6 +162,7 @@ class OrderService {
 
       // Invalidate cache
       _cache.del('$_baseCacheKey:getAllOrders');
+      _cache.delByPattern(userSideCacheKeyPattern);
     } catch (e) {
       if (e is AppError) {
         rethrow;
@@ -177,6 +180,7 @@ class OrderService {
 
       // Invalidate cache
       _cache.del('$_baseCacheKey:getAllOrders');
+      _cache.delByPattern(userSideCacheKeyPattern);
     } catch (e) {
       if (e is AppError) {
         rethrow;

@@ -14,12 +14,14 @@ class ProductService {
       ProductMediaRepository();
   final Cache _cache = Cache();
   late final String _baseCacheKey;
+  late final String userSideCacheKeyPattern;
 
   ProductService() {
     if (AppSession.instance.isLoggedIn &&
         AppSession.instance.merchantId != null) {
       currentMerchantId = AppSession.instance.merchantId;
       _baseCacheKey = 'service:merchant:$currentMerchantId:product';
+      userSideCacheKeyPattern = 'service:user:*:product:*';
     } else {
       throw AppError(
         type: ErrorType.UNAUTHORIZED,
@@ -170,6 +172,7 @@ class ProductService {
         if (newProduct != null) {
           _cache.del('$_baseCacheKey:getAllProductsForCurrentMerchant');
           _cache.del('$_baseCacheKey:getProductById:$id');
+          _cache.delByPattern(userSideCacheKeyPattern);
           return ProductVM.fromRaw(newProduct);
         }
         throw AppError(type: ErrorType.NOT_FOUND, message: 'Product not found');
@@ -238,6 +241,7 @@ class ProductService {
         _cache.del('$_baseCacheKey:getAllProductsForCurrentMerchant');
         _cache.del('$_baseCacheKey:getProductById:$id');
         _cache.del('$_baseCacheKey:getAllProducts');
+        _cache.delByPattern(userSideCacheKeyPattern);
         return ProductVM.fromRaw(newProduct);
       }
       throw AppError(type: ErrorType.NOT_FOUND, message: 'Product not found');
@@ -274,6 +278,7 @@ class ProductService {
       _cache.del('$_baseCacheKey:getAllProductsForCurrentMerchant');
       _cache.del('$_baseCacheKey:getProductById:$productId');
       _cache.del('$_baseCacheKey:getAllProducts');
+      _cache.delByPattern(userSideCacheKeyPattern);
       throw AppError(type: ErrorType.NOT_FOUND, message: 'Product not found');
     } catch (e) {
       if (e is AppError) {

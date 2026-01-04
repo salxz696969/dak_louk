@@ -22,12 +22,14 @@ class LiveStreamService {
       ProductMediaRepository();
   final Cache _cache = Cache();
   late final String _baseCacheKey;
+  late final String userSideCacheKeyPattern;
 
   LiveStreamService() {
     if (AppSession.instance.isLoggedIn &&
         AppSession.instance.merchantId != null) {
       currentMerchantId = AppSession.instance.merchantId;
       _baseCacheKey = 'service:merchant:$currentMerchantId:live_stream';
+      userSideCacheKeyPattern = 'service:user:*:live_stream:*';
     } else {
       throw AppError(
         type: ErrorType.UNAUTHORIZED,
@@ -185,6 +187,7 @@ class LiveStreamService {
       if (newLiveStream != null) {
         _cache.del('$_baseCacheKey:getLiveStreamById:$id');
         _cache.del('$_baseCacheKey:getAllLiveStreams');
+        _cache.delByPattern(userSideCacheKeyPattern);
         return MerchantLiveStreamsVM.fromRaw(newLiveStream);
       }
 
@@ -254,6 +257,7 @@ class LiveStreamService {
       if (newLiveStream != null) {
         _cache.del('$_baseCacheKey:getLiveStreamById:$id');
         _cache.del('$_baseCacheKey:getAllLiveStreams');
+        _cache.delByPattern(userSideCacheKeyPattern);
         return MerchantLiveStreamsVM.fromRaw(newLiveStream);
       }
       throw AppError(
@@ -306,6 +310,7 @@ class LiveStreamService {
       // future fix maybe to let id be a field in cahceble and let teh child inherit from it, but sould cause issue if db is not named id or sth so for now each model define itself
       _cache.del('$_baseCacheKey:getLiveStreamById:$liveStreamId');
       _cache.del('$_baseCacheKey:getAllLiveStreams');
+      _cache.delByPattern(userSideCacheKeyPattern);
     } catch (e) {
       if (e is AppError) {
         rethrow;

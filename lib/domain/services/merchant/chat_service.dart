@@ -11,11 +11,13 @@ class ChatService {
   final Cache _cache = Cache();
   late final currentMerchantId;
   late final String _baseCacheKey;
+  late final String userSideCacheKeyPattern;
   ChatService() {
     if (AppSession.instance.isLoggedIn &&
         AppSession.instance.merchantId != null) {
       currentMerchantId = AppSession.instance.merchantId;
       _baseCacheKey = 'service:merchant:$currentMerchantId:chat';
+      userSideCacheKeyPattern = 'service:user:*:chat:*';
     } else {
       throw AppError(
         type: ErrorType.UNAUTHORIZED,
@@ -56,7 +58,7 @@ class ChatService {
       // );
 
       _cache.del('$_baseCacheKey:getChatsByChatRoomId:${dto.chatRoomId}');
-
+      _cache.delByPattern(userSideCacheKeyPattern);
       return id;
     } catch (e) {
       if (e is AppError) {
