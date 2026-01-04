@@ -1,13 +1,14 @@
+import 'package:dak_louk/core/media/media_model.dart';
 import 'package:flutter/material.dart';
 
 class MediaSection extends StatelessWidget {
-  final List<String> mediaUrls;
+  final List<MediaModel> medias;
   final VoidCallback onAddMedia;
   final void Function(int index) onRemoveMedia;
 
   const MediaSection({
     super.key,
-    required this.mediaUrls,
+    required this.medias,
     required this.onAddMedia,
     required this.onRemoveMedia,
   });
@@ -24,12 +25,12 @@ class MediaSection extends StatelessWidget {
         const SizedBox(height: 8),
 
         // Media Gallery
-        if (mediaUrls.isNotEmpty)
+        if (medias.isNotEmpty)
           SizedBox(
             height: 120,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              itemCount: mediaUrls.length,
+              itemCount: medias.length,
               itemBuilder: (context, index) {
                 return Stack(
                   children: [
@@ -44,7 +45,7 @@ class MediaSection extends StatelessWidget {
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(8),
                         child: Image.asset(
-                          mediaUrls[index],
+                          medias[index].url,
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) {
                             return Container(

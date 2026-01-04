@@ -10,6 +10,7 @@ import 'package:dak_louk/data/repositories/post_repo.dart';
 import 'package:dak_louk/data/repositories/promo_media_repo.dart';
 import 'package:dak_louk/core/utils/orm.dart';
 import 'package:dak_louk/data/tables/tables.dart';
+import 'package:dak_louk/data/cache/cache.dart';
 
 class MerchantService {
   late final currentUserId;
@@ -21,10 +22,13 @@ class MerchantService {
   final ProductMediaRepository _productMediaRepository =
       ProductMediaRepository();
   final CartRepository _cartRepository = CartRepository();
+  final Cache _cache = Cache();
+  late final String _baseCacheKey;
 
   MerchantService() {
     if (AppSession.instance.isLoggedIn) {
       currentUserId = AppSession.instance.userId;
+      _baseCacheKey = 'service:user:$currentUserId:merchant';
     } else {
       throw AppError(type: ErrorType.UNAUTHORIZED, message: 'Unauthorized');
     }
@@ -32,6 +36,12 @@ class MerchantService {
 
   Future<MerchantVM> getMerchantById(int id) async {
     try {
+      final cacheKey = '$_baseCacheKey:getMerchantById:$id';
+      if (_cache.exists(cacheKey)) {
+        final cached = _cache.get(cacheKey);
+        return _cache.expectSingle(cached) as MerchantVM;
+      }
+
       final merchant = await _merchantRepository.getById(id);
       if (merchant == null) {
         throw AppError(
@@ -39,8 +49,13 @@ class MerchantService {
           message: 'Merchant not found',
         );
       }
-      return MerchantVM.fromRaw(merchant);
+      final result = MerchantVM.fromRaw(merchant);
+      _cache.set(cacheKey, Single(result));
+      return result;
     } catch (e) {
+      if (e is AppError) {
+        rethrow;
+      }
       throw AppError(
         type: ErrorType.DB_ERROR,
         message: 'Failed to get merchant',
@@ -50,6 +65,12 @@ class MerchantService {
 
   Future<List<MerchantPostsVM>> getMerchantPosts(int merchantId) async {
     try {
+      final cacheKey = '$_baseCacheKey:getMerchantPosts:$merchantId';
+      if (_cache.exists(cacheKey)) {
+        final cached = _cache.get(cacheKey);
+        return _cache.expectMany(cached).cast<MerchantPostsVM>().toList();
+      }
+
       final posts = await _postRepository.queryThisTable(
         where: Clauses.where
             .eq(Tables.posts.cols.merchantId, merchantId)
@@ -70,6 +91,7 @@ class MerchantService {
         result.add(MerchantPostsVM.fromRaw(post, promoMedias: medias));
       }
 
+      _cache.set(cacheKey, Many(result));
       return result;
     } catch (e) {
       if (e is AppError) {
@@ -86,6 +108,12 @@ class MerchantService {
     int merchantId,
   ) async {
     try {
+      final cacheKey = '$_baseCacheKey:getMerchantLiveStreams:$merchantId';
+      if (_cache.exists(cacheKey)) {
+        final cached = _cache.get(cacheKey);
+        return _cache.expectMany(cached).cast<MerchantLivestreamsVM>().toList();
+      }
+
       final liveStreams = await _liveStreamRepository.queryThisTable(
         where: Clauses.where
             .eq(Tables.liveStreams.cols.merchantId, merchantId)
@@ -95,12 +123,18 @@ class MerchantService {
             .args,
       );
       // No media join needed for livestreams per instructions
-      return liveStreams
+      final result = liveStreams
           .map(
             (stream) => MerchantLivestreamsVM.fromRaw(stream, promoMedias: []),
           )
           .toList();
+
+      _cache.set(cacheKey, Many(result));
+      return result;
     } catch (e) {
+      if (e is AppError) {
+        rethrow;
+      }
       throw AppError(
         type: ErrorType.DB_ERROR,
         message: 'Failed to get merchant live streams',
@@ -110,6 +144,12 @@ class MerchantService {
 
   Future<List<MerchantProductsVM>> getMerchantProducts(int merchantId) async {
     try {
+      final cacheKey = '$_baseCacheKey:getMerchantProducts:$merchantId';
+      if (_cache.exists(cacheKey)) {
+        final cached = _cache.get(cacheKey);
+        return _cache.expectMany(cached).cast<MerchantProductsVM>().toList();
+      }
+
       final products = await _productRepository.queryThisTable(
         where: Clauses.where
             .eq(Tables.products.cols.merchantId, merchantId)
@@ -156,8 +196,12 @@ class MerchantService {
         );
       }
 
+      _cache.set(cacheKey, Many(result));
       return result;
-    } catch (_) {
+    } catch (e) {
+      if (e is AppError) {
+        rethrow;
+      }
       throw AppError(
         type: ErrorType.DB_ERROR,
         message: 'Failed to get merchant products',

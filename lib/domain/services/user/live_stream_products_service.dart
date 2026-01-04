@@ -1,4 +1,6 @@
 import 'package:dak_louk/core/auth/app_session.dart';
+import 'package:dak_louk/core/enums/media_type_enum.dart';
+import 'package:dak_louk/core/media/media_model.dart';
 import 'package:dak_louk/core/utils/error.dart';
 import 'package:dak_louk/data/repositories/live_stream_product_repo.dart';
 import 'package:dak_louk/data/repositories/product_media_repo.dart';
@@ -6,6 +8,7 @@ import 'package:dak_louk/data/repositories/product_repo.dart';
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/core/utils/orm.dart';
 import 'package:dak_louk/data/tables/tables.dart';
+import 'package:dak_louk/data/cache/cache.dart';
 
 class LiveStreamProductsService {
   late final currentUserId;
@@ -14,10 +17,13 @@ class LiveStreamProductsService {
   final ProductRepository _productRepository = ProductRepository();
   final ProductMediaRepository _productMediaRepository =
       ProductMediaRepository();
+  final Cache _cache = Cache();
+  late final String _baseCacheKey;
 
   LiveStreamProductsService() {
     if (AppSession.instance.isLoggedIn) {
       currentUserId = AppSession.instance.userId;
+      _baseCacheKey = 'service:user:$currentUserId:live_stream_products';
     } else {
       throw AppError(type: ErrorType.UNAUTHORIZED, message: 'Unauthorized');
     }
@@ -27,6 +33,13 @@ class LiveStreamProductsService {
     int liveStreamId,
   ) async {
     try {
+      final cacheKey =
+          '$_baseCacheKey:getLiveStreamProductsByLiveStreamId:$liveStreamId';
+      if (_cache.exists(cacheKey)) {
+        final cached = _cache.get(cacheKey);
+        return _cache.expectMany(cached).cast<LiveStreamProductsVM>().toList();
+      }
+
       final statement = Clauses.where.eq(
         Tables.liveStreamProducts.cols.liveStreamId,
         liveStreamId,
@@ -63,14 +76,23 @@ class LiveStreamProductsService {
               .args,
         );
 
-        final imageUrl = productMediaList.isNotEmpty
-            ? productMediaList.first.url
-            : '';
+        final medias = productMediaList.isNotEmpty
+            ? productMediaList
+                  .map(
+                    (m) => MediaModel(
+                      url: m.url,
+                      type: m.mediaType == 'video'
+                          ? MediaType.video
+                          : MediaType.image,
+                    ),
+                  )
+                  .toList()
+            : <MediaModel>[];
 
         vmList.add(
           LiveStreamProductsVM.fromRaw(
             liveStreamProduct,
-            image: imageUrl,
+            medias: medias,
             name: product.name,
             quantity: product.quantity,
             price: (product.price * 100).truncate() / 100,
@@ -85,6 +107,7 @@ class LiveStreamProductsService {
         );
       }
 
+      _cache.set(cacheKey, Many(vmList));
       return vmList;
     } catch (e) {
       if (e is AppError) {

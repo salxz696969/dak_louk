@@ -12,9 +12,13 @@ class PromoMediaRepository extends BaseRepository<PromoMediaModel> {
       id: map[Tables.promoMedias.cols.id] as int,
       postId: map[Tables.promoMedias.cols.postId] as int,
       url: map[Tables.promoMedias.cols.url] as String,
-      mediaType: map[Tables.promoMedias.cols.mediaType] as String?,
-      createdAt: DateTime.parse(map[Tables.promoMedias.cols.createdAt] as String),
-      updatedAt: DateTime.parse(map[Tables.promoMedias.cols.updatedAt] as String),
+      mediaType: map[Tables.promoMedias.cols.mediaType] as String,
+      createdAt: DateTime.parse(
+        map[Tables.promoMedias.cols.createdAt] as String,
+      ),
+      updatedAt: DateTime.parse(
+        map[Tables.promoMedias.cols.updatedAt] as String,
+      ),
     );
   }
 

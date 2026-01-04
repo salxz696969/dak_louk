@@ -56,16 +56,12 @@ class PostVM extends Cacheable {
       isSaved: isSaved,
     );
   }
-
-  // Simple getters
-  String? get primaryMediaUrl =>
-      products.isNotEmpty ? products.first.imageUrls.first : null;
 }
 
-class PostProductVM {
+class PostProductVM extends Cacheable{
   final int id;
   final String name;
-  final List<String> imageUrls;
+  final List<MediaModel> medias;
   final double price;
   final int quantity;
   final String description;
@@ -75,7 +71,7 @@ class PostProductVM {
   PostProductVM({
     required this.id,
     required this.name,
-    required this.imageUrls,
+    required this.medias,
     required this.price,
     required this.quantity,
     required this.description,
@@ -85,14 +81,14 @@ class PostProductVM {
 
   factory PostProductVM.fromRaw(
     ProductModel raw, {
-    required List<String> mediaUrls,
+    required List<MediaModel> medias,
     required ProductCategory category,
     required bool isAddedToCart,
   }) {
     return PostProductVM(
       id: raw.id,
       name: raw.name,
-      imageUrls: mediaUrls,
+      medias: medias,
       price: raw.price,
       quantity: raw.quantity,
       description: raw.description ?? '',
@@ -102,7 +98,7 @@ class PostProductVM {
   }
 }
 
-class PostMerchantVM {
+class PostMerchantVM extends Cacheable{
   final int id;
   final String name;
   final String bio;

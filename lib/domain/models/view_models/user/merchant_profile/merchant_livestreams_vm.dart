@@ -1,6 +1,6 @@
 part of models;
 
-class MerchantLivestreamsVM {
+class MerchantLivestreamsVM extends Cacheable {
   final int id;
   final String title;
   final String thumbnailUrl;

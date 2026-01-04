@@ -4,7 +4,7 @@ class PromoMediaVM extends Cacheable {
   final int id;
   final int postId;
   final String url;
-  final String? mediaType;
+  final MediaType? mediaType;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -22,13 +22,13 @@ class PromoMediaVM extends Cacheable {
       id: raw.id,
       postId: raw.postId,
       url: raw.url,
-      mediaType: raw.mediaType,
+      mediaType: raw.mediaType == 'video' ? MediaType.video : MediaType.image,
       createdAt: raw.createdAt,
       updatedAt: raw.updatedAt,
     );
   }
 
   // Simple getters
-  bool get isVideo => mediaType == 'video';
-  bool get isImage => mediaType == 'image' || mediaType == null;
+  bool get isVideo => mediaType == MediaType.video;
+  bool get isImage => mediaType == MediaType.image;
 }

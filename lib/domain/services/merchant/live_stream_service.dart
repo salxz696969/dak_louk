@@ -5,6 +5,7 @@ import 'package:dak_louk/data/repositories/live_stream_repo.dart';
 import 'package:dak_louk/data/repositories/live_stream_chat_repo.dart';
 import 'package:dak_louk/data/repositories/product_repo.dart';
 import 'package:dak_louk/data/repositories/product_media_repo.dart';
+import 'package:dak_louk/data/cache/cache.dart';
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/core/utils/orm.dart';
 import 'package:dak_louk/data/tables/tables.dart';
@@ -19,10 +20,16 @@ class LiveStreamService {
   final ProductRepository _productRepository = ProductRepository();
   final ProductMediaRepository _productMediaRepository =
       ProductMediaRepository();
+  final Cache _cache = Cache();
+  late final String _baseCacheKey;
+  late final String userSideCacheKeyPattern;
+
   LiveStreamService() {
     if (AppSession.instance.isLoggedIn &&
         AppSession.instance.merchantId != null) {
       currentMerchantId = AppSession.instance.merchantId;
+      _baseCacheKey = 'service:merchant:$currentMerchantId:live_stream';
+      userSideCacheKeyPattern = 'service:user:*:live_stream:*';
     } else {
       throw AppError(
         type: ErrorType.UNAUTHORIZED,
@@ -33,6 +40,11 @@ class LiveStreamService {
 
   Future<List<MerchantLiveStreamsVM>> getAllLiveStreams() async {
     try {
+      final cacheKey = '$_baseCacheKey:getAllLiveStreams';
+      if (_cache.exists(cacheKey)) {
+        final cached = _cache.get(cacheKey);
+        return _cache.expectMany(cached).cast<MerchantLiveStreamsVM>().toList();
+      }
       final statement = Clauses.where.eq(
         Tables.liveStreams.cols.merchantId,
         currentMerchantId,
@@ -111,6 +123,7 @@ class LiveStreamService {
         );
       }
 
+      _cache.set(cacheKey, Many(liveStreamsWithProducts));
       return liveStreamsWithProducts;
     } catch (e) {
       throw AppError(
@@ -122,8 +135,14 @@ class LiveStreamService {
 
   Future<MerchantLiveStreamsVM?> getLiveStreamById(int id) async {
     try {
+      final cacheKey = '$_baseCacheKey:getLiveStreamById:$id';
+      if (_cache.exists(cacheKey)) {
+        final cached = _cache.get(cacheKey);
+        return _cache.expectSingle(cached) as MerchantLiveStreamsVM;
+      }
       final liveStream = await _liveStreamRepository.getById(id);
       if (liveStream != null && liveStream.merchantId == currentMerchantId) {
+        _cache.set(cacheKey, Single(MerchantLiveStreamsVM.fromRaw(liveStream)));
         return MerchantLiveStreamsVM.fromRaw(liveStream);
       }
       return null;
@@ -151,7 +170,6 @@ class LiveStreamService {
         updatedAt: DateTime.now().toIso8601String(),
       );
       final id = await _liveStreamRepository.insert(liveStreamModel);
-
       // Add products if provided
       if (dto.productIds != null && dto.productIds!.isNotEmpty) {
         for (final productId in dto.productIds!) {
@@ -167,8 +185,12 @@ class LiveStreamService {
 
       final newLiveStream = await _liveStreamRepository.getById(id);
       if (newLiveStream != null) {
+        _cache.del('$_baseCacheKey:getLiveStreamById:$id');
+        _cache.del('$_baseCacheKey:getAllLiveStreams');
+        _cache.delByPattern(userSideCacheKeyPattern);
         return MerchantLiveStreamsVM.fromRaw(newLiveStream);
       }
+
       throw AppError(
         type: ErrorType.NOT_FOUND,
         message: 'Live stream not found',
@@ -233,6 +255,9 @@ class LiveStreamService {
 
       final newLiveStream = await _liveStreamRepository.getById(id);
       if (newLiveStream != null) {
+        _cache.del('$_baseCacheKey:getLiveStreamById:$id');
+        _cache.del('$_baseCacheKey:getAllLiveStreams');
+        _cache.delByPattern(userSideCacheKeyPattern);
         return MerchantLiveStreamsVM.fromRaw(newLiveStream);
       }
       throw AppError(
@@ -280,6 +305,12 @@ class LiveStreamService {
 
       // Delete the live stream
       await _liveStreamRepository.delete(liveStreamId);
+      // delete all live stremas when deleting one, cuz we dont want leftover, could have looped to find it but cant access id since cacheble is vague
+      // abit wasteful when doing getAllAgain
+      // future fix maybe to let id be a field in cahceble and let teh child inherit from it, but sould cause issue if db is not named id or sth so for now each model define itself
+      _cache.del('$_baseCacheKey:getLiveStreamById:$liveStreamId');
+      _cache.del('$_baseCacheKey:getAllLiveStreams');
+      _cache.delByPattern(userSideCacheKeyPattern);
     } catch (e) {
       if (e is AppError) {
         rethrow;

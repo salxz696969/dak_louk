@@ -5,15 +5,21 @@ import 'package:dak_louk/core/utils/orm.dart';
 import 'package:dak_louk/data/tables/tables.dart';
 import 'package:dak_louk/core/auth/app_session.dart';
 import 'package:dak_louk/core/utils/error.dart';
+import 'package:dak_louk/data/cache/cache.dart';
 
 class LiveStreamChatService {
   late final currentUserId;
   final LiveStreamChatRepository _liveStreamChatRepository =
       LiveStreamChatRepository();
   final UserRepository _userRepository = UserRepository();
+  final Cache _cache = Cache();
+  late final String _baseCacheKey;
+  late final String merchantSideCacheKeyPattern;
   LiveStreamChatService() {
     if (AppSession.instance.isLoggedIn) {
       currentUserId = AppSession.instance.userId;
+      _baseCacheKey = 'service:user:$currentUserId:live_stream_chat';
+      merchantSideCacheKeyPattern = 'service:merchant:*:live_stream:*';
     } else {
       throw AppError(type: ErrorType.UNAUTHORIZED, message: 'Unauthorized');
     }
@@ -24,6 +30,13 @@ class LiveStreamChatService {
     int liveStreamId,
   ) async {
     try {
+      final cacheKey =
+          '$_baseCacheKey:getAllLiveStreamChatByLiveStreamId:$liveStreamId';
+      if (_cache.exists(cacheKey)) {
+        final cached = _cache.get(cacheKey);
+        return _cache.expectMany(cached).cast<LiveStreamChatVM>().toList();
+      }
+
       final statement = Clauses.where.eq(
         Tables.liveStreamChats.cols.liveStreamId,
         liveStreamId,
@@ -48,11 +61,18 @@ class LiveStreamChatService {
           }
         }
         // Populate user relations like in the original DAO
+        _cache.set(cacheKey, Many(chatsVM));
         return chatsVM;
       }
       throw Exception('LiveStreamChat not found');
     } catch (e) {
-      rethrow;
+      if (e is AppError) {
+        rethrow;
+      }
+      throw AppError(
+        type: ErrorType.DB_ERROR,
+        message: 'Failed to get live stream chat',
+      );
     }
   }
 
@@ -75,6 +95,11 @@ class LiveStreamChatService {
         if (newChat != null) {
           final user = await _userRepository.getById(newChat.userId);
           if (user != null) {
+            // Invalidate cache for this live stream's chats
+            _cache.del(
+              '$_baseCacheKey:getAllLiveStreamChatByLiveStreamId:${dto.liveStreamId}',
+            );
+            _cache.delByPattern(merchantSideCacheKeyPattern);
             return LiveStreamChatVM.fromRaw(
               newChat,
               username: user.username,

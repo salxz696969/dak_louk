@@ -1,4 +1,5 @@
 import 'package:dak_louk/core/enums/media_type_enum.dart';
+import 'package:dak_louk/core/media/media_model.dart';
 import 'package:dak_louk/core/media/media_picker_sheet.dart';
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/domain/services/merchant/product_service.dart';
@@ -36,7 +37,9 @@ class _LiveStreamEditFormState extends State<LiveStreamEditForm> {
               id: product.id,
               name: product.name,
               price: product.price,
-              imageUrls: product.imageUrls,
+              medias: product.imageUrls
+                  .map((m) => MediaModel(url: m, type: MediaType.image))
+                  .toList(),
             ),
           ) ??
           [],
@@ -88,7 +91,7 @@ class _LiveStreamEditFormState extends State<LiveStreamEditForm> {
               id: product.id,
               name: product.name,
               price: product.price,
-              imageUrls: product.imageUrls,
+              medias: product.medias,
             ),
           )
           .toList(),

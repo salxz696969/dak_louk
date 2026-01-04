@@ -1,5 +1,8 @@
 import 'package:dak_louk/core/auth/app_session.dart';
+import 'package:dak_louk/core/enums/media_type_enum.dart';
+import 'package:dak_louk/core/media/media_model.dart';
 import 'package:dak_louk/core/utils/error.dart';
+import 'package:dak_louk/data/cache/cache.dart';
 import 'package:dak_louk/data/repositories/cart_repo.dart';
 import 'package:dak_louk/data/repositories/merchant_repo.dart';
 import 'package:dak_louk/data/repositories/product_repo.dart';
@@ -32,11 +35,16 @@ class PostService {
   final ProductCategoryMapsRepository _productCategoryMapsRepository =
       ProductCategoryMapsRepository();
   final CartRepository _cartRepository = CartRepository();
+  final Cache _cache = Cache();
+  late final String _baseCacheKey;
+  late final String merchantSideCacheKeyPattern;
 
   // Business logic methods migrated from PostRepository
   PostService() {
     if (AppSession.instance.isLoggedIn) {
       currentUserId = AppSession.instance.userId;
+      _baseCacheKey = 'service:user:$currentUserId:post';
+      merchantSideCacheKeyPattern = 'service:merchant:*:post:*';
     } else {
       throw AppError(type: ErrorType.UNAUTHORIZED, message: 'Unauthorized');
     }
@@ -92,6 +100,12 @@ class PostService {
     int limit = 100,
   }) async {
     try {
+      final cacheKey = '$_baseCacheKey:getAllPosts:$category:$limit';
+      if (_cache.exists(cacheKey)) {
+        final cached = _cache.get(cacheKey);
+        return _cache.expectMany(cached).cast<PostVM>().toList();
+      }
+
       if (limit <= 0) limit = 100;
 
       List<PostModel> posts;
@@ -205,7 +219,16 @@ class PostService {
                 PostProductVM(
                   id: product.id,
                   name: product.name,
-                  imageUrls: productMedias.map((media) => media.url).toList(),
+                  medias: productMedias
+                      .map(
+                        (media) => MediaModel(
+                          url: media.url,
+                          type: media.mediaType == 'video'
+                              ? MediaType.video
+                              : MediaType.image,
+                        ),
+                      )
+                      .toList(),
                   price: (product.price * 100).truncate() / 100,
                   quantity: product.quantity,
                   isAddedToCart: isAddedToCart.isNotEmpty,
@@ -252,6 +275,7 @@ class PostService {
         }),
       );
 
+      _cache.set(cacheKey, Many(enrichedPosts));
       return enrichedPosts;
     } catch (e) {
       if (e is AppError) {
@@ -284,13 +308,14 @@ class PostService {
         }
       }
 
-      if (dto.promoMediaUrls != null) {
-        for (final mediaUrl in dto.promoMediaUrls!) {
+      if (dto.promoMedias != null) {
+        for (final media in dto.promoMedias!) {
           await _promoMediaRepository.insert(
             PromoMediaModel(
               id: 0,
               postId: id,
-              url: mediaUrl,
+              url: media.url,
+              mediaType: media.type == MediaType.video ? 'video' : 'image',
               createdAt: DateTime.now(),
               updatedAt: DateTime.now(),
             ),
@@ -301,7 +326,13 @@ class PostService {
       final newPost = await _postRepository.getById(id);
       if (newPost != null) {
         final postVMs = await _buildPostVMs([newPost]);
-        return postVMs.isNotEmpty ? postVMs.first : null;
+        if (postVMs.isNotEmpty) {
+          // Invalidate cache
+          _cache.del('$_baseCacheKey:getAllPosts');
+          _cache.del('$_baseCacheKey:getPostById:$id');
+          _cache.delByPattern(merchantSideCacheKeyPattern);
+          return postVMs.first;
+        }
       }
       throw AppError(type: ErrorType.NOT_FOUND, message: 'Post not found');
     } catch (e) {
@@ -317,10 +348,19 @@ class PostService {
 
   Future<PostVM?> getPostById(int id) async {
     try {
+      final cacheKey = '$_baseCacheKey:getPostById:$id';
+      if (_cache.exists(cacheKey)) {
+        final cached = _cache.get(cacheKey);
+        return _cache.expectSingle(cached) as PostVM;
+      }
+
       final post = await _postRepository.getById(id);
       if (post != null) {
         final postVMs = await _buildPostVMs([post]);
-        return postVMs.isNotEmpty ? postVMs.first : null;
+        if (postVMs.isNotEmpty) {
+          _cache.set(cacheKey, Single(postVMs.first));
+          return postVMs.first;
+        }
       }
       throw AppError(type: ErrorType.NOT_FOUND, message: 'Post not found');
     } catch (e) {
@@ -397,6 +437,12 @@ class PostService {
 
   Future<List<PostVM>> getSimilarPosts(int postId) async {
     try {
+      final cacheKey = '$_baseCacheKey:getSimilarPosts:$postId';
+      if (_cache.exists(cacheKey)) {
+        final cached = _cache.get(cacheKey);
+        return _cache.expectMany(cached).cast<PostVM>().toList();
+      }
+
       final post = await _postRepository.getById(postId);
       if (post == null) {
         throw AppError(type: ErrorType.NOT_FOUND, message: 'Post not found');
@@ -408,7 +454,9 @@ class PostService {
         args: Clauses.like.like(Tables.posts.cols.caption, post.caption!).args,
         limit: 10,
       );
-      return await _buildPostVMs(posts);
+      final result = await _buildPostVMs(posts);
+      _cache.set(cacheKey, Many(result));
+      return result;
     } catch (e) {
       throw AppError(
         type: ErrorType.DB_ERROR,
@@ -499,7 +547,16 @@ class PostService {
               PostProductVM(
                 id: product.id,
                 name: product.name,
-                imageUrls: productMedias.map((media) => media.url).toList(),
+                medias: productMedias
+                    .map(
+                      (media) => MediaModel(
+                        url: media.url,
+                        type: media.mediaType == 'video'
+                            ? MediaType.video
+                            : MediaType.image,
+                      ),
+                    )
+                    .toList(),
                 price: (product.price * 100).truncate() / 100,
                 quantity: product.quantity,
                 description: product.description ?? '',

@@ -1,5 +1,8 @@
+import 'package:dak_louk/core/enums/media_type_enum.dart';
+import 'package:dak_louk/core/media/media_model.dart';
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/domain/services/merchant/post_service.dart';
+import 'package:dak_louk/ui/widgets/common/media_carousel.dart';
 import 'package:dak_louk/ui/widgets/merchant/posts/product_item.dart';
 import 'package:flutter/material.dart';
 
@@ -74,19 +77,21 @@ class _PostItemState extends State<PostItem> {
 
         const SizedBox(height: 12),
 
-        // Promo Media (display first one)
+        // Promo Media Carousel
         if (widget.post.promoMedias?.isNotEmpty ?? false)
           Container(
-            height: 300,
-            width: double.infinity,
             margin: const EdgeInsets.symmetric(horizontal: 12),
-            decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.asset(
-                widget.post.promoMedias!.first.url,
-                fit: BoxFit.cover,
-              ),
+            child: MediaCarousel(
+              medias: widget.post.promoMedias!
+                  .map(
+                    (media) => MediaModel(
+                      url: media.url,
+                      type: media.mediaType == 'video'
+                          ? MediaType.video
+                          : MediaType.image,
+                    ),
+                  )
+                  .toList(),
             ),
           ),
 

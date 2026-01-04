@@ -1,5 +1,8 @@
+import 'package:dak_louk/core/enums/media_type_enum.dart';
+import 'package:dak_louk/core/media/media_model.dart';
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/domain/services/user/cart_service.dart';
+import 'package:dak_louk/ui/widgets/common/media_carousel.dart';
 import 'package:flutter/material.dart';
 
 class LiveStreamProductItem extends StatefulWidget {
@@ -28,19 +31,20 @@ class _LiveStreamProductItemState extends State<LiveStreamProductItem> {
               borderRadius: BorderRadius.circular(12),
               color: Colors.grey[200],
             ),
-            child: widget.product.image.isNotEmpty
+            child: widget.product.medias.isNotEmpty
                 ? ClipRRect(
                     borderRadius: BorderRadius.circular(12),
-                    child: Image.asset(
-                      widget.product.image,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        );
-                      },
+                    child: MediaCarousel(
+                      medias: widget.product.medias
+                          .map(
+                            (m) => MediaModel(
+                              url: m.url,
+                              type: m.type == MediaType.video
+                                  ? MediaType.video
+                                  : MediaType.image,
+                            ),
+                          )
+                          .toList(),
                     ),
                   )
                 : Container(

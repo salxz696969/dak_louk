@@ -1,6 +1,6 @@
 part of models;
 
-class MerchantPostsVM {
+class MerchantPostsVM extends Cacheable {
   final int id;
   final String caption;
   final String imageUrl;

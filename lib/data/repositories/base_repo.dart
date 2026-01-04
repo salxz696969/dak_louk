@@ -191,8 +191,8 @@ abstract class BaseRepository<T extends Cacheable>
         where: statement.clause,
         whereArgs: statement.args,
       );
-      _cache.del('$cacheKey:$id');
-      _cache.del('$cacheKey:all');
+      _cache.del('$cacheKey:$id'); // the single item cache
+      _cache.del('$cacheKey:all'); // the many cache list
       // couldve used id to remove from the list but since cacheble is inaccesable to the id field of the model i couldnt
       final newCache = await getAll();
       _cache.set('$cacheKey:all', Many(newCache));
@@ -219,6 +219,17 @@ abstract class BaseRepository<T extends Cacheable>
     int? offset,
   }) async {
     try {
+      if (where != null ||
+          args != null ||
+          orderBy != null ||
+          limit != null ||
+          offset != null) {
+        final cacheKey = _getQueryCacheKey(where, args, orderBy, limit, offset);
+        final cached = _cache.get(cacheKey);
+        if (cached != null) {
+          return _expectMany(cached).toList();
+        }
+      }
       final db = await database;
       final result = await db.query(
         tableName,
@@ -229,7 +240,6 @@ abstract class BaseRepository<T extends Cacheable>
         offset: offset,
       );
 
-      // this means that it will convert the database map to a list of models mathching it exactly with no validation
       return result.map((map) => fromMap(map)).toList();
     } catch (e) {
       if (e is AppError) {
@@ -245,7 +255,22 @@ abstract class BaseRepository<T extends Cacheable>
 
   // use to suffix the repo's keys to avoid conflicts with other repos or services
   String _getBaseCacheKey() {
-    return 'model:${this.tableName}';
+    return 'repo:${this.tableName}';
+  }
+
+  String _getQueryCacheKey(
+    String? where,
+    List<Object?>? args,
+    String? orderBy,
+    int? limit,
+    int? offset,
+  ) {
+    final whereClause = where ?? '';
+    final argsClause = args?.map((e) => e?.toString() ?? '').join(',') ?? '';
+    final orderByClause = orderBy ?? '';
+    final limitClause = limit?.toString() ?? '';
+    final offsetClause = offset?.toString() ?? '';
+    return 'repo:$tableName:query:$whereClause:$argsClause:$orderByClause:$limitClause:$offsetClause';
   }
 
   // safer casting and checking

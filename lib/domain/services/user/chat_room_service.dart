@@ -4,6 +4,7 @@ import 'package:dak_louk/core/utils/time_ago.dart' as time_ago;
 import 'package:dak_louk/data/repositories/chat_repo.dart';
 import 'package:dak_louk/data/repositories/chat_room_repo.dart';
 import 'package:dak_louk/data/repositories/merchant_repo.dart';
+import 'package:dak_louk/data/cache/cache.dart';
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/core/utils/orm.dart';
 import 'package:dak_louk/data/tables/tables.dart';
@@ -13,14 +14,20 @@ class ChatRoomService {
   final ChatRoomRepository _chatRoomRepository = ChatRoomRepository();
   final MerchantRepository _merchantRepository = MerchantRepository();
   final ChatRepository _chatRepository = ChatRepository();
+  final Cache _cache = Cache();
+  late final String _baseCacheKey;
+
   ChatRoomService() {
     if (AppSession.instance.isLoggedIn) {
       currentUserId = AppSession.instance.userId;
+      _baseCacheKey = 'service:user:$currentUserId:chat_room';
     } else {
       throw AppError(type: ErrorType.UNAUTHORIZED, message: 'Unauthorized');
     }
   }
 
+  // ! not used in ui, but should be when theres no seeded data, should happen when we click the message icon oin a post or 
+  // ! merchant profile, if the getChatsByChatroom id or by merchant id create the chatroom
   // Migrated from ChatRoomDao.insertChatRoom
   Future<int> createChatRoom(CreateChatRoomDTO dto) async {
     try {
@@ -31,7 +38,12 @@ class ChatRoomService {
         createdAt: DateTime.now().toIso8601String(),
         updatedAt: DateTime.now().toIso8601String(),
       );
-      return await _chatRoomRepository.insert(chatRoomModel);
+      final id = await _chatRoomRepository.insert(chatRoomModel);
+      if (id > 0) {
+        // Invalidate cache for all chat rooms
+        _cache.del('$_baseCacheKey:getAllChatRooms');
+      }
+      return id;
     } catch (e) {
       if (e is AppError) {
         rethrow;
@@ -110,6 +122,12 @@ class ChatRoomService {
   // Migrated from ChatRoomDao.getAllChatRoomsByUserId
   Future<List<ChatRoomVM?>> getAllChatRooms() async {
     try {
+      final cacheKey = '$_baseCacheKey:getAllChatRooms';
+      if (_cache.exists(cacheKey)) {
+        final cached = _cache.get(cacheKey);
+        return _cache.expectMany(cached).cast<ChatRoomVM?>().toList();
+      }
+
       print('getAllChatRooms: querying chat rooms for user $currentUserId');
       final statement = Clauses.where.eq(
         Tables.chatRooms.cols.userId,
@@ -162,6 +180,7 @@ class ChatRoomService {
         }
       }
       print('getAllChatRooms: returning ${chatRoomsVM.length} ChatRoomVMs');
+      _cache.set(cacheKey, Many(chatRoomsVM));
       return chatRoomsVM;
     } catch (e) {
       print('getAllChatRooms: error - $e');

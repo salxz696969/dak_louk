@@ -125,16 +125,3 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 }
-
-// (3) PROFILE APP BAR
-class _ProfileAppBar extends StatelessWidget {
-  final String title;
-  const _ProfileAppBar({required this.title});
-  @override
-  Widget build(BuildContext context) {
-    return AppBar(
-      title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-      centerTitle: true,
-    );
-  }
-}

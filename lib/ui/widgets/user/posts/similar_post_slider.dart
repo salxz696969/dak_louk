@@ -1,5 +1,8 @@
+import 'package:dak_louk/core/enums/media_type_enum.dart';
+import 'package:dak_louk/core/media/media_model.dart';
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/ui/screens/user/post_detail_screen.dart';
+import 'package:dak_louk/ui/widgets/common/media_carousel.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -84,12 +87,17 @@ class _SimilarItemCardState extends State<_SimilarItemCard> {
               ),
               child: Stack(
                 children: [
-                  AspectRatio(
-                    aspectRatio: 4 / 3,
-                    child: Image(
-                      image: AssetImage(widget.post.primaryMediaUrl ?? ''),
-                      fit: BoxFit.cover,
-                    ),
+                  MediaCarousel(
+                    medias: widget.post.promoMedias!
+                        .map(
+                          (m) => MediaModel(
+                            url: m.url,
+                            type: m.mediaType == 'video'
+                                ? MediaType.video
+                                : MediaType.image,
+                          ),
+                        )
+                        .toList(),
                   ),
                 ],
               ),

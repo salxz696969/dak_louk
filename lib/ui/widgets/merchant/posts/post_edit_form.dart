@@ -1,5 +1,6 @@
 import 'package:dak_louk/core/enums/media_type_enum.dart';
 import 'package:dak_louk/core/media/media_picker_sheet.dart';
+import 'package:dak_louk/core/media/media_model.dart';
 import 'package:flutter/material.dart';
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/domain/services/merchant/post_service.dart';
@@ -21,7 +22,7 @@ class PostEditForm extends StatefulWidget {
 class _PostEditFormState extends State<PostEditForm> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _captionCtrl;
-  final List<String> _mediaUrls = [];
+  final List<MediaModel> _promoMedias = [];
   List<AddProductsModel> _selectedProducts = [];
 
   bool _saving = false;
@@ -33,7 +34,16 @@ class _PostEditFormState extends State<PostEditForm> {
     super.initState();
     _captionCtrl = TextEditingController(text: widget.post.caption ?? '');
     if (widget.post.promoMedias != null) {
-      _mediaUrls.addAll(widget.post.promoMedias!.map((m) => m.url));
+      _promoMedias.addAll(
+        widget.post.promoMedias!.map(
+          (m) => MediaModel(
+            url: m.url,
+            type: m.mediaType == 'video' ? MediaType.video : MediaType.image,
+          ),
+        ),
+      );
+    } else {
+      _promoMedias.addAll([]);
     }
     _selectedProducts.addAll(
       widget.post.products.map(
@@ -41,7 +51,7 @@ class _PostEditFormState extends State<PostEditForm> {
           id: product.id,
           name: product.name,
           price: product.price,
-          imageUrls: product.imageUrls,
+          medias: product.medias,
         ),
       ),
     );
@@ -61,14 +71,14 @@ class _PostEditFormState extends State<PostEditForm> {
     );
     if (path != null) {
       setState(() {
-        _mediaUrls.add(path);
+        _promoMedias.add(MediaModel(url: path, type: MediaType.image));
       });
     }
   }
 
   void _removeMedia(int index) {
     setState(() {
-      _mediaUrls.removeAt(index);
+      _promoMedias.removeAt(index);
     });
   }
 
@@ -82,7 +92,7 @@ class _PostEditFormState extends State<PostEditForm> {
               id: product.id,
               name: product.name,
               price: product.price,
-              imageUrls: product.imageUrls,
+              medias: product.medias,
             ),
           )
           .toList(),
@@ -162,7 +172,7 @@ class _PostEditFormState extends State<PostEditForm> {
 
               // Media Section
               MediaSection(
-                mediaUrls: _mediaUrls,
+                medias: _promoMedias,
                 onAddMedia: _addMedia,
                 onRemoveMedia: _removeMedia,
               ),
@@ -177,7 +187,7 @@ class _PostEditFormState extends State<PostEditForm> {
                         id: product.id,
                         name: product.name,
                         price: product.price,
-                        imageUrls: product.imageUrls,
+                        medias: product.medias,
                       ),
                     )
                     .toList(),

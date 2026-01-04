@@ -1,16 +1,23 @@
 import 'package:dak_louk/data/repositories/chat_repo.dart';
 import 'package:dak_louk/core/auth/app_session.dart';
 import 'package:dak_louk/core/utils/error.dart';
+import 'package:dak_louk/data/cache/cache.dart';
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/core/utils/orm.dart';
 import 'package:dak_louk/data/tables/tables.dart';
 
 class ChatService {
   final ChatRepository _chatRepository = ChatRepository();
+  final Cache _cache = Cache();
   late final currentUserId;
+  late final String _baseCacheKey;
+  late final String merchantSideCacheKeyPattern;
+
   ChatService() {
     if (AppSession.instance.isLoggedIn) {
       currentUserId = AppSession.instance.userId;
+      _baseCacheKey = 'service:user:$currentUserId:chat';
+      merchantSideCacheKeyPattern = 'service:merchant:*:chat:*';
     } else {
       throw AppError(type: ErrorType.UNAUTHORIZED, message: 'Unauthorized');
     }
@@ -18,13 +25,6 @@ class ChatService {
   // Migrated from ChatDao.insertChat
   Future<ChatVM?> createChat(CreateChatDTO dto) async {
     try {
-      // Nicely log the incoming DTO
-      print(
-        '[ChatService] Creating chat with DTO: {\n'
-        '  chatRoomId: ${dto.chatRoomId},\n'
-        '  text: "${dto.text}"\n'
-        '}',
-      );
       final chatModel = ChatModel(
         id: 0,
         senderId: currentUserId,
@@ -33,21 +33,13 @@ class ChatService {
         createdAt: DateTime.now().toIso8601String(),
         updatedAt: DateTime.now().toIso8601String(),
       );
-      // Nicely log the model about to be inserted
-      print(
-        '[ChatService] Inserting ChatModel: {\n'
-        '  id: ${chatModel.id},\n'
-        '  senderId: ${chatModel.senderId},\n'
-        '  chatRoomId: ${chatModel.chatRoomId},\n'
-        '  text: "${chatModel.text}",\n'
-        '  createdAt: ${chatModel.createdAt},\n'
-        '  updatedAt: ${chatModel.updatedAt}\n'
-        '}',
-      );
       final id = await _chatRepository.insert(chatModel);
       if (id > 0) {
         final newChat = await _chatRepository.getById(id);
         if (newChat != null) {
+          // Invalidate cache for this chat room
+          _cache.del('$_baseCacheKey:getChatsByChatRoomId:${dto.chatRoomId}');
+          _cache.delByPattern(merchantSideCacheKeyPattern);
           return ChatVM.fromRaw(newChat, isMine: true);
         }
         throw AppError(type: ErrorType.NOT_FOUND, message: 'Chat not found');
@@ -122,6 +114,12 @@ class ChatService {
   // Migrated from ChatDao.getChatByChatRoomId
   Future<List<ChatVM>> getChatsByChatRoomId(int chatRoomId) async {
     try {
+      final cacheKey = '$_baseCacheKey:getChatsByChatRoomId:$chatRoomId';
+      if (_cache.exists(cacheKey)) {
+        final cached = _cache.get(cacheKey);
+        return _cache.expectMany(cached).cast<ChatVM>().toList();
+      }
+
       final statement = Clauses.where.eq(
         Tables.chats.cols.chatRoomId,
         chatRoomId,
@@ -141,11 +139,12 @@ class ChatService {
             );
           }),
         );
+        _cache.set(cacheKey, Many(enrichedChats));
         return enrichedChats;
       }
 
       // Return empty chat as in DAO
-      return [
+      final emptyChat = [
         ChatVM.fromRaw(
           ChatModel(
             id: 0,
@@ -158,6 +157,8 @@ class ChatService {
           isMine: false,
         ),
       ];
+      _cache.set(cacheKey, Many(emptyChat));
+      return emptyChat;
     } catch (e) {
       rethrow;
     }

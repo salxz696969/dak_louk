@@ -2,6 +2,7 @@ import 'package:dak_louk/core/auth/app_session.dart';
 import 'package:dak_louk/core/utils/error.dart';
 import 'package:dak_louk/data/repositories/product_repo.dart';
 import 'package:dak_louk/data/repositories/product_media_repo.dart';
+import 'package:dak_louk/data/cache/cache.dart';
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/core/utils/orm.dart';
 import 'package:dak_louk/data/tables/tables.dart';
@@ -11,11 +12,16 @@ class ProductService {
   final ProductRepository _productRepository = ProductRepository();
   final ProductMediaRepository _productMediaRepository =
       ProductMediaRepository();
+  final Cache _cache = Cache();
+  late final String _baseCacheKey;
+  late final String userSideCacheKeyPattern;
 
   ProductService() {
     if (AppSession.instance.isLoggedIn &&
         AppSession.instance.merchantId != null) {
       currentMerchantId = AppSession.instance.merchantId;
+      _baseCacheKey = 'service:merchant:$currentMerchantId:product';
+      userSideCacheKeyPattern = 'service:user:*:product:*';
     } else {
       throw AppError(
         type: ErrorType.UNAUTHORIZED,
@@ -27,10 +33,21 @@ class ProductService {
   // Migrated from ProductDao
   Future<List<ProductVM>> getAllProducts(String? category, int limit) async {
     try {
+      final cacheKey = '$_baseCacheKey:getAllProducts:$category:$limit';
+      if (_cache.exists(cacheKey)) {
+        final cached = _cache.get(cacheKey);
+        return _cache.expectMany(cached).cast<ProductVM>().toList();
+      }
       if (limit <= 0) limit = 100;
       if (category == null) {
         final products = await _productRepository.queryThisTable(limit: limit);
         if (products.isNotEmpty) {
+          _cache.set(
+            cacheKey,
+            Many(
+              products.map((product) => ProductVM.fromRaw(product)).toList(),
+            ),
+          );
           return products.map((product) => ProductVM.fromRaw(product)).toList();
         }
         throw AppError(type: ErrorType.NOT_FOUND, message: 'No products found');
@@ -38,6 +55,12 @@ class ProductService {
       if (category == 'all') {
         final products = await _productRepository.queryThisTable(limit: limit);
         if (products.isNotEmpty) {
+          _cache.set(
+            cacheKey,
+            Many(
+              products.map((product) => ProductVM.fromRaw(product)).toList(),
+            ),
+          );
           return products.map((product) => ProductVM.fromRaw(product)).toList();
         }
         throw AppError(type: ErrorType.NOT_FOUND, message: 'No products found');
@@ -52,17 +75,35 @@ class ProductService {
           limit: limit,
         );
         if (products.isNotEmpty) {
+          _cache.set(
+            cacheKey,
+            Many(
+              products.map((product) => ProductVM.fromRaw(product)).toList(),
+            ),
+          );
           return products.map((product) => ProductVM.fromRaw(product)).toList();
         }
         throw AppError(type: ErrorType.NOT_FOUND, message: 'No products found');
       }
     } catch (e) {
-      rethrow;
+      if (e is AppError) {
+        rethrow;
+      }
+      throw AppError(
+        type: ErrorType.DB_ERROR,
+        message: 'Failed to get products',
+      );
     }
   }
 
   Future<List<ProductVM>> getAllProductsForCurrentMerchant() async {
     try {
+      final cacheKey = '$_baseCacheKey:getAllProductsForCurrentMerchant';
+      if (_cache.exists(cacheKey)) {
+        final cached = _cache.get(cacheKey);
+        return _cache.expectMany(cached).cast<ProductVM>().toList();
+      }
+
       final statement = Clauses.where.eq(
         Tables.products.cols.merchantId,
         currentMerchantId,
@@ -98,6 +139,8 @@ class ProductService {
         final productVM = ProductVM.fromRaw(product, mediaUrls: mediaUrls);
         productsWithMedia.add(productVM);
       }
+
+      _cache.set(cacheKey, Many(productsWithMedia));
       return productsWithMedia;
     } catch (e) {
       if (e is AppError) {
@@ -127,6 +170,9 @@ class ProductService {
       if (id > 0) {
         final newProduct = await _productRepository.getById(id);
         if (newProduct != null) {
+          _cache.del('$_baseCacheKey:getAllProductsForCurrentMerchant');
+          _cache.del('$_baseCacheKey:getProductById:$id');
+          _cache.delByPattern(userSideCacheKeyPattern);
           return ProductVM.fromRaw(newProduct);
         }
         throw AppError(type: ErrorType.NOT_FOUND, message: 'Product not found');
@@ -148,8 +194,14 @@ class ProductService {
 
   Future<ProductVM?> getProductById(int id) async {
     try {
+      final cacheKey = '$_baseCacheKey:getProductById:$id';
+      if (_cache.exists(cacheKey)) {
+        final cached = _cache.get(cacheKey);
+        return _cache.expectSingle(cached) as ProductVM;
+      }
       final product = await _productRepository.getById(id);
       if (product != null) {
+        _cache.set(cacheKey, Single(ProductVM.fromRaw(product)));
         return ProductVM.fromRaw(product);
       }
       throw AppError(type: ErrorType.NOT_FOUND, message: 'Product not found');
@@ -186,6 +238,10 @@ class ProductService {
       await _productRepository.update(productModel);
       final newProduct = await _productRepository.getById(id);
       if (newProduct != null) {
+        _cache.del('$_baseCacheKey:getAllProductsForCurrentMerchant');
+        _cache.del('$_baseCacheKey:getProductById:$id');
+        _cache.del('$_baseCacheKey:getAllProducts');
+        _cache.delByPattern(userSideCacheKeyPattern);
         return ProductVM.fromRaw(newProduct);
       }
       throw AppError(type: ErrorType.NOT_FOUND, message: 'Product not found');
@@ -218,6 +274,11 @@ class ProductService {
         await _productMediaRepository.delete(media.id);
       }
       await _productRepository.delete(productId);
+
+      _cache.del('$_baseCacheKey:getAllProductsForCurrentMerchant');
+      _cache.del('$_baseCacheKey:getProductById:$productId');
+      _cache.del('$_baseCacheKey:getAllProducts');
+      _cache.delByPattern(userSideCacheKeyPattern);
       throw AppError(type: ErrorType.NOT_FOUND, message: 'Product not found');
     } catch (e) {
       if (e is AppError) {

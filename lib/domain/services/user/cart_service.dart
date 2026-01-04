@@ -3,6 +3,7 @@ import 'package:dak_louk/data/repositories/cart_repo.dart';
 import 'package:dak_louk/data/repositories/product_repo.dart';
 import 'package:dak_louk/data/repositories/merchant_repo.dart';
 import 'package:dak_louk/data/repositories/product_media_repo.dart';
+import 'package:dak_louk/data/cache/cache.dart';
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/core/utils/orm.dart';
 import 'package:dak_louk/data/tables/tables.dart';
@@ -14,11 +15,14 @@ class CartService {
   final MerchantRepository _merchantRepository = MerchantRepository();
   final ProductMediaRepository _productMediaRepository =
       ProductMediaRepository();
+  final Cache _cache = Cache();
   late final currentUserId;
+  late final String _baseCacheKey;
 
   CartService() {
     if (AppSession.instance.isLoggedIn) {
       currentUserId = AppSession.instance.userId;
+      _baseCacheKey = 'service:user:$currentUserId:cart';
     } else {
       throw AppError(type: ErrorType.UNAUTHORIZED, message: 'Unauthorized');
     }
@@ -26,6 +30,12 @@ class CartService {
 
   Future<List<CartVM>> getCarts() async {
     try {
+      final cacheKey = '$_baseCacheKey:getCarts';
+      if (_cache.exists(cacheKey)) {
+        final cached = _cache.get(cacheKey);
+        return _cache.expectMany(cached).cast<CartVM>().toList();
+      }
+
       // Get all cart items for the current user
       final statement = Clauses.where.eq(
         Tables.carts.cols.userId,
@@ -115,6 +125,7 @@ class CartService {
         }
       }
 
+      _cache.set(cacheKey, Many(cartVMs));
       return cartVMs;
     } catch (e) {
       if (e is AppError) {
@@ -137,6 +148,9 @@ class CartService {
         throw AppError(type: ErrorType.UNAUTHORIZED, message: 'Unauthorized');
       }
       await _cartRepository.delete(id);
+
+      // Invalidate cache
+      _cache.del('$_baseCacheKey:getCarts');
     } catch (e) {
       if (e is AppError) {
         rethrow;
@@ -162,6 +176,8 @@ class CartService {
       if (id > 0) {
         final newCart = await _cartRepository.getById(id);
         if (newCart != null) {
+          // Invalidate cache
+          _cache.del('$_baseCacheKey:getCarts');
           return newCart.id;
         }
         throw AppError(type: ErrorType.NOT_FOUND, message: 'Cart not found');
@@ -201,6 +217,8 @@ class CartService {
       await _cartRepository.update(cartModel);
       final newCart = await _cartRepository.getById(id);
       if (newCart != null) {
+        // Invalidate cache
+        _cache.del('$_baseCacheKey:getCarts');
         return newCart.id;
       }
       return null;

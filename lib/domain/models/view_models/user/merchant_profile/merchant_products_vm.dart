@@ -1,6 +1,6 @@
 part of models;
 
-class MerchantProductsVM {
+class MerchantProductsVM extends Cacheable{
   final int id;
   final String name;
   final String image;
