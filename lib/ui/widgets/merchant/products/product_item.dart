@@ -58,10 +58,7 @@ class MerchantProductItem extends StatelessWidget {
             style: const TextStyle(fontWeight: FontWeight.w500),
           ),
           subtitle: Text('\$${product.price.toStringAsFixed(2)}'),
-          trailing: IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: onEdit,
-          ),
+          trailing: IconButton(icon: const Icon(Icons.edit), onPressed: onEdit),
         ),
       ),
     );

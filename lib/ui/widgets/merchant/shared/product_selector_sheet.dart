@@ -1,3 +1,5 @@
+import 'package:dak_louk/core/enums/media_type_enum.dart';
+import 'package:dak_louk/core/media/media_model.dart';
 import 'package:dak_louk/ui/widgets/merchant/shared/add_products_section.dart';
 import 'package:flutter/material.dart';
 import 'package:dak_louk/domain/models/models.dart';
@@ -115,7 +117,16 @@ class _ProductSelectorContentState extends State<_ProductSelectorContent> {
                                   id: product.id,
                                   name: product.name,
                                   price: product.price,
-                                  imageUrls: product.mediaUrls ?? [],
+                                  medias:
+                                      product.mediaUrls
+                                          ?.map(
+                                            (m) => MediaModel(
+                                              url: m,
+                                              type: MediaType.image,
+                                            ),
+                                          )
+                                          .toList() ??
+                                      [],
                                 ),
                               );
                             } else if (selected == false && alreadySelected) {

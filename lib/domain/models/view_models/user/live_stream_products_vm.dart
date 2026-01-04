@@ -5,18 +5,18 @@ class LiveStreamProductsVM extends Cacheable {
   final String name;
   final double price;
   final int quantity;
-  final String image;
+  final List<MediaModel> medias;
 
   LiveStreamProductsVM({
     required this.id,
     required this.name,
     required this.price,
     required this.quantity,
-    required this.image,
+    required this.medias,
   });
   factory LiveStreamProductsVM.fromRaw(
     LiveStreamProductModel raw, {
-    required String image,
+    required List<MediaModel> medias,
     required String name,
     required double price,
     required int quantity,
@@ -26,7 +26,7 @@ class LiveStreamProductsVM extends Cacheable {
       name: name,
       price: price,
       quantity: quantity,
-      image: image,
+      medias: medias,
     );
   }
 }

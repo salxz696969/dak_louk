@@ -1,15 +1,17 @@
+import 'package:dak_louk/core/media/media_model.dart';
+import 'package:dak_louk/ui/widgets/common/media_carousel.dart';
 import 'package:flutter/material.dart';
 
 class AddProductsModel {
   int id;
   String name;
   double price;
-  List<String> imageUrls;
+  List<MediaModel> medias;
   AddProductsModel({
     required this.id,
     required this.name,
     required this.price,
-    required this.imageUrls,
+    required this.medias,
   });
 }
 
@@ -61,18 +63,9 @@ class ProductsSection extends StatelessWidget {
                             borderRadius: const BorderRadius.vertical(
                               top: Radius.circular(8),
                             ),
-                            child: product.imageUrls.isNotEmpty
-                                ? Image.asset(
-                                    product.imageUrls.first,
-                                    width: 120,
-                                    height: 90,
-                                    fit: BoxFit.cover,
-                                  )
-                                : Container(
-                                    width: 120,
-                                    height: 90,
-                                    color: Colors.grey[200],
-                                  ),
+                            child: product.medias.isNotEmpty
+                                ? MediaCarousel(medias: product.medias)
+                                : const SizedBox.shrink(),
                           ),
                           Padding(
                             padding: const EdgeInsets.all(4),

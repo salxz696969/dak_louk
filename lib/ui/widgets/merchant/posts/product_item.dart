@@ -1,5 +1,6 @@
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/domain/services/user/cart_service.dart';
+import 'package:dak_louk/ui/widgets/common/media_carousel.dart';
 import 'package:flutter/material.dart';
 
 class ProductItem extends StatefulWidget {
@@ -28,20 +29,10 @@ class _ProductItemState extends State<ProductItem> {
               borderRadius: BorderRadius.circular(12),
               color: Colors.grey[200],
             ),
-            child: widget.product.imageUrls.isNotEmpty
+            child: widget.product.medias.isNotEmpty
                 ? ClipRRect(
                     borderRadius: BorderRadius.circular(12),
-                    child: Image.asset(
-                      widget.product.imageUrls.first,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        );
-                      },
-                    ),
+                    child: MediaCarousel(medias: widget.product.medias),
                   )
                 : Container(
                     decoration: BoxDecoration(

@@ -3,15 +3,15 @@ part of models;
 class CreatePostDTO {
   final String? caption;
   final List<int>? productIds;
-  final List<String>? promoMediaUrls;
+  final List<MediaModel>? promoMedias;
 
-  CreatePostDTO({this.caption, this.productIds, this.promoMediaUrls});
+  CreatePostDTO({this.caption, this.productIds, this.promoMedias});
 }
 
 class UpdatePostDTO {
   final String? caption;
   final List<int>? productIds;
-  final List<String>? promoMediaUrls;
+  final List<MediaModel>? promoMedias;
 
-  UpdatePostDTO({this.caption, this.productIds, this.promoMediaUrls});
+  UpdatePostDTO({this.caption, this.productIds, this.promoMedias});
 }

@@ -1,4 +1,6 @@
 import 'package:dak_louk/core/auth/app_session.dart';
+import 'package:dak_louk/core/enums/media_type_enum.dart';
+import 'package:dak_louk/core/media/media_model.dart';
 import 'package:dak_louk/core/utils/error.dart';
 import 'package:dak_louk/data/repositories/cart_repo.dart';
 import 'package:dak_louk/data/repositories/merchant_repo.dart';
@@ -205,7 +207,16 @@ class PostService {
                 PostProductVM(
                   id: product.id,
                   name: product.name,
-                  imageUrls: productMedias.map((media) => media.url).toList(),
+                  medias: productMedias
+                      .map(
+                        (media) => MediaModel(
+                          url: media.url,
+                          type: media.mediaType == 'video'
+                              ? MediaType.video
+                              : MediaType.image,
+                        ),
+                      )
+                      .toList(),
                   price: (product.price * 100).truncate() / 100,
                   quantity: product.quantity,
                   isAddedToCart: isAddedToCart.isNotEmpty,
@@ -284,13 +295,14 @@ class PostService {
         }
       }
 
-      if (dto.promoMediaUrls != null) {
-        for (final mediaUrl in dto.promoMediaUrls!) {
+      if (dto.promoMedias != null) {
+        for (final media in dto.promoMedias!) {
           await _promoMediaRepository.insert(
             PromoMediaModel(
               id: 0,
               postId: id,
-              url: mediaUrl,
+              url: media.url,
+              mediaType: media.type == MediaType.video ? 'video' : 'image',
               createdAt: DateTime.now(),
               updatedAt: DateTime.now(),
             ),
@@ -499,7 +511,16 @@ class PostService {
               PostProductVM(
                 id: product.id,
                 name: product.name,
-                imageUrls: productMedias.map((media) => media.url).toList(),
+                medias: productMedias
+                    .map(
+                      (media) => MediaModel(
+                        url: media.url,
+                        type: media.mediaType == 'video'
+                            ? MediaType.video
+                            : MediaType.image,
+                      ),
+                    )
+                    .toList(),
                 price: (product.price * 100).truncate() / 100,
                 quantity: product.quantity,
                 description: product.description ?? '',

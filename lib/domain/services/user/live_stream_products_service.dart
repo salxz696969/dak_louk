@@ -1,4 +1,6 @@
 import 'package:dak_louk/core/auth/app_session.dart';
+import 'package:dak_louk/core/enums/media_type_enum.dart';
+import 'package:dak_louk/core/media/media_model.dart';
 import 'package:dak_louk/core/utils/error.dart';
 import 'package:dak_louk/data/repositories/live_stream_product_repo.dart';
 import 'package:dak_louk/data/repositories/product_media_repo.dart';
@@ -63,14 +65,23 @@ class LiveStreamProductsService {
               .args,
         );
 
-        final imageUrl = productMediaList.isNotEmpty
-            ? productMediaList.first.url
-            : '';
+        final medias = productMediaList.isNotEmpty
+            ? productMediaList
+                  .map(
+                    (m) => MediaModel(
+                      url: m.url,
+                      type: m.mediaType == 'video'
+                          ? MediaType.video
+                          : MediaType.image,
+                    ),
+                  )
+                  .toList()
+            : <MediaModel>[];
 
         vmList.add(
           LiveStreamProductsVM.fromRaw(
             liveStreamProduct,
-            image: imageUrl,
+            medias: medias,
             name: product.name,
             quantity: product.quantity,
             price: (product.price * 100).truncate() / 100,
