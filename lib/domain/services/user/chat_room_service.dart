@@ -36,7 +36,12 @@ class ChatRoomService {
         createdAt: DateTime.now().toIso8601String(),
         updatedAt: DateTime.now().toIso8601String(),
       );
-      return await _chatRoomRepository.insert(chatRoomModel);
+      final id = await _chatRoomRepository.insert(chatRoomModel);
+      if (id > 0) {
+        // Invalidate cache for all chat rooms
+        _cache.del('$_baseCacheKey:getAllChatRooms');
+      }
+      return id;
     } catch (e) {
       if (e is AppError) {
         rethrow;

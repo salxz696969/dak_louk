@@ -58,7 +58,7 @@ class PostVM extends Cacheable {
   }
 }
 
-class PostProductVM {
+class PostProductVM extends Cacheable{
   final int id;
   final String name;
   final List<MediaModel> medias;
@@ -98,7 +98,7 @@ class PostProductVM {
   }
 }
 
-class PostMerchantVM {
+class PostMerchantVM extends Cacheable{
   final int id;
   final String name;
   final String bio;

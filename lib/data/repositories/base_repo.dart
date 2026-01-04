@@ -191,8 +191,8 @@ abstract class BaseRepository<T extends Cacheable>
         where: statement.clause,
         whereArgs: statement.args,
       );
-      _cache.del('$cacheKey:$id');
-      _cache.del('$cacheKey:all');
+      _cache.del('$cacheKey:$id'); // the single item cache
+      _cache.del('$cacheKey:all'); // the many cache list
       // couldve used id to remove from the list but since cacheble is inaccesable to the id field of the model i couldnt
       final newCache = await getAll();
       _cache.set('$cacheKey:all', Many(newCache));
@@ -255,7 +255,7 @@ abstract class BaseRepository<T extends Cacheable>
 
   // use to suffix the repo's keys to avoid conflicts with other repos or services
   String _getBaseCacheKey() {
-    return 'model:${this.tableName}';
+    return 'repo:${this.tableName}';
   }
 
   String _getQueryCacheKey(
@@ -270,7 +270,7 @@ abstract class BaseRepository<T extends Cacheable>
     final orderByClause = orderBy ?? '';
     final limitClause = limit?.toString() ?? '';
     final offsetClause = offset?.toString() ?? '';
-    return 'model:$tableName:query:$whereClause:$argsClause:$orderByClause:$limitClause:$offsetClause';
+    return 'repo:$tableName:query:$whereClause:$argsClause:$orderByClause:$limitClause:$offsetClause';
   }
 
   // safer casting and checking

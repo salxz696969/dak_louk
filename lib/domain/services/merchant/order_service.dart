@@ -157,6 +157,9 @@ class OrderService {
           updatedAt: DateTime.now(),
         ),
       );
+
+      // Invalidate cache
+      _cache.del('$_baseCacheKey:getAllOrders');
     } catch (e) {
       if (e is AppError) {
         rethrow;
@@ -171,6 +174,9 @@ class OrderService {
   Future<void> deleteOrder(int id) async {
     try {
       await _orderRepository.delete(id);
+
+      // Invalidate cache
+      _cache.del('$_baseCacheKey:getAllOrders');
     } catch (e) {
       if (e is AppError) {
         rethrow;

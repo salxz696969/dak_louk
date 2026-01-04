@@ -8,6 +8,7 @@ import 'package:dak_louk/data/repositories/product_repo.dart';
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/core/utils/orm.dart';
 import 'package:dak_louk/data/tables/tables.dart';
+import 'package:dak_louk/data/cache/cache.dart';
 
 class LiveStreamProductsService {
   late final currentUserId;
@@ -16,10 +17,13 @@ class LiveStreamProductsService {
   final ProductRepository _productRepository = ProductRepository();
   final ProductMediaRepository _productMediaRepository =
       ProductMediaRepository();
+  final Cache _cache = Cache();
+  late final String _baseCacheKey;
 
   LiveStreamProductsService() {
     if (AppSession.instance.isLoggedIn) {
       currentUserId = AppSession.instance.userId;
+      _baseCacheKey = 'service:user:$currentUserId:live_stream_products';
     } else {
       throw AppError(type: ErrorType.UNAUTHORIZED, message: 'Unauthorized');
     }
@@ -29,6 +33,13 @@ class LiveStreamProductsService {
     int liveStreamId,
   ) async {
     try {
+      final cacheKey =
+          '$_baseCacheKey:getLiveStreamProductsByLiveStreamId:$liveStreamId';
+      if (_cache.exists(cacheKey)) {
+        final cached = _cache.get(cacheKey);
+        return _cache.expectMany(cached).cast<LiveStreamProductsVM>().toList();
+      }
+
       final statement = Clauses.where.eq(
         Tables.liveStreamProducts.cols.liveStreamId,
         liveStreamId,
@@ -96,6 +107,7 @@ class LiveStreamProductsService {
         );
       }
 
+      _cache.set(cacheKey, Many(vmList));
       return vmList;
     } catch (e) {
       if (e is AppError) {

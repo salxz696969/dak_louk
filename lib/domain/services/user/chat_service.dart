@@ -23,13 +23,6 @@ class ChatService {
   // Migrated from ChatDao.insertChat
   Future<ChatVM?> createChat(CreateChatDTO dto) async {
     try {
-      // Nicely log the incoming DTO
-      print(
-        '[ChatService] Creating chat with DTO: {\n'
-        '  chatRoomId: ${dto.chatRoomId},\n'
-        '  text: "${dto.text}"\n'
-        '}',
-      );
       final chatModel = ChatModel(
         id: 0,
         senderId: currentUserId,
@@ -38,21 +31,12 @@ class ChatService {
         createdAt: DateTime.now().toIso8601String(),
         updatedAt: DateTime.now().toIso8601String(),
       );
-      // Nicely log the model about to be inserted
-      print(
-        '[ChatService] Inserting ChatModel: {\n'
-        '  id: ${chatModel.id},\n'
-        '  senderId: ${chatModel.senderId},\n'
-        '  chatRoomId: ${chatModel.chatRoomId},\n'
-        '  text: "${chatModel.text}",\n'
-        '  createdAt: ${chatModel.createdAt},\n'
-        '  updatedAt: ${chatModel.updatedAt}\n'
-        '}',
-      );
       final id = await _chatRepository.insert(chatModel);
       if (id > 0) {
         final newChat = await _chatRepository.getById(id);
         if (newChat != null) {
+          // Invalidate cache for this chat room
+          _cache.del('$_baseCacheKey:getChatsByChatRoomId:${dto.chatRoomId}');
           return ChatVM.fromRaw(newChat, isMine: true);
         }
         throw AppError(type: ErrorType.NOT_FOUND, message: 'Chat not found');

@@ -23,7 +23,7 @@ class ChatService {
       );
     }
   }
-  // Migrated from ChatDao.insertChat
+
   Future<int> createChat(CreateChatDTO dto) async {
     try {
       final chatModel = ChatModel(
@@ -34,7 +34,30 @@ class ChatService {
         createdAt: DateTime.now().toIso8601String(),
         updatedAt: DateTime.now().toIso8601String(),
       );
-      return await _chatRepository.insert(chatModel);
+
+      final id = await _chatRepository.insert(chatModel);
+      // !too risky to aggregate update so ill just invalidate and let the next read cache a new one
+      // final cachedChats = await _cache
+      //     .get('$_baseCacheKey:getChatsByChatRoomId:${dto.chatRoomId}')
+      //     ?.many;
+      // cachedChats?.add(
+      //   ChatModel(
+      //     id: id,
+      //     senderId: currentMerchantId,
+      //     text: dto.text,
+      //     chatRoomId: dto.chatRoomId,
+      //     createdAt: DateTime.now().toIso8601String(),
+      //     updatedAt: DateTime.now().toIso8601String(),
+      //   ),
+      // );
+      // _cache.set(
+      //   '$_baseCacheKey:getChatsByChatRoomId:${dto.chatRoomId}',
+      //   Many(cachedChats ?? []),
+      // );
+
+      _cache.del('$_baseCacheKey:getChatsByChatRoomId:${dto.chatRoomId}');
+
+      return id;
     } catch (e) {
       if (e is AppError) {
         rethrow;

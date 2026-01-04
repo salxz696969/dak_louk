@@ -481,7 +481,11 @@ class PostService {
         final newPost = await _postRepository.getById(id);
         if (newPost != null) {
           final postVMs = await _buildPostVMs([newPost]);
-          return postVMs.isNotEmpty ? postVMs.first : null;
+          if (postVMs.isNotEmpty) {
+            // Invalidate cache for all posts for current merchant
+            _cache.del('$_baseCacheKey:getAllPostsForCurrentMerchant');
+            return postVMs.first;
+          }
         }
       }
       throw AppError(
@@ -501,10 +505,16 @@ class PostService {
 
   Future<PostVM?> getPostById(int id) async {
     try {
+      final cacheKey = '$_baseCacheKey:getPostById:$id';
+      if (_cache.exists(cacheKey)) {
+        final cached = _cache.get(cacheKey);
+        return _cache.expectSingle(cached) as PostVM;
+      }
       final post = await _postRepository.getById(id);
       if (post != null) {
         final postVMs = await _buildPostVMs([post]);
-        return postVMs.isNotEmpty ? postVMs.first : null;
+        _cache.set(cacheKey, Single(postVMs.first));
+        return postVMs.first;
       }
       throw AppError(type: ErrorType.NOT_FOUND, message: 'Post not found');
     } catch (e) {
@@ -528,18 +538,16 @@ class PostService {
         throw AppError(type: ErrorType.UNAUTHORIZED, message: 'Unauthorized');
       }
 
-      // Update the post itself
       await _postRepository.update(
         PostModel(
           id: id,
           merchantId: currentMerchantId,
           caption: dto.caption,
-          createdAt: post.createdAt, // Keep original creation time
+          createdAt: post.createdAt,
           updatedAt: DateTime.now(),
         ),
       );
 
-      // Delete old post-product relationships
       final oldProductRelations = await _postProductsRepository.queryThisTable(
         where: Clauses.where.eq(Tables.postProducts.cols.postId, id).clause,
         args: Clauses.where.eq(Tables.postProducts.cols.postId, id).args,
@@ -548,7 +556,6 @@ class PostService {
         await _postProductsRepository.delete(relation.id);
       }
 
-      // Delete old promo media
       final oldPromoMedia = await _promoMediaRepository.queryThisTable(
         where: Clauses.where.eq(Tables.promoMedias.cols.postId, id).clause,
         args: Clauses.where.eq(Tables.promoMedias.cols.postId, id).args,
@@ -557,7 +564,6 @@ class PostService {
         await _promoMediaRepository.delete(media.id);
       }
 
-      // Add new post-product relationships if provided
       if (dto.productIds != null) {
         for (var productId in dto.productIds!) {
           await _postProductsRepository.insert(
@@ -566,7 +572,6 @@ class PostService {
         }
       }
 
-      // Add new promo media if provided
       if (dto.promoMedias != null) {
         for (var media in dto.promoMedias!) {
           await _promoMediaRepository.insert(
@@ -585,7 +590,11 @@ class PostService {
       final updatedPost = await _postRepository.getById(id);
       if (updatedPost != null) {
         final postVMs = await _buildPostVMs([updatedPost]);
-        return postVMs.isNotEmpty ? postVMs.first : null;
+        if (postVMs.isNotEmpty) {
+          _cache.del('$_baseCacheKey:getAllPostsForCurrentMerchant');
+          _cache.del('$_baseCacheKey:getPostById:$id');
+          return postVMs.first;
+        }
       }
       throw AppError(type: ErrorType.NOT_FOUND, message: 'Post not found');
     } catch (e) {
@@ -601,7 +610,6 @@ class PostService {
 
   Future<void> deletePost(int postId) async {
     try {
-      // Delete associated products first
       final productStatement = Clauses.where.eq(
         Tables.postProducts.cols.postId,
         postId,
@@ -614,7 +622,6 @@ class PostService {
         await _postProductsRepository.delete(postProduct.id);
       }
 
-      // Delete associated media
       final mediaStatement = Clauses.where.eq(
         Tables.promoMedias.cols.postId,
         postId,
@@ -627,8 +634,10 @@ class PostService {
         await _promoMediaRepository.delete(promoMedia.id);
       }
 
-      // Delete the post
       await _postRepository.delete(postId);
+
+      _cache.del('$_baseCacheKey:getAllPostsForCurrentMerchant');
+      _cache.del('$_baseCacheKey:getPostById:$postId');
     } catch (e) {
       if (e is AppError) {
         rethrow;
@@ -640,17 +649,14 @@ class PostService {
     }
   }
 
-  // Helper method to build PostVMs from PostModels
   Future<List<PostVM>> _buildPostVMs(List<PostModel> posts) async {
     if (posts.isEmpty) return [];
 
-    // Get all likes and saves
     final postLikes = await _postLikeRepository.queryThisTable();
     final postSaves = await _postSaveRepository.queryThisTable();
 
     final enrichedPosts = await Future.wait(
       posts.map((post) async {
-        // Get merchant info
         final merchant = await _merchantRepository.getById(post.merchantId);
         if (merchant == null) {
           throw AppError(
@@ -659,7 +665,6 @@ class PostService {
           );
         }
 
-        // Get post-product relationships
         final postProductRelations = await _postProductsRepository
             .queryThisTable(
               where: Clauses.where
@@ -670,12 +675,10 @@ class PostService {
                   .args,
             );
 
-        // Get products for this post
         final postProducts = <PostProductVM>[];
         for (final relation in postProductRelations) {
           final product = await _productRepository.getById(relation.productId);
           if (product != null) {
-            // Get product media
             final productMedias = await _productMediaRepository.queryThisTable(
               where: Clauses.where
                   .eq(Tables.productMedias.cols.productId, product.id)
@@ -685,7 +688,6 @@ class PostService {
                   .args,
             );
 
-            // Get product categories
             final categoryMaps = await _productCategoryMapsRepository
                 .queryThisTable(
                   where: Clauses.where
@@ -702,7 +704,6 @@ class PostService {
                 categoryMaps.first.categoryId,
               );
               if (categoryModel != null) {
-                // Convert string to enum
                 category = ProductCategory.values.firstWhere(
                   (e) => e.name == categoryModel.name,
                   orElse: () => ProductCategory.others,
@@ -742,7 +743,6 @@ class PostService {
           }
         }
 
-        // Create merchant VM
         final merchantVM = PostMerchantVM(
           id: merchant.id,
           bio: merchant.bio,
@@ -752,7 +752,6 @@ class PostService {
           rating: (merchant.rating * 100).truncate() / 100,
         );
 
-        // Calculate likes and saves for this post
         final likesCount = postLikes
             .where((like) => like.postId == post.id)
             .length;

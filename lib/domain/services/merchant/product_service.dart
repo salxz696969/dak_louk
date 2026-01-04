@@ -31,10 +31,21 @@ class ProductService {
   // Migrated from ProductDao
   Future<List<ProductVM>> getAllProducts(String? category, int limit) async {
     try {
+      final cacheKey = '$_baseCacheKey:getAllProducts:$category:$limit';
+      if (_cache.exists(cacheKey)) {
+        final cached = _cache.get(cacheKey);
+        return _cache.expectMany(cached).cast<ProductVM>().toList();
+      }
       if (limit <= 0) limit = 100;
       if (category == null) {
         final products = await _productRepository.queryThisTable(limit: limit);
         if (products.isNotEmpty) {
+          _cache.set(
+            cacheKey,
+            Many(
+              products.map((product) => ProductVM.fromRaw(product)).toList(),
+            ),
+          );
           return products.map((product) => ProductVM.fromRaw(product)).toList();
         }
         throw AppError(type: ErrorType.NOT_FOUND, message: 'No products found');
@@ -42,6 +53,12 @@ class ProductService {
       if (category == 'all') {
         final products = await _productRepository.queryThisTable(limit: limit);
         if (products.isNotEmpty) {
+          _cache.set(
+            cacheKey,
+            Many(
+              products.map((product) => ProductVM.fromRaw(product)).toList(),
+            ),
+          );
           return products.map((product) => ProductVM.fromRaw(product)).toList();
         }
         throw AppError(type: ErrorType.NOT_FOUND, message: 'No products found');
@@ -56,12 +73,24 @@ class ProductService {
           limit: limit,
         );
         if (products.isNotEmpty) {
+          _cache.set(
+            cacheKey,
+            Many(
+              products.map((product) => ProductVM.fromRaw(product)).toList(),
+            ),
+          );
           return products.map((product) => ProductVM.fromRaw(product)).toList();
         }
         throw AppError(type: ErrorType.NOT_FOUND, message: 'No products found');
       }
     } catch (e) {
-      rethrow;
+      if (e is AppError) {
+        rethrow;
+      }
+      throw AppError(
+        type: ErrorType.DB_ERROR,
+        message: 'Failed to get products',
+      );
     }
   }
 
@@ -106,7 +135,7 @@ class ProductService {
             : <String>[];
 
         final productVM = ProductVM.fromRaw(product, mediaUrls: mediaUrls);
-        productsWithMedia.add(productVM        );
+        productsWithMedia.add(productVM);
       }
 
       _cache.set(cacheKey, Many(productsWithMedia));
@@ -139,6 +168,8 @@ class ProductService {
       if (id > 0) {
         final newProduct = await _productRepository.getById(id);
         if (newProduct != null) {
+          _cache.del('$_baseCacheKey:getAllProductsForCurrentMerchant');
+          _cache.del('$_baseCacheKey:getProductById:$id');
           return ProductVM.fromRaw(newProduct);
         }
         throw AppError(type: ErrorType.NOT_FOUND, message: 'Product not found');
@@ -160,8 +191,14 @@ class ProductService {
 
   Future<ProductVM?> getProductById(int id) async {
     try {
+      final cacheKey = '$_baseCacheKey:getProductById:$id';
+      if (_cache.exists(cacheKey)) {
+        final cached = _cache.get(cacheKey);
+        return _cache.expectSingle(cached) as ProductVM;
+      }
       final product = await _productRepository.getById(id);
       if (product != null) {
+        _cache.set(cacheKey, Single(ProductVM.fromRaw(product)));
         return ProductVM.fromRaw(product);
       }
       throw AppError(type: ErrorType.NOT_FOUND, message: 'Product not found');
@@ -198,6 +235,9 @@ class ProductService {
       await _productRepository.update(productModel);
       final newProduct = await _productRepository.getById(id);
       if (newProduct != null) {
+        _cache.del('$_baseCacheKey:getAllProductsForCurrentMerchant');
+        _cache.del('$_baseCacheKey:getProductById:$id');
+        _cache.del('$_baseCacheKey:getAllProducts');
         return ProductVM.fromRaw(newProduct);
       }
       throw AppError(type: ErrorType.NOT_FOUND, message: 'Product not found');
@@ -230,6 +270,10 @@ class ProductService {
         await _productMediaRepository.delete(media.id);
       }
       await _productRepository.delete(productId);
+
+      _cache.del('$_baseCacheKey:getAllProductsForCurrentMerchant');
+      _cache.del('$_baseCacheKey:getProductById:$productId');
+      _cache.del('$_baseCacheKey:getAllProducts');
       throw AppError(type: ErrorType.NOT_FOUND, message: 'Product not found');
     } catch (e) {
       if (e is AppError) {

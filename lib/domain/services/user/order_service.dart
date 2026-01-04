@@ -179,5 +179,8 @@ class OrderService {
         }
       }
     }
+
+    // Invalidate cache
+    _cache.del('$_baseCacheKey:getAllOrders');
   }
 }

@@ -148,6 +148,9 @@ class CartService {
         throw AppError(type: ErrorType.UNAUTHORIZED, message: 'Unauthorized');
       }
       await _cartRepository.delete(id);
+
+      // Invalidate cache
+      _cache.del('$_baseCacheKey:getCarts');
     } catch (e) {
       if (e is AppError) {
         rethrow;
@@ -173,6 +176,8 @@ class CartService {
       if (id > 0) {
         final newCart = await _cartRepository.getById(id);
         if (newCart != null) {
+          // Invalidate cache
+          _cache.del('$_baseCacheKey:getCarts');
           return newCart.id;
         }
         throw AppError(type: ErrorType.NOT_FOUND, message: 'Cart not found');
@@ -212,6 +217,8 @@ class CartService {
       await _cartRepository.update(cartModel);
       final newCart = await _cartRepository.getById(id);
       if (newCart != null) {
+        // Invalidate cache
+        _cache.del('$_baseCacheKey:getCarts');
         return newCart.id;
       }
       return null;

@@ -45,6 +45,10 @@ abstract class CacheInterface {
   /// Delete a value from the cache
   void del(String key);
 
+  void delByPrefix(String prefix);
+
+  void delByPattern(String pattern);
+
   /// Check if a value exists in the cache
   bool exists(String key);
 
@@ -80,6 +84,25 @@ class Cache implements CacheInterface {
   }
 
   @override
+  void delByPrefix(String prefix) {
+    _cache.removeWhere((key, value) => key.startsWith(prefix));
+  }
+
+  @override
+  void delByPattern(String pattern) {
+    final regex = RegExp(
+      '^' +
+          pattern
+              .replaceAll('.', r'\.')
+              .replaceAll('*', '.*')
+              .replaceAll('?', '.') +
+          r'$',
+    );
+
+    _cache.removeWhere((key, _) => regex.hasMatch(key));
+  }
+
+  @override
   bool exists(String key) {
     return _cache.containsKey(key);
   }
@@ -100,7 +123,7 @@ class Cache implements CacheInterface {
   // becuase it can return whatever (that is cacheble ) its dumber not tied to the class type
   // used only in service layer to cache VMs
 
-   List<Cacheable> expectMany(CacheValue? value) {
+  List<Cacheable> expectMany(CacheValue? value) {
     if (value == null) {
       throw AppError(
         type: ErrorType.CACHE_ERROR,

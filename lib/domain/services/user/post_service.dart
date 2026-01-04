@@ -324,7 +324,12 @@ class PostService {
       final newPost = await _postRepository.getById(id);
       if (newPost != null) {
         final postVMs = await _buildPostVMs([newPost]);
-        return postVMs.isNotEmpty ? postVMs.first : null;
+        if (postVMs.isNotEmpty) {
+          // Invalidate cache
+          _cache.del('$_baseCacheKey:getAllPosts');
+          _cache.del('$_baseCacheKey:getPostById:$id');
+          return postVMs.first;
+        }
       }
       throw AppError(type: ErrorType.NOT_FOUND, message: 'Post not found');
     } catch (e) {
@@ -340,10 +345,19 @@ class PostService {
 
   Future<PostVM?> getPostById(int id) async {
     try {
+      final cacheKey = '$_baseCacheKey:getPostById:$id';
+      if (_cache.exists(cacheKey)) {
+        final cached = _cache.get(cacheKey);
+        return _cache.expectSingle(cached) as PostVM;
+      }
+
       final post = await _postRepository.getById(id);
       if (post != null) {
         final postVMs = await _buildPostVMs([post]);
-        return postVMs.isNotEmpty ? postVMs.first : null;
+        if (postVMs.isNotEmpty) {
+          _cache.set(cacheKey, Single(postVMs.first));
+          return postVMs.first;
+        }
       }
       throw AppError(type: ErrorType.NOT_FOUND, message: 'Post not found');
     } catch (e) {
@@ -420,6 +434,12 @@ class PostService {
 
   Future<List<PostVM>> getSimilarPosts(int postId) async {
     try {
+      final cacheKey = '$_baseCacheKey:getSimilarPosts:$postId';
+      if (_cache.exists(cacheKey)) {
+        final cached = _cache.get(cacheKey);
+        return _cache.expectMany(cached).cast<PostVM>().toList();
+      }
+
       final post = await _postRepository.getById(postId);
       if (post == null) {
         throw AppError(type: ErrorType.NOT_FOUND, message: 'Post not found');
@@ -431,7 +451,9 @@ class PostService {
         args: Clauses.like.like(Tables.posts.cols.caption, post.caption!).args,
         limit: 10,
       );
-      return await _buildPostVMs(posts);
+      final result = await _buildPostVMs(posts);
+      _cache.set(cacheKey, Many(result));
+      return result;
     } catch (e) {
       throw AppError(
         type: ErrorType.DB_ERROR,
