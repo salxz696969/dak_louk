@@ -1,6 +1,7 @@
 import 'package:dak_louk/core/auth/app_session.dart';
 import 'package:dak_louk/core/utils/error.dart';
 import 'package:dak_louk/data/repositories/product_repo.dart';
+import 'package:dak_louk/data/repositories/product_media_repo.dart';
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/core/utils/orm.dart';
 import 'package:dak_louk/data/tables/tables.dart';
@@ -8,6 +9,8 @@ import 'package:dak_louk/data/tables/tables.dart';
 class ProductService {
   late final currentUserId;
   final ProductRepository _productRepository = ProductRepository();
+  final ProductMediaRepository _productMediaRepository =
+      ProductMediaRepository();
 
   ProductService() {
     if (AppSession.instance.isLoggedIn) {
@@ -51,6 +54,55 @@ class ProductService {
       }
     } catch (e) {
       rethrow;
+    }
+  }
+
+  Future<List<ProductVM>> getAllProductsForCurrentMerchant() async {
+    try {
+      final statement = Clauses.where.eq(
+        Tables.products.cols.merchantId,
+        currentUserId,
+      );
+
+      final products = await _productRepository.queryThisTable(
+        where: statement.clause,
+        args: statement.args,
+        orderBy: Clauses.orderBy.desc(Tables.products.cols.createdAt).clause,
+      );
+
+      if (products.isEmpty) {
+        return [];
+      }
+
+      final List<ProductVM> productsWithMedia = [];
+
+      for (final product in products) {
+        final mediaStatement = Clauses.where.eq(
+          Tables.productMedias.cols.productId,
+          product.id,
+        );
+
+        final medias = await _productMediaRepository.queryThisTable(
+          where: mediaStatement.clause,
+          args: mediaStatement.args,
+        );
+
+        final mediaUrls = medias.isNotEmpty
+            ? medias.map((media) => media.url).toList()
+            : <String>[];
+
+        final productVM = ProductVM.fromRaw(product, mediaUrls: mediaUrls);
+        productsWithMedia.add(productVM);
+      }
+      return productsWithMedia;
+    } catch (e) {
+      if (e is AppError) {
+        rethrow;
+      }
+      throw AppError(
+        type: ErrorType.DB_ERROR,
+        message: 'Failed to get merchant products',
+      );
     }
   }
 

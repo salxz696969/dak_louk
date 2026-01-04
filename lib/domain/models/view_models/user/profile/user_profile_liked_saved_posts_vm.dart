@@ -1,7 +1,7 @@
 part of models;
 
 class UserProfileLikedSavedPostsVM extends Cacheable {
-  final id;
+  final int id;
   final String imageUrl;
   final String caption;
 

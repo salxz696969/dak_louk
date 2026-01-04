@@ -76,6 +76,10 @@ class _Where {
   _Where notBetween(String column, Object? start, Object? end) {
     return _Where('$column NOT BETWEEN ? AND ?', [start, end]);
   }
+
+  _Where neq(String column, Object? value) {
+    return _Where('$column != ?', [value]);
+  }
 }
 
 class _OrderBy {
@@ -83,12 +87,28 @@ class _OrderBy {
 
   const _OrderBy(this.clause);
 
+  _OrderBy asc(String column) {
+    return _OrderBy('$column ASC');
+  }
+
   _OrderBy desc(String column) {
     return _OrderBy('$column DESC');
   }
 
-  _OrderBy asc(String column) {
-    return _OrderBy('$column ASC');
+  _OrderBy caseWhen(String column, Map<String, int> cases, {int? elseValue}) {
+    String caseClause = 'CASE $column ';
+    cases.forEach((value, priority) {
+      caseClause += "WHEN '$value' THEN $priority ";
+    });
+    if (elseValue != null) {
+      caseClause += 'ELSE $elseValue ';
+    }
+    caseClause += 'END ASC';
+    return _OrderBy(caseClause);
+  }
+
+  _OrderBy thenBy(String orderByClause) {
+    return _OrderBy('$clause, $orderByClause');
   }
 }
 
