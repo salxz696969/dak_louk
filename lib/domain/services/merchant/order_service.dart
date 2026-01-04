@@ -1,8 +1,5 @@
-import 'package:dak_louk/data/repositories/cart_repo.dart';
-import 'package:dak_louk/core/enums/order_status_enum.dart';
 import 'package:dak_louk/data/repositories/order_product_repo.dart';
 import 'package:dak_louk/data/repositories/order_repo.dart';
-import 'package:dak_louk/data/repositories/merchant_repo.dart';
 import 'package:dak_louk/data/repositories/product_media_repo.dart';
 import 'package:dak_louk/data/repositories/product_repo.dart';
 import 'package:dak_louk/domain/models/models.dart';
@@ -17,8 +14,6 @@ class OrderService {
   final OrderRepository _orderRepository = OrderRepository();
   final OrderProductRepository _orderProductRepository =
       OrderProductRepository();
-  final CartRepository _cartRepository = CartRepository();
-  final MerchantRepository _merchantRepository = MerchantRepository();
   final ProductRepository _productRepository = ProductRepository();
   final ProductMediaRepository _productMediaRepository =
       ProductMediaRepository();
@@ -132,28 +127,47 @@ class OrderService {
     }
   }
 
-  Future<OrderVM?> getOrderById(int id) async {
-    // Placeholder - implement later
-    throw UnimplementedError('getOrderById not implemented');
-  }
-
-  Future<OrderVM?> createOrder(CreateOrderDTO dto) async {
-    // Placeholder - implement later
-    throw UnimplementedError('createOrder not implemented');
-  }
-
-  Future<OrderVM?> updateOrder(int id, UpdateOrderDTO dto) async {
-    // Placeholder - implement later
-    throw UnimplementedError('updateOrder not implemented');
+  Future<void> updateOrder(int id, UpdateOrderDTO dto) async {
+    try {
+      final order = await _orderRepository.getById(id);
+      if (order == null) {
+        throw AppError(type: ErrorType.NOT_FOUND, message: 'Order not found');
+      }
+      if (order.merchantId != currentMerchantId) {
+        throw AppError(type: ErrorType.UNAUTHORIZED, message: 'Unauthorized');
+      }
+      await _orderRepository.update(
+        OrderModel(
+          id: id,
+          merchantId: currentMerchantId,
+          status: dto.status ?? order.status,
+          userId: order.userId,
+          createdAt: order.createdAt,
+          updatedAt: DateTime.now(),
+        ),
+      );
+    } catch (e) {
+      if (e is AppError) {
+        rethrow;
+      }
+      throw AppError(
+        type: ErrorType.DB_ERROR,
+        message: 'Failed to update order',
+      );
+    }
   }
 
   Future<void> deleteOrder(int id) async {
-    // Placeholder - implement later
-    throw UnimplementedError('deleteOrder not implemented');
-  }
-
-  Future<OrderVM?> updateOrderStatus(int orderId, String newStatus) async {
-    // fuck the orm thing implement it yourself
-    throw UnimplementedError('updateOrderStatus not implemented');
+    try {
+      await _orderRepository.delete(id);
+    } catch (e) {
+      if (e is AppError) {
+        rethrow;
+      }
+      throw AppError(
+        type: ErrorType.DB_ERROR,
+        message: 'Failed to delete order',
+      );
+    }
   }
 }

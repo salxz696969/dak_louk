@@ -1,8 +1,8 @@
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/domain/services/user/post_like_service.dart';
 import 'package:dak_louk/domain/services/user/post_save_service.dart';
-import 'package:dak_louk/ui/widgets/merchant/posts/post_form.dart';
-import 'package:dak_louk/ui/widgets/merchant/products/product_item.dart';
+import 'package:dak_louk/ui/widgets/merchant/posts/post_create_form.dart';
+import 'package:dak_louk/ui/widgets/user/posts/product_item.dart';
 import 'package:dak_louk/ui/screens/user/merchant_profile_screen.dart';
 import 'package:flutter/material.dart';
 

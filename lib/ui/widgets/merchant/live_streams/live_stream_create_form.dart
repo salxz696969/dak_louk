@@ -3,7 +3,10 @@ import 'dart:io';
 import 'package:dak_louk/core/enums/media_type_enum.dart';
 import 'package:dak_louk/core/media/media_picker_sheet.dart';
 import 'package:dak_louk/domain/models/models.dart';
+import 'package:dak_louk/domain/services/merchant/product_service.dart';
+import 'package:dak_louk/ui/widgets/merchant/shared/add_products_section.dart';
 import 'package:dak_louk/ui/widgets/merchant/merchant_app_bar.dart';
+import 'package:dak_louk/ui/widgets/merchant/shared/product_selector_sheet.dart';
 import 'package:flutter/material.dart';
 
 class LiveStreamCreateForm extends StatefulWidget {
@@ -18,6 +21,8 @@ class _LiveStreamCreateFormState extends State<LiveStreamCreateForm> {
   final TextEditingController titleController = TextEditingController();
   String streamUrl = '';
   String? thumbnailUrl;
+  List<AddProductsModel> _selectedProducts = [];
+  final _productService = ProductService();
 
   void _handleSubmit() {
     if (_formKey.currentState!.validate()) {
@@ -32,6 +37,7 @@ class _LiveStreamCreateFormState extends State<LiveStreamCreateForm> {
         title: titleController.text,
         streamUrl: streamUrl,
         thumbnailUrl: thumbnailUrl,
+        productIds: _selectedProducts.map((product) => product.id).toList()!,
       );
 
       Navigator.pop(context, dto);
@@ -58,6 +64,23 @@ class _LiveStreamCreateFormState extends State<LiveStreamCreateForm> {
     if (path != null) {
       setState(() => thumbnailUrl = path);
     }
+  }
+
+  void _addProduct() {
+    showProductSelectorSheet(
+      context: context,
+      productService: _productService,
+      selectedProducts: _selectedProducts,
+      onProductsSelected: (selectedProducts) => setState(() {
+        _selectedProducts = selectedProducts;
+      }),
+    );
+  }
+
+  void _removeProduct(int index) {
+    setState(() {
+      _selectedProducts.removeAt(index);
+    });
   }
 
   @override
@@ -168,6 +191,15 @@ class _LiveStreamCreateFormState extends State<LiveStreamCreateForm> {
                     ],
                   ),
                 ),
+              ),
+
+              const SizedBox(height: 16),
+
+              // Products Section
+              ProductsSection(
+                selectedProducts: _selectedProducts,
+                onAddProduct: _addProduct,
+                onRemoveProduct: _removeProduct,
               ),
             ],
           ),

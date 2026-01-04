@@ -1,5 +1,7 @@
 library models;
 
+import 'package:dak_louk/core/enums/order_status_enum.dart';
+
 // Cache
 part '../../data/cache/cacheable.dart';
 

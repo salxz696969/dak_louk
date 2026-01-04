@@ -4,7 +4,7 @@ class OrderMerchantVM extends Cacheable {
   final int id;
   final String username;
   final String userProfileImage;
-  final String status;
+  final OrderStatusEnum status;
   final List<OrderProductMerchantVM> products;
   final int totalPrice;
 
@@ -31,7 +31,7 @@ class OrderMerchantVM extends Cacheable {
       id: raw.id,
       username: username,
       userProfileImage: userProfileImage,
-      status: raw.status,
+      status: OrderStatusEnum.values.firstWhere((e) => e.name == raw.status),
       products: products,
       totalPrice: totalPrice,
       createdAt: raw.createdAt,

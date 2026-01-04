@@ -1,9 +1,11 @@
+import 'package:dak_louk/core/enums/media_type_enum.dart';
+import 'package:dak_louk/core/media/media_picker_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/domain/services/merchant/post_service.dart';
 import 'package:dak_louk/domain/services/merchant/product_service.dart';
-import 'package:dak_louk/ui/widgets/merchant/posts/media_section.dart';
-import 'package:dak_louk/ui/widgets/merchant/posts/products_section.dart';
+import 'package:dak_louk/ui/widgets/merchant/shared/add_media_section.dart';
+import 'package:dak_louk/ui/widgets/merchant/shared/add_products_section.dart';
 import 'package:dak_louk/ui/widgets/merchant/shared/product_selector_sheet.dart';
 
 class PostForm extends StatefulWidget {
@@ -20,7 +22,7 @@ class _PostFormState extends State<PostForm> {
   final _formKey = GlobalKey<FormState>();
   final _captionCtrl = TextEditingController();
   final List<String> _mediaUrls = [];
-  final List<PostProductVM> _selectedProducts = [];
+  List<AddProductsModel> _selectedProducts = [];
 
   bool _saving = false;
   final _service = PostService();
@@ -34,7 +36,16 @@ class _PostFormState extends State<PostForm> {
       if (widget.post!.promoMedias != null) {
         _mediaUrls.addAll(widget.post!.promoMedias!.map((m) => m.url));
       }
-      _selectedProducts.addAll(widget.post!.products);
+      _selectedProducts.addAll(
+        widget.post!.products.map(
+          (product) => AddProductsModel(
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            imageUrls: product.imageUrls,
+          ),
+        ),
+      );
     }
   }
 
@@ -44,40 +55,17 @@ class _PostFormState extends State<PostForm> {
     super.dispose();
   }
 
-  void _addMedia() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        final urlController = TextEditingController();
-        return AlertDialog(
-          title: const Text('Add Media'),
-          content: TextField(
-            controller: urlController,
-            decoration: const InputDecoration(
-              hintText: 'Enter media URL',
-              border: OutlineInputBorder(),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                if (urlController.text.isNotEmpty) {
-                  setState(() {
-                    _mediaUrls.add(urlController.text);
-                  });
-                  Navigator.pop(context);
-                }
-              },
-              child: const Text('Add'),
-            ),
-          ],
-        );
-      },
+  Future<void> _addMedia() async {
+    final path = await MediaPickerSheet.show(
+      context,
+      type: MediaType.image,
+      folder: 'post_media',
     );
+    if (path != null) {
+      setState(() {
+        _mediaUrls.add(path);
+      });
+    }
   }
 
   void _removeMedia(int index) {
@@ -91,7 +79,9 @@ class _PostFormState extends State<PostForm> {
       context: context,
       productService: _productService,
       selectedProducts: _selectedProducts,
-      onProductsSelected: () => setState(() {}),
+      onProductsSelected: (selectedProducts) => setState(() {
+        _selectedProducts = selectedProducts;
+      }),
     );
   }
 
@@ -116,6 +106,8 @@ class _PostFormState extends State<PostForm> {
             caption: _captionCtrl.text.trim().isEmpty
                 ? null
                 : _captionCtrl.text.trim(),
+            productIds: _selectedProducts.map((product) => product.id).toList(),
+            promoMediaUrls: _mediaUrls,
           ),
         );
       } else {
@@ -126,6 +118,8 @@ class _PostFormState extends State<PostForm> {
             caption: _captionCtrl.text.trim().isEmpty
                 ? null
                 : _captionCtrl.text.trim(),
+            productIds: _selectedProducts.map((product) => product.id).toList(),
+            promoMediaUrls: _mediaUrls,
           ),
         );
       }

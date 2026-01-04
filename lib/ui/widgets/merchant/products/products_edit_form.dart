@@ -1,36 +1,40 @@
-import 'package:flutter/material.dart';
+import 'package:dak_louk/core/enums/media_type_enum.dart';
+import 'package:dak_louk/core/media/media_picker_sheet.dart';
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/domain/services/merchant/product_service.dart';
+import 'package:flutter/material.dart';
 
-class ProductForm extends StatefulWidget {
-  final ProductVM? product;
+class ProductsUpdateForm extends StatefulWidget {
+  final ProductVM product;
   final void Function(ProductVM savedProduct)? onSaved;
 
-  const ProductForm({super.key, this.product, this.onSaved});
+  const ProductsUpdateForm({super.key, required this.product, this.onSaved});
 
   @override
-  State<ProductForm> createState() => _ProductFormState();
+  State<ProductsUpdateForm> createState() => _ProductsUpdateFormState();
 }
 
-class _ProductFormState extends State<ProductForm> {
+class _ProductsUpdateFormState extends State<ProductsUpdateForm> {
   final _formKey = GlobalKey<FormState>();
-  final _nameCtrl = TextEditingController();
-  final _descCtrl = TextEditingController();
-  final _priceCtrl = TextEditingController();
-  final _qtyCtrl = TextEditingController();
+  late final TextEditingController _nameCtrl;
+  late final TextEditingController _descCtrl;
+  late final TextEditingController _priceCtrl;
+  late final TextEditingController _qtyCtrl;
 
   bool _saving = false;
   final _service = ProductService();
+  String? imageUrl;
 
   @override
   void initState() {
     super.initState();
-    if (widget.product != null) {
-      _nameCtrl.text = widget.product!.name;
-      _descCtrl.text = widget.product!.description ?? '';
-      _priceCtrl.text = widget.product!.price.toString();
-      _qtyCtrl.text = widget.product!.quantity.toString();
-    }
+    _nameCtrl = TextEditingController(text: widget.product.name);
+    _descCtrl = TextEditingController(text: widget.product.description ?? '');
+    _priceCtrl = TextEditingController(text: widget.product.price.toString());
+    _qtyCtrl = TextEditingController(text: widget.product.quantity.toString());
+    imageUrl = widget.product.mediaUrls?.isNotEmpty ?? false
+        ? widget.product.mediaUrls!.first
+        : null;
   }
 
   @override
@@ -42,38 +46,35 @@ class _ProductFormState extends State<ProductForm> {
     super.dispose();
   }
 
+  Future<void> _pickImage() async {
+    final path = await MediaPickerSheet.show(
+      context,
+      type: MediaType.image,
+      folder: 'product_images',
+    );
+    if (path != null) {
+      setState(() => imageUrl = path);
+    }
+  }
+
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _saving = true);
 
     try {
-      ProductVM? result;
-
-      if (widget.product == null) {
-        result = await _service.createProduct(
-          CreateProductDTO(
-            name: _nameCtrl.text.trim(),
-            description: _descCtrl.text.trim().isEmpty
-                ? null
-                : _descCtrl.text.trim(),
-            price: double.parse(_priceCtrl.text),
-            quantity: int.parse(_qtyCtrl.text),
-          ),
-        );
-      } else {
-        result = await _service.updateProduct(
-          widget.product!.id,
-          UpdateProductDTO(
-            name: _nameCtrl.text.trim(),
-            description: _descCtrl.text.trim().isEmpty
-                ? null
-                : _descCtrl.text.trim(),
-            price: double.parse(_priceCtrl.text),
-            quantity: int.parse(_qtyCtrl.text),
-          ),
-        );
-      }
+      final result = await _service.updateProduct(
+        widget.product.id,
+        UpdateProductDTO(
+          name: _nameCtrl.text.trim(),
+          description: _descCtrl.text.trim().isEmpty
+              ? null
+              : _descCtrl.text.trim(),
+          price: double.parse(_priceCtrl.text),
+          quantity: int.parse(_qtyCtrl.text),
+          imageUrl: imageUrl,
+        ),
+      );
 
       widget.onSaved?.call(result!);
       if (mounted) Navigator.pop(context);
@@ -97,21 +98,48 @@ class _ProductFormState extends State<ProductForm> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Align(
+            const Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                widget.product == null ? 'Add Product' : 'Edit Product',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
+                'Edit Product',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
             ),
             const SizedBox(height: 16),
 
+            // Image Picker
+            InkWell(
+              onTap: _pickImage,
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.image, color: Colors.grey),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        imageUrl == null
+                            ? 'Tap to select product image (optional)'
+                            : '${imageUrl!.split('/').last}',
+                        style: TextStyle(
+                          color: imageUrl == null ? Colors.grey : Colors.black,
+                        ),
+                      ),
+                    ),
+                    const Icon(Icons.chevron_right),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+
             TextFormField(
               controller: _nameCtrl,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Product Name',
                 border: OutlineInputBorder(),
               ),
@@ -122,7 +150,7 @@ class _ProductFormState extends State<ProductForm> {
 
             TextFormField(
               controller: _descCtrl,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Description',
                 border: OutlineInputBorder(),
               ),
@@ -133,10 +161,11 @@ class _ProductFormState extends State<ProductForm> {
 
             TextFormField(
               controller: _priceCtrl,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Price',
                 border: OutlineInputBorder(),
               ),
+              keyboardType: TextInputType.number,
               validator: (v) =>
                   double.tryParse(v ?? '') == null ? 'Invalid price' : null,
             ),
@@ -145,7 +174,7 @@ class _ProductFormState extends State<ProductForm> {
 
             TextFormField(
               controller: _qtyCtrl,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Quantity',
                 border: OutlineInputBorder(),
               ),
@@ -167,10 +196,10 @@ class _ProductFormState extends State<ProductForm> {
                 onTap: _saving ? null : _submit,
                 child: _saving
                     ? const CircularProgressIndicator()
-                    : Center(
+                    : const Center(
                         child: Text(
-                          widget.product == null ? 'Create' : 'Update',
-                          style: const TextStyle(
+                          'Update',
+                          style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
                             fontSize: 16,

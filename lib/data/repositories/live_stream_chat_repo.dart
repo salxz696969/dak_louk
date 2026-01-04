@@ -13,12 +13,8 @@ class LiveStreamChatRepository extends BaseRepository<LiveStreamChatModel> {
       liveStreamId: map[Tables.liveStreamChats.cols.liveStreamId] as int,
       userId: map[Tables.liveStreamChats.cols.userId] as int,
       text: map[Tables.liveStreamChats.cols.text] as String,
-      createdAt: DateTime.parse(
-        map[Tables.liveStreamChats.cols.createdAt] as String,
-      ),
-      updatedAt: DateTime.parse(
-        map[Tables.liveStreamChats.cols.updatedAt] as String,
-      ),
+      createdAt: map[Tables.liveStreamChats.cols.createdAt] as String,
+      updatedAt: map[Tables.liveStreamChats.cols.updatedAt] as String,
     );
   }
 

@@ -164,12 +164,10 @@ class _MerchantLiveScreenState extends State<MerchantLiveScreen> {
             itemCount: liveStreams.length,
             itemBuilder: (context, index) {
               final liveStream = liveStreams[index];
-              return InkWell(
-                onLongPress: () => _handleEdit(liveStream),
-                child: LiveStreamItem(
-                  liveStream: liveStream,
-                  onDelete: () => _handleDelete(liveStream.id),
-                ),
+              return LiveStreamItem(
+                liveStream: liveStream,
+                onEdit: () => _handleEdit(liveStream),
+                onDelete: () => _handleDelete(liveStream.id),
               );
             },
           );

@@ -1,6 +1,8 @@
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/domain/services/merchant/product_service.dart';
-import 'package:dak_louk/ui/widgets/merchant/products/product_form.dart';
+import 'package:dak_louk/ui/widgets/merchant/products/product_item.dart';
+import 'package:dak_louk/ui/widgets/merchant/products/products_create_form.dart';
+import 'package:dak_louk/ui/widgets/merchant/products/products_edit_form.dart';
 import 'package:flutter/material.dart';
 
 class MerchantProductsScreen extends StatefulWidget {
@@ -47,53 +49,10 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
                   itemCount: _products.length,
                   itemBuilder: (context, index) {
                     final product = _products[index];
-                    return Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 12.0),
-                      decoration: BoxDecoration(
-                        border: Border(
-                          bottom: BorderSide(
-                            color: Colors.grey.shade300,
-                            width: 1.0,
-                          ),
-                        ),
-                      ),
-                      child: ListTile(
-                        leading: ClipRRect(
-                          borderRadius: BorderRadius.circular(8.0),
-                          child: Image.asset(
-                            (product.mediaUrls?.isNotEmpty ?? false)
-                                ? product.mediaUrls!.first
-                                : 'assets/images/coffee1.png',
-                            width: 50,
-                            height: 50,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        title: Text(
-                          product.name,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(fontWeight: FontWeight.w500),
-                        ),
-                        subtitle: Text('\$${product.price.toStringAsFixed(2)}'),
-                        trailing: PopupMenuButton<String>(
-                          icon: const Icon(Icons.more_horiz),
-                          itemBuilder: (context) => const [
-                            PopupMenuItem(value: 'edit', child: Text('Edit')),
-                            PopupMenuItem(
-                              value: 'delete',
-                              child: Text('Delete'),
-                            ),
-                          ],
-                          onSelected: (value) async {
-                            if (value == 'edit') {
-                              _showProductForm(context, product: product);
-                            } else if (value == 'delete') {
-                              await _deleteProduct(product.id, index);
-                            }
-                          },
-                        ),
-                      ),
+                    return MerchantProductItem(
+                      product: product,
+                      onEdit: () => _showProductForm(context, product: product),
+                      onDelete: () => _deleteProduct(product.id, index),
                     );
                   },
                 ),
@@ -127,25 +86,27 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
         padding: EdgeInsets.only(
           bottom: MediaQuery.of(context).viewInsets.bottom,
         ),
-        child: ProductForm(
-          product: product,
-          onSaved: (savedProduct) {
-            setState(() {
-              if (product == null) {
-                // Add new product
-                _products.insert(0, savedProduct);
-              } else {
-                // Update existing product
-                final index = _products.indexWhere(
-                  (p) => p.id == savedProduct.id,
-                );
-                if (index != -1) {
-                  _products[index] = savedProduct;
-                }
-              }
-            });
-          },
-        ),
+        child: product == null
+            ? ProductsCreateForm(
+                onSaved: (savedProduct) {
+                  setState(() {
+                    _products.insert(0, savedProduct);
+                  });
+                },
+              )
+            : ProductsUpdateForm(
+                product: product,
+                onSaved: (savedProduct) {
+                  setState(() {
+                    final index = _products.indexWhere(
+                      (p) => p.id == savedProduct.id,
+                    );
+                    if (index != -1) {
+                      _products[index] = savedProduct;
+                    }
+                  });
+                },
+              ),
       ),
     );
   }

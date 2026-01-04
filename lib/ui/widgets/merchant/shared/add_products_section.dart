@@ -1,8 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:dak_louk/domain/models/models.dart';
+
+class AddProductsModel {
+  int id;
+  String name;
+  double price;
+  List<String> imageUrls;
+  AddProductsModel({
+    required this.id,
+    required this.name,
+    required this.price,
+    required this.imageUrls,
+  });
+}
 
 class ProductsSection extends StatelessWidget {
-  final List<PostProductVM> selectedProducts;
+  final List<AddProductsModel> selectedProducts;
   final VoidCallback onAddProduct;
   final void Function(int index) onRemoveProduct;
 

@@ -1,12 +1,14 @@
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/domain/services/merchant/post_service.dart';
-import 'package:dak_louk/ui/widgets/merchant/products/product_item.dart';
+import 'package:dak_louk/ui/widgets/merchant/posts/product_item.dart';
 import 'package:flutter/material.dart';
 
 class PostItem extends StatefulWidget {
   final PostVM post;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
 
-  const PostItem({super.key, required this.post});
+  const PostItem({super.key, required this.post, this.onEdit, this.onDelete});
 
   @override
   State<PostItem> createState() => _PostItemState();
@@ -52,55 +54,18 @@ class _PostItemState extends State<PostItem> {
                 'Post • ${widget.post.createdAt}',
                 style: TextStyle(color: Colors.grey[600], fontSize: 12),
               ),
-              IconButton(
+              PopupMenuButton<String>(
                 icon: const Icon(Icons.more_horiz),
-                onPressed: () {
-                  showModalBottomSheet(
-                    context: context,
-                    builder: (context) => Container(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          ListTile(
-                            leading: const Icon(
-                              Icons.delete,
-                              color: Colors.red,
-                            ),
-                            title: const Text('Delete Post'),
-                            onTap: () {
-                              Navigator.pop(context);
-                              showDialog(
-                                context: context,
-                                builder: (context) => AlertDialog(
-                                  title: const Text('Delete Post'),
-                                  content: const Text(
-                                    'Are you sure you want to delete this post?',
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () => Navigator.pop(context),
-                                      child: const Text('Cancel'),
-                                    ),
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                        handleDeletePost();
-                                      },
-                                      child: const Text(
-                                        'Delete',
-                                        style: TextStyle(color: Colors.red),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
+                itemBuilder: (context) => const [
+                  PopupMenuItem(value: 'edit', child: Text('Edit')),
+                  PopupMenuItem(value: 'delete', child: Text('Delete')),
+                ],
+                onSelected: (value) {
+                  if (value == 'edit') {
+                    widget.onEdit?.call();
+                  } else if (value == 'delete') {
+                    widget.onDelete?.call();
+                  }
                 },
               ),
             ],

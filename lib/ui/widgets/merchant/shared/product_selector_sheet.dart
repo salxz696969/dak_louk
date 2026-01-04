@@ -1,3 +1,4 @@
+import 'package:dak_louk/ui/widgets/merchant/shared/add_products_section.dart';
 import 'package:flutter/material.dart';
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/domain/services/merchant/product_service.dart';
@@ -8,14 +9,15 @@ import 'package:dak_louk/domain/services/merchant/product_service.dart';
 /// - [context]: The build context
 /// - [productService]: Service for fetching products
 /// - [selectedProducts]: List of currently selected products (will be modified)
-/// - [onProductsSelected]: Optional callback when products are selected/deselected
+/// - [onProductsSelected]: Callback when products are selected/deselected
 ///
 /// Returns: Future<void> - completes when the bottom sheet is dismissed
+
 Future<void> showProductSelectorSheet({
   required BuildContext context,
   required ProductService productService,
-  required List<PostProductVM> selectedProducts,
-  VoidCallback? onProductsSelected,
+  required List<AddProductsModel> selectedProducts,
+  required Function(List<AddProductsModel>) onProductsSelected,
 }) {
   return showModalBottomSheet(
     showDragHandle: true,
@@ -36,13 +38,13 @@ Future<void> showProductSelectorSheet({
 
 class _ProductSelectorContent extends StatefulWidget {
   final ProductService productService;
-  final List<PostProductVM> selectedProducts;
-  final VoidCallback? onProductsSelected;
+  final List<AddProductsModel> selectedProducts;
+  final Function(List<AddProductsModel>) onProductsSelected;
 
   const _ProductSelectorContent({
     required this.productService,
     required this.selectedProducts,
-    this.onProductsSelected,
+    required this.onProductsSelected,
   });
 
   @override
@@ -109,15 +111,11 @@ class _ProductSelectorContentState extends State<_ProductSelectorContent> {
                           setState(() {
                             if (selected == true && !alreadySelected) {
                               widget.selectedProducts.add(
-                                PostProductVM(
+                                AddProductsModel(
                                   id: product.id,
                                   name: product.name,
                                   price: product.price,
                                   imageUrls: product.mediaUrls ?? [],
-                                  quantity: 1,
-                                  category: ProductCategory.all,
-                                  description: product.description ?? '',
-                                  isAddedToCart: false,
                                 ),
                               );
                             } else if (selected == false && alreadySelected) {
@@ -125,7 +123,7 @@ class _ProductSelectorContentState extends State<_ProductSelectorContent> {
                                 (p) => p.id == product.id,
                               );
                             }
-                            widget.onProductsSelected?.call();
+                            widget.onProductsSelected(widget.selectedProducts);
                           });
                         },
                       ),

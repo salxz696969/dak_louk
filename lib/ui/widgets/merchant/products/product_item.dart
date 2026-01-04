@@ -1,72 +1,68 @@
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:flutter/material.dart';
 
-class ProductItem extends StatefulWidget {
-  final PostProductVM product;
+class MerchantProductItem extends StatelessWidget {
+  final ProductVM product;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
 
-  const ProductItem({super.key, required this.product});
+  const MerchantProductItem({
+    super.key,
+    required this.product,
+    required this.onEdit,
+    required this.onDelete,
+  });
 
-  @override
-  State<ProductItem> createState() => _ProductItemState();
-}
-
-class _ProductItemState extends State<ProductItem> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 200,
-      margin: const EdgeInsets.only(right: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Product Image
-          Container(
-            height: 150,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              color: Colors.grey[200],
-            ),
-            child: widget.product.imageUrls.isNotEmpty
-                ? ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.asset(
-                      widget.product.imageUrls.first,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        );
-                      },
-                    ),
-                  )
-                : Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
+    return Dismissible(
+      key: Key('product-${product.id}'),
+      direction: DismissDirection.endToStart,
+      background: Container(
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.only(right: 20),
+        margin: const EdgeInsets.symmetric(horizontal: 12.0),
+        decoration: BoxDecoration(
+          color: Colors.red,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: const Icon(Icons.delete, color: Colors.white),
+      ),
+      confirmDismiss: (direction) async {
+        onDelete();
+        return false; // Don't actually dismiss, handle in callback
+      },
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 12.0),
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: BorderSide(color: Colors.grey.shade300, width: 1.0),
           ),
-          const SizedBox(height: 8),
-          // Product Name
-          Text(
-            widget.product.name,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-            maxLines: 2,
+        ),
+        child: ListTile(
+          leading: ClipRRect(
+            borderRadius: BorderRadius.circular(8.0),
+            child: Image.asset(
+              (product.mediaUrls?.isNotEmpty ?? false)
+                  ? product.mediaUrls!.first
+                  : 'assets/images/coffee1.png',
+              width: 50,
+              height: 50,
+              fit: BoxFit.cover,
+            ),
+          ),
+          title: Text(
+            product.name,
+            maxLines: 1,
             overflow: TextOverflow.ellipsis,
+            style: const TextStyle(fontWeight: FontWeight.w500),
           ),
-          const SizedBox(height: 4),
-          // Product Price
-          Text(
-            '\$${widget.product.price}',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).primaryColor,
-            ),
+          subtitle: Text('\$${product.price.toStringAsFixed(2)}'),
+          trailing: IconButton(
+            icon: const Icon(Icons.edit),
+            onPressed: onEdit,
           ),
-        ],
+        ),
       ),
     );
   }

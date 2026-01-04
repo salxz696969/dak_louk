@@ -1,9 +1,10 @@
-import 'dart:io';
-
 import 'package:dak_louk/core/enums/media_type_enum.dart';
 import 'package:dak_louk/core/media/media_picker_sheet.dart';
 import 'package:dak_louk/domain/models/models.dart';
+import 'package:dak_louk/domain/services/merchant/product_service.dart';
+import 'package:dak_louk/ui/widgets/merchant/shared/add_products_section.dart';
 import 'package:dak_louk/ui/widgets/merchant/merchant_app_bar.dart';
+import 'package:dak_louk/ui/widgets/merchant/shared/product_selector_sheet.dart';
 import 'package:flutter/material.dart';
 
 class LiveStreamEditForm extends StatefulWidget {
@@ -20,6 +21,8 @@ class _LiveStreamEditFormState extends State<LiveStreamEditForm> {
   late final TextEditingController titleController;
   late String streamUrl;
   String? thumbnailUrl;
+  List<AddProductsModel> _selectedProducts = [];
+  final _productService = ProductService();
 
   @override
   void initState() {
@@ -27,6 +30,17 @@ class _LiveStreamEditFormState extends State<LiveStreamEditForm> {
     titleController = TextEditingController(text: widget.liveStream.title);
     streamUrl = widget.liveStream.streamUrl;
     thumbnailUrl = widget.liveStream.thumbnailUrl;
+    _selectedProducts.addAll(
+      widget.liveStream.products?.map(
+            (product) => AddProductsModel(
+              id: product.id,
+              name: product.name,
+              price: product.price,
+              imageUrls: product.imageUrls,
+            ),
+          ) ??
+          [],
+    );
   }
 
   void _handleSubmit() {
@@ -35,6 +49,7 @@ class _LiveStreamEditFormState extends State<LiveStreamEditForm> {
         title: titleController.text,
         streamUrl: streamUrl,
         thumbnailUrl: thumbnailUrl,
+        productIds: _selectedProducts.map((product) => product.id).toList(),
       );
 
       Navigator.pop(context, dto);
@@ -61,6 +76,32 @@ class _LiveStreamEditFormState extends State<LiveStreamEditForm> {
     if (path != null) {
       setState(() => thumbnailUrl = path);
     }
+  }
+
+  void _addProduct() {
+    showProductSelectorSheet(
+      context: context,
+      productService: _productService,
+      selectedProducts: _selectedProducts
+          .map(
+            (product) => AddProductsModel(
+              id: product.id,
+              name: product.name,
+              price: product.price,
+              imageUrls: product.imageUrls,
+            ),
+          )
+          .toList(),
+      onProductsSelected: (selectedProducts) => setState(() {
+        _selectedProducts = selectedProducts;
+      }),
+    );
+  }
+
+  void _removeProduct(int index) {
+    setState(() {
+      _selectedProducts.removeAt(index);
+    });
   }
 
   @override
@@ -153,6 +194,15 @@ class _LiveStreamEditFormState extends State<LiveStreamEditForm> {
                     ],
                   ),
                 ),
+              ),
+
+              const SizedBox(height: 16),
+
+              // Products Section
+              ProductsSection(
+                selectedProducts: _selectedProducts,
+                onAddProduct: _addProduct,
+                onRemoveProduct: _removeProduct,
               ),
             ],
           ),

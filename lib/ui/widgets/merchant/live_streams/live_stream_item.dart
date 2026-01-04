@@ -5,11 +5,13 @@ import 'package:flutter/material.dart';
 class LiveStreamItem extends StatelessWidget {
   final MerchantLiveStreamsVM liveStream;
   final VoidCallback onDelete;
+  final VoidCallback? onEdit;
 
   const LiveStreamItem({
     super.key,
     required this.liveStream,
     required this.onDelete,
+    this.onEdit,
   });
 
   Future<void> _showDeleteDialog(BuildContext context) async {
@@ -142,11 +144,21 @@ class LiveStreamItem extends StatelessWidget {
                 ),
               ),
 
-              // Play icon
-              const Icon(
-                Icons.play_circle_outline,
-                color: Colors.grey,
-                size: 24,
+              // Action icons
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.edit, color: Colors.grey),
+                    onPressed: onEdit,
+                    iconSize: 20,
+                  ),
+                  const Icon(
+                    Icons.play_circle_outline,
+                    color: Colors.grey,
+                    size: 24,
+                  ),
+                ],
               ),
             ],
           ),

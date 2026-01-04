@@ -276,21 +276,21 @@ class PostService {
           updatedAt: DateTime.now(),
         ),
       );
-      if (dto.product != null) {
-        for (final dt in dto.product!) {
-          final postProduct = await _postProductsRepository.insert(
-            PostProductModel(id: 0, postId: id, productId: dt.id),
+      if (dto.productIds != null) {
+        for (final productId in dto.productIds!) {
+          await _postProductsRepository.insert(
+            PostProductModel(id: 0, postId: id, productId: productId),
           );
         }
       }
 
-      if (dto.promoMedia != null) {
-        for (final media in dto.promoMedia!) {
-          final promoMedia = await _promoMediaRepository.insert(
+      if (dto.promoMediaUrls != null) {
+        for (final mediaUrl in dto.promoMediaUrls!) {
+          await _promoMediaRepository.insert(
             PromoMediaModel(
               id: 0,
               postId: id,
-              url: media.url,
+              url: mediaUrl,
               createdAt: DateTime.now(),
               updatedAt: DateTime.now(),
             ),

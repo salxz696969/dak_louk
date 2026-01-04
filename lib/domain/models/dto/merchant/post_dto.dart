@@ -2,16 +2,16 @@ part of models;
 
 class CreatePostDTO {
   final String? caption;
-  final List<PostProductVM>? product;
-  final List<PromoMediaVM>? promoMedia;
+  final List<int>? productIds;
+  final List<String>? promoMediaUrls;
 
-  CreatePostDTO({this.caption, this.product, this.promoMedia});
+  CreatePostDTO({this.caption, this.productIds, this.promoMediaUrls});
 }
 
 class UpdatePostDTO {
   final String? caption;
-  final List<PostProductVM>? product;
-  final List<PromoMediaVM>? promoMedia;
+  final List<int>? productIds;
+  final List<String>? promoMediaUrls;
 
-  UpdatePostDTO({this.caption, this.product, this.promoMedia});
+  UpdatePostDTO({this.caption, this.productIds, this.promoMediaUrls});
 }

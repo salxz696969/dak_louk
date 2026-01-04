@@ -424,13 +424,37 @@ class PostService {
           updatedAt: DateTime.now(),
         ),
       );
-
-      final newPost = await _postRepository.getById(id);
-      if (newPost != null) {
-        final postVMs = await _buildPostVMs([newPost]);
-        return postVMs.isNotEmpty ? postVMs.first : null;
+      if (dto.promoMediaUrls != null) {
+        for (var mediaUrl in dto.promoMediaUrls!) {
+          await _promoMediaRepository.insert(
+            PromoMediaModel(
+              id: 0,
+              postId: id,
+              url: mediaUrl,
+              createdAt: DateTime.now(),
+              updatedAt: DateTime.now(),
+            ),
+          );
+        }
       }
-      throw AppError(type: ErrorType.NOT_FOUND, message: 'Post not found');
+      if (dto.productIds != null) {
+        for (var productId in dto.productIds!) {
+          await _postProductsRepository.insert(
+            PostProductModel(id: 0, postId: id, productId: productId),
+          );
+        }
+      }
+      if (id > 0) {
+        final newPost = await _postRepository.getById(id);
+        if (newPost != null) {
+          final postVMs = await _buildPostVMs([newPost]);
+          return postVMs.isNotEmpty ? postVMs.first : null;
+        }
+      }
+      throw AppError(
+        type: ErrorType.DB_ERROR,
+        message: 'Failed to create post',
+      );
     } catch (e) {
       if (e is AppError) {
         rethrow;
@@ -470,6 +494,8 @@ class PostService {
       if (post.merchantId != currentMerchantId) {
         throw AppError(type: ErrorType.UNAUTHORIZED, message: 'Unauthorized');
       }
+
+      // Update the post itself
       await _postRepository.update(
         PostModel(
           id: id,
@@ -479,6 +505,49 @@ class PostService {
           updatedAt: DateTime.now(),
         ),
       );
+
+      // Delete old post-product relationships
+      final oldProductRelations = await _postProductsRepository.queryThisTable(
+        where: Clauses.where.eq(Tables.postProducts.cols.postId, id).clause,
+        args: Clauses.where.eq(Tables.postProducts.cols.postId, id).args,
+      );
+      for (final relation in oldProductRelations) {
+        await _postProductsRepository.delete(relation.id);
+      }
+
+      // Delete old promo media
+      final oldPromoMedia = await _promoMediaRepository.queryThisTable(
+        where: Clauses.where.eq(Tables.promoMedias.cols.postId, id).clause,
+        args: Clauses.where.eq(Tables.promoMedias.cols.postId, id).args,
+      );
+      for (final media in oldPromoMedia) {
+        await _promoMediaRepository.delete(media.id);
+      }
+
+      // Add new post-product relationships if provided
+      if (dto.productIds != null) {
+        for (var productId in dto.productIds!) {
+          await _postProductsRepository.insert(
+            PostProductModel(id: 0, postId: id, productId: productId),
+          );
+        }
+      }
+
+      // Add new promo media if provided
+      if (dto.promoMediaUrls != null) {
+        for (var mediaUrl in dto.promoMediaUrls!) {
+          await _promoMediaRepository.insert(
+            PromoMediaModel(
+              id: 0,
+              postId: id,
+              url: mediaUrl,
+              createdAt: DateTime.now(),
+              updatedAt: DateTime.now(),
+            ),
+          );
+        }
+      }
+
       final updatedPost = await _postRepository.getById(id);
       if (updatedPost != null) {
         final postVMs = await _buildPostVMs([updatedPost]);
@@ -498,18 +567,33 @@ class PostService {
 
   Future<void> deletePost(int postId) async {
     try {
-      // Delete associated media first
-      final statement = Clauses.where.eq(
+      // Delete associated products first
+      final productStatement = Clauses.where.eq(
+        Tables.postProducts.cols.postId,
+        postId,
+      );
+      final postProducts = await _postProductsRepository.queryThisTable(
+        where: productStatement.clause,
+        args: productStatement.args,
+      );
+      for (final postProduct in postProducts) {
+        await _postProductsRepository.delete(postProduct.id);
+      }
+
+      // Delete associated media
+      final mediaStatement = Clauses.where.eq(
         Tables.promoMedias.cols.postId,
         postId,
       );
       final promoMedias = await _promoMediaRepository.queryThisTable(
-        where: statement.clause,
-        args: statement.args,
+        where: mediaStatement.clause,
+        args: mediaStatement.args,
       );
       for (final promoMedia in promoMedias) {
         await _promoMediaRepository.delete(promoMedia.id);
       }
+
+      // Delete the post
       await _postRepository.delete(postId);
     } catch (e) {
       if (e is AppError) {
