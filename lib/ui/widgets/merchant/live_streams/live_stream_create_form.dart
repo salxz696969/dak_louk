@@ -37,7 +37,7 @@ class _LiveStreamCreateFormState extends State<LiveStreamCreateForm> {
         title: titleController.text,
         streamUrl: streamUrl,
         thumbnailUrl: thumbnailUrl,
-        productIds: _selectedProducts.map((product) => product.id).toList()!,
+        productIds: _selectedProducts.map((product) => product.id).toList(),
       );
 
       Navigator.pop(context, dto);
