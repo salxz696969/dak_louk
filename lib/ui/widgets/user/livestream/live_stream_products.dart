@@ -7,7 +7,7 @@ class LiveStreamProducts extends StatelessWidget {
   final int liveStreamId;
   final LiveStreamProductsService _liveStreamProductsService =
       LiveStreamProductsService();
-  LiveStreamProducts({required this.liveStreamId});
+  LiveStreamProducts({super.key, required this.liveStreamId});
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +25,7 @@ class LiveStreamProducts extends StatelessWidget {
         } else {
           final liveStreamProducts = snapshot.data!;
           return SizedBox(
-            height: 280,
+            height: 300,
             // enough to fit the product card
             child: ListView.builder(
               scrollDirection: Axis.horizontal,

@@ -47,6 +47,9 @@ class _MerchantChatState extends State<MerchantChat> {
     await _chatService.createChat(
       CreateChatDTO(chatRoomId: widget.chatRoomId, text: text),
     );
+    setState(() {
+      _controller.clear();
+    });
     _scrollToBottom();
   }
 

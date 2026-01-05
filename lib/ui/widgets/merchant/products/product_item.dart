@@ -45,7 +45,7 @@ class MerchantProductItem extends StatelessWidget {
             child: Image.asset(
               (product.mediaUrls?.isNotEmpty ?? false)
                   ? product.mediaUrls!.first
-                  : 'assets/images/coffee1.png',
+                  : 'assets/images/plane.jpg',
               width: 50,
               height: 50,
               fit: BoxFit.cover,

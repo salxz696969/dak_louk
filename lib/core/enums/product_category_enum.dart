@@ -7,12 +7,8 @@ enum ProductCategory {
   electronics('electronics'),
   home('home'),
   fashion('fashion'),
-  jobs('jobs'),
-  services('services'),
-  entertainment('entertainment'),
   kids('kids'),
   pets('pets'),
-  business('business'),
   others('others');
 
   final String name;
