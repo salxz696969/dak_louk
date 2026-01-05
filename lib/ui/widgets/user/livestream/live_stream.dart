@@ -87,7 +87,7 @@ class _LiveStreamState extends State<LiveStream> {
                 backgroundColor: const Color.fromARGB(255, 20, 20, 20),
                 context: context,
                 builder: (context) => SizedBox(
-                  height: 380,
+                  height: 400,
                   child: Padding(
                     padding: const EdgeInsets.only(right: 16, left: 16),
                     child: Column(

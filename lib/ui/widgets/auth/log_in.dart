@@ -60,17 +60,19 @@ class _LogInState extends State<LogIn> {
           const SizedBox(height: 24),
           SizedBox(
             width: double.infinity,
-            child: ElevatedButton(
-              onPressed: _handleSubmit,
-              style: ElevatedButton.styleFrom(
+            child: InkWell(
+              onTap: _handleSubmit,
+              child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
+                decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
+                  color: Theme.of(context).colorScheme.secondary,
                 ),
-              ),
-              child: const Text(
-                'Log In',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                alignment: Alignment.center,
+                child: const Text(
+                  'Log In',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white),
+                ),
               ),
             ),
           ),

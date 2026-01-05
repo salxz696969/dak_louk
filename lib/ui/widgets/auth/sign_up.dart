@@ -65,15 +65,15 @@ class _SignUpState extends State<SignUp> {
                     right: 0,
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.blue,
+                        color: Theme.of(context).colorScheme.secondary,
                         borderRadius: BorderRadius.circular(20),
                       ),
+                      padding: const EdgeInsets.all(8),
                       child: const Icon(
                         Icons.camera_alt,
                         color: Colors.white,
                         size: 20,
                       ),
-                      padding: const EdgeInsets.all(8),
                     ),
                   ),
                 ],
@@ -177,17 +177,27 @@ class _SignUpState extends State<SignUp> {
             const SizedBox(height: 24),
             SizedBox(
               width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _handleSubmit,
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
+              child: InkWell(
+                onTap: _handleSubmit,
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 16,
+                    horizontal: 12,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primary,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                ),
-                child: const Text(
-                  'Sign Up',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  alignment: Alignment.center,
+                  child: const Text(
+                    'Sign Up',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
               ),
             ),
