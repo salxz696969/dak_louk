@@ -13,7 +13,6 @@ Dak Louk is a Flutter marketplace application implementing a clean, layered arch
 7. [UX & Interaction Patterns](#7-ux--interaction-patterns)
 8. [Media & Platform Integrations](#8-media--platform-integrations)
 9. [Theming & Visual System](#9-theming--visual-system)
-10. [Testing & Maintainability](#10-testing--maintainability)
 
 ---
 
@@ -54,9 +53,9 @@ The application follows a singleton-based initialization pattern:
 
 **Role-Based Behavior**:
 
-- Merchants have both `userId` and `merchantId` set (same value)
-- Users only have `userId` set
-- Session determines which services and UI flows are accessible
+- Merchants have `merchantId` 
+- Users have `userId` 
+- Session determines which services and UI flows are accessible (via constructor checking in services)
 
 ### 1.3 Role-Based Flows
 
@@ -1184,69 +1183,6 @@ ThemeData(
 - Same typography
 - Same spacing and padding
 - Same interaction patterns (buttons, cards, etc.)
-
----
-
-## 10. Testing & Maintainability
-
-### 10.1 Testability of Services & Repositories
-
-**Service Testability**:
-
-- Services depend on repositories (can be mocked)
-- Services are instantiated per use (no singletons)
-- Services have clear input/output contracts (DTOs → View Models)
-
-**Repository Testability**:
-
-- Repositories depend on `AppDatabase` (can be mocked or use in-memory database)
-- Repositories have clear interfaces (`BaseRepositoryInterface`)
-- Repositories are pure data access (no business logic)
-
-**Testing Strategy** (Future):
-
-- Unit tests for services (mock repositories)
-- Unit tests for repositories (in-memory SQLite)
-- Integration tests for full flows
-
-### 10.2 Design Decisions Aiding Testing
-
-**Dependency Injection Ready**:
-
-- Services instantiate repositories (could be injected)
-- No global state (except `AppSession` singleton)
-- Clear separation of concerns
-
-**Interface-Based Design**:
-
-- `BaseRepositoryInterface` allows mocking
-- Services depend on interfaces, not implementations
-
-**Pure Functions**:
-
-- Model transformations are pure (no side effects)
-- Validation logic is pure (can be tested independently)
-
-### 10.3 Design Decisions Hindering Testing
-
-**Singleton Dependencies**:
-
-- `AppSession` is a singleton (hard to mock)
-- `AppDatabase` is a singleton (hard to mock)
-- `Cache` is a singleton (hard to mock)
-
-**Tight Coupling**:
-
-- Services directly instantiate repositories
-- No dependency injection framework
-- Hard to swap implementations for testing
-
-**Future Improvements**:
-
-- Dependency injection (GetIt, Riverpod, etc.)
-- Interface-based dependencies
-- Test doubles for singletons
-- In-memory database for testing
 
 ---
 
