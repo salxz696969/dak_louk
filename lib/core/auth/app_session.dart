@@ -1,17 +1,9 @@
-import 'package:dak_louk/core/utils/error.dart';
-import 'package:dak_louk/core/utils/hash.dart';
-import 'package:dak_louk/data/repositories/user_repo.dart';
-import 'package:dak_louk/data/repositories/merchant_repo.dart';
-import 'package:dak_louk/domain/models/models.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:dak_louk/core/enums/role_enum.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AppSession {
   AppSession._internal();
   static final AppSession instance = AppSession._internal();
-
-  final UserRepository _userRepository = UserRepository();
-  final MerchantRepository _merchantRepository = MerchantRepository();
 
   static const _keyUserId = 'user_id';
   static const _keyUsername = 'username';
@@ -60,143 +52,82 @@ class AppSession {
     _address = prefs.getString(_keyAddress);
   }
 
-  Future<Role?> login({required String email, required String password}) async {
-    final passwordHash = Hasher.sha256Hash(password);
-    final user = await _userRepository.getUserByEmailAndPassword(
-      email,
-      passwordHash,
-    );
-    final merchant = await _merchantRepository.getMerchantByEmailAndPassword(
-      email,
-      passwordHash,
-    );
-    // either the user is null or the merchant is null never both and both null on incorrect
-    if (user == null && merchant == null) {
-      return null;
-    }
+  Future<void> setUserSession({
+    required int userId,
+    required String username,
+    required Role role,
+    String? phone,
+    String? address,
+  }) async {
     final prefs = await SharedPreferences.getInstance();
 
-    if (user != null) {
-      // Standard user login
-      _userId = user.id;
-      _username = user.username;
-      _role = Role.user;
-      _phone = user.phone;
-      _address = user.address;
+    _userId = userId;
+    _username = username;
+    _role = role;
+    _phone = phone;
+    _address = address;
 
-      _merchantId = null;
-      _merchantUsername = null;
-      _merchantProfileImageUrl = null;
+    _merchantId = null;
+    _merchantUsername = null;
+    _merchantProfileImageUrl = null;
 
-      await prefs.setInt(_keyUserId, _userId!);
-      await prefs.setString(_keyUsername, _username!);
-      await prefs.setString(_keyRole, _role!.name);
+    await prefs.setInt(_keyUserId, _userId!);
+    await prefs.setString(_keyUsername, _username!);
+    await prefs.setString(_keyRole, _role!.name);
+    if (_phone != null) {
       await prefs.setString(_keyPhone, _phone!);
-      await prefs.setString(_keyAddress, _address!);
-
-      await prefs.remove(_keyMerchantId);
-      await prefs.remove(_keyMerchantUsername);
-      await prefs.remove(_keyMerchantProfileImageUrl);
-
-      return Role.user;
-    }
-    if (merchant != null) {
-      // Merchant login, fill both sections
-      _userId = merchant.id;
-      _username = merchant.username;
-      _role = Role.merchant;
-      _merchantId = merchant.id;
-      _merchantUsername = merchant.username;
-      _merchantProfileImageUrl = merchant.profileImage;
-
-      // You might want to also get additional merchant-specific data here in the future
-      await prefs.setInt(_keyUserId, _userId!);
-      await prefs.setString(_keyUsername, _username!);
-      await prefs.setString(_keyRole, _role!.name);
-
-      await prefs.setInt(_keyMerchantId, _merchantId!);
-      await prefs.setString(_keyMerchantUsername, _merchantUsername!);
-
-      if (_merchantProfileImageUrl != null) {
-        await prefs.setString(
-          _keyMerchantProfileImageUrl,
-          _merchantProfileImageUrl!,
-        );
-      } else {
-        await prefs.remove(_keyMerchantProfileImageUrl);
-      }
-
-      // Optional: clear user-specific fields if merchant is not also user
+    } else {
       await prefs.remove(_keyPhone);
-      await prefs.remove(_keyAddress);
-      _phone = null;
-      _address = null;
-
-      return Role.merchant;
     }
-    // fallback (should never reach)
-    return null;
+    if (_address != null) {
+      await prefs.setString(_keyAddress, _address!);
+    } else {
+      await prefs.remove(_keyAddress);
+    }
+
+    await prefs.remove(_keyMerchantId);
+    await prefs.remove(_keyMerchantUsername);
+    await prefs.remove(_keyMerchantProfileImageUrl);
   }
 
-  Future<void> signUpUser({
-    required String email,
+  Future<void> setMerchantSession({
+    required int userId,
     required String username,
-    required String profileImageUrl,
-    required String bio,
-    required String password,
-    required String phone,
-    required String address,
+    required Role role,
+    required int merchantId,
+    required String merchantUsername,
+    String? merchantProfileImageUrl,
   }) async {
-    final passwordHash = Hasher.sha256Hash(password);
-    final user = await _userRepository.getUserByEmailAndPassword(
-      email,
-      passwordHash,
-    );
-    if (user != null) {
-      throw AppError(
-        type: ErrorType.ALREADY_EXISTS,
-        message: 'User already exists',
+    final prefs = await SharedPreferences.getInstance();
+
+    _userId = userId;
+    _username = username;
+    _role = role;
+    _merchantId = merchantId;
+    _merchantUsername = merchantUsername;
+    _merchantProfileImageUrl = merchantProfileImageUrl;
+
+    _phone = null;
+    _address = null;
+
+    await prefs.setInt(_keyUserId, _userId!);
+    await prefs.setString(_keyUsername, _username!);
+    await prefs.setString(_keyRole, _role!.name);
+
+    await prefs.setInt(_keyMerchantId, _merchantId!);
+    await prefs.setString(_keyMerchantUsername, _merchantUsername!);
+
+    if (_merchantProfileImageUrl != null) {
+      await prefs.setString(
+        _keyMerchantProfileImageUrl,
+        _merchantProfileImageUrl!,
       );
-    }
-    final userModel = UserModel(
-      id: 0,
-      username: username,
-      passwordHash: passwordHash,
-      profileImageUrl: profileImageUrl,
-      bio: bio,
-      phone: phone,
-      address: address,
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    );
-    final id = await _userRepository.insert(userModel);
-    if (id > 0) {
-      _userId = id;
-      _username = username;
-      _role = Role.user;
-      _phone = phone;
-      _address = address;
-
-      _merchantId = null;
-      _merchantUsername = null;
-      _merchantProfileImageUrl = null;
-
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setInt(_keyUserId, _userId!);
-      await prefs.setString(_keyUsername, _username!);
-      await prefs.setString(_keyRole, _role!.name);
-      await prefs.setString(_keyPhone, _phone!);
-      await prefs.setString(_keyAddress, _address!);
-
-      await prefs.remove(_keyMerchantId);
-      await prefs.remove(_keyMerchantUsername);
-      await prefs.remove(_keyMerchantProfileImageUrl);
     } else {
-      throw AppError(
-        type: ErrorType.DB_ERROR,
-        message: 'Failed to sign up user',
-      );
+      await prefs.remove(_keyMerchantProfileImageUrl);
     }
+
+    await prefs.remove(_keyPhone);
+    await prefs.remove(_keyAddress);
   }
 
   Future<void> logout() async {
