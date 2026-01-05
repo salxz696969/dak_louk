@@ -1,0 +1,10 @@
+classDiagram
+class AppDatabase {
+-instance: AppDatabase
+-db: Database?
+database(): Database
+-_init(): Database
+close(): void
+}
+AppDatabase ..> AppDatabase
+AppDatabase ..> Database

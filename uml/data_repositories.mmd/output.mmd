@@ -1,0 +1,160 @@
+classDiagram
+class ProductRepository {
+tableName(): String
+fromMap(): ProductModel
+toMap(): Map<String, dynamic
+}
+BaseRepository <|-- ProductRepository
+class PostSaveRepository {
+tableName(): String
+fromMap(): PostSaveModel
+toMap(): Map<String, dynamic
+}
+BaseRepository <|-- PostSaveRepository
+class UserRepository {
+tableName(): String
+fromMap(): UserModel
+toMap(): Map<String, dynamic
+getUserByEmailAndPassword(): UserModel?
+}
+BaseRepository <|-- UserRepository
+class OrderProductRepository {
+tableName(): String
+fromMap(): OrderProductModel
+toMap(): Map<String, dynamic
+}
+BaseRepository <|-- OrderProductRepository
+class MerchantRepository {
+tableName(): String
+fromMap(): MerchantModel
+toMap(): Map<String, dynamic
+getMerchantByEmailAndPassword(): MerchantModel?
+}
+BaseRepository <|-- MerchantRepository
+class FollowerRepository {
+tableName(): String
+fromMap(): FollowerModel
+toMap(): Map<String, dynamic
+}
+BaseRepository <|-- FollowerRepository
+class PostLikeRepository {
+tableName(): String
+fromMap(): PostLikeModel
+toMap(): Map<String, dynamic
+}
+BaseRepository <|-- PostLikeRepository
+class ChatRoomRepository {
+tableName(): String
+fromMap(): ChatRoomModel
+toMap(): Map<String, dynamic
+}
+BaseRepository <|-- ChatRoomRepository
+class ProductMediaRepository {
+tableName(): String
+fromMap(): ProductMediaModel
+toMap(): Map<String, dynamic
+}
+BaseRepository <|-- ProductMediaRepository
+class LiveStreamProductRepository {
+tableName(): String
+fromMap(): LiveStreamProductModel
+toMap(): Map<String, dynamic
+}
+BaseRepository <|-- LiveStreamProductRepository
+class BaseRepositoryInterface {
+<<abstract>>
+getAll(): T[0..*]
+getById(): T?
+insert(): int
+update(): int
+delete(): int
+tableName(): String
+fromMap(): T
+toMap(): Map<String, dynamic
+queryThisTable(): T[0..*]
+}
+class BaseRepository {
+<<abstract>>
+-appDatabase: AppDatabase
+-cache: Cache
+database(): Database
+getAll(): T[0..*]
+getById(): T?
+insert(): int
+update(): int
+delete(): int
+queryThisTable(): T[0..*]
+-_getBaseCacheKey(): String
+-_getQueryCacheKey(): String
+-_expectMany(): T[0..*]
+-_expectSingle(): T
+}
+BaseRepository ..> AppDatabase
+BaseRepository ..> Cache
+BaseRepository ..|> BaseRepositoryInterface
+class ProductCategoryRepository {
+tableName(): String
+fromMap(): ProductCategoryModel
+toMap(): Map<String, dynamic
+}
+BaseRepository <|-- ProductCategoryRepository
+class OrderRepository {
+tableName(): String
+fromMap(): OrderModel
+toMap(): Map<String, dynamic
+}
+BaseRepository <|-- OrderRepository
+class LiveStreamChatRepository {
+tableName(): String
+fromMap(): LiveStreamChatModel
+toMap(): Map<String, dynamic
+}
+BaseRepository <|-- LiveStreamChatRepository
+class PromoMediaRepository {
+tableName(): String
+fromMap(): PromoMediaModel
+toMap(): Map<String, dynamic
+}
+BaseRepository <|-- PromoMediaRepository
+class ChatRepository {
+tableName(): String
+fromMap(): ChatModel
+toMap(): Map<String, dynamic
+}
+BaseRepository <|-- ChatRepository
+class PostRepository {
+tableName(): String
+fromMap(): PostModel
+toMap(): Map<String, dynamic
+}
+BaseRepository <|-- PostRepository
+class CartRepository {
+tableName(): String
+fromMap(): CartModel
+toMap(): Map<String, dynamic
+}
+BaseRepository <|-- CartRepository
+class ReviewRepository {
+tableName(): String
+fromMap(): ReviewModel
+toMap(): Map<String, dynamic
+}
+BaseRepository <|-- ReviewRepository
+class LiveStreamRepository {
+tableName(): String
+fromMap(): LiveStreamModel
+toMap(): Map<String, dynamic
+}
+BaseRepository <|-- LiveStreamRepository
+class PostProductsRepository {
+tableName(): String
+fromMap(): PostProductModel
+toMap(): Map<String, dynamic
+}
+BaseRepository <|-- PostProductsRepository
+class ProductCategoryMapsRepository {
+tableName(): String
+fromMap(): ProductCategoryMapModel
+toMap(): Map<String, dynamic
+}
+BaseRepository <|-- ProductCategoryMapsRepository

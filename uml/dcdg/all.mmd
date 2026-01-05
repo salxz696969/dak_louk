@@ -1,0 +1,2718 @@
+classDiagram
+class PostDetailScreen
+PostDetailScreen : +postId int
+PostDetailScreen : +createState() State<PostDetailScreen>
+StatefulWidget <|-- PostDetailScreen
+
+class _PostDetailScreenState
+_PostDetailScreenState : -_postService PostService
+_PostDetailScreenState o-- PostService
+_PostDetailScreenState : +build() Widget
+State <|-- _PostDetailScreenState
+
+class _SimilarItems
+_SimilarItems : +postId int
+_SimilarItems : -_postService PostService
+_SimilarItems o-- PostService
+_SimilarItems : +build() Widget
+StatelessWidget <|-- _SimilarItems
+
+class CartScreen
+CartScreen : +createState() State<CartScreen>
+StatefulWidget <|-- CartScreen
+
+class _CartScreenState
+_CartScreenState : -_cartService CartService
+_CartScreenState o-- CartService
+_CartScreenState : -_cartsFuture dynamic
+_CartScreenState : -_currentCarts List~CartVM~
+_CartScreenState : +initState() void
+_CartScreenState : -_loadCarts() void
+_CartScreenState : -_removeCart() void
+_CartScreenState : -_updateCart() void
+_CartScreenState : -_calculateSubTotal() double
+_CartScreenState : -_handlePlaceAllOrder() void
+_CartScreenState : +build() Widget
+State <|-- _CartScreenState
+
+class ChatScreen
+ChatScreen : +targetUserName String
+ChatScreen : +chatRoomId int
+ChatScreen : +build() Widget
+StatelessWidget <|-- ChatScreen
+
+class LiveStreamScreen
+LiveStreamScreen : +createState() State<LiveStreamScreen>
+StatefulWidget <|-- LiveStreamScreen
+
+class _LiveStreamScreenState
+_LiveStreamScreenState : -_liveStreamService LiveStreamService
+_LiveStreamScreenState o-- LiveStreamService
+_LiveStreamScreenState : +build() Widget
+State <|-- _LiveStreamScreenState
+
+class MerchantProfileScreen
+MerchantProfileScreen : +merchant MerchantVM
+MerchantProfileScreen o-- MerchantVM
+MerchantProfileScreen : +createState() State<MerchantProfileScreen>
+StatefulWidget <|-- MerchantProfileScreen
+
+class _MerchantProfileScreenState
+_MerchantProfileScreenState : +selectedTab MerchantProfileTabsEnum
+_MerchantProfileScreenState o-- MerchantProfileTabsEnum
+_MerchantProfileScreenState : +onTabSelected() void
+_MerchantProfileScreenState : +initState() void
+_MerchantProfileScreenState : +build() Widget
+State <|-- _MerchantProfileScreenState
+
+class MerchantProfileTabsEnum
+<<enumeration>> MerchantProfileTabsEnum
+MerchantProfileTabsEnum : +index int
+MerchantProfileTabsEnum : +values$ List~MerchantProfileTabsEnum~
+MerchantProfileTabsEnum : +posts$ MerchantProfileTabsEnum
+MerchantProfileTabsEnum o-- MerchantProfileTabsEnum
+Enum <|.. MerchantProfileTabsEnum
+
+class OrdersScreen
+OrdersScreen : +createState() State<OrdersScreen>
+StatefulWidget <|-- OrdersScreen
+
+class _OrdersScreenState
+_OrdersScreenState : -_orderService OrderService
+_OrdersScreenState o-- OrderService
+_OrdersScreenState : +build() Widget
+State <|-- _OrdersScreenState
+
+class ProfileScreen
+ProfileScreen : +createState() State<ProfileScreen>
+StatefulWidget <|-- ProfileScreen
+
+class _ProfileScreenState
+_ProfileScreenState : -_userService UserService
+_ProfileScreenState o-- UserService
+_ProfileScreenState : +selectedTab ProfileTabsEnum
+_ProfileScreenState o-- ProfileTabsEnum
+_ProfileScreenState : -_userFuture dynamic
+_ProfileScreenState : -_likedPostsFuture dynamic
+_ProfileScreenState : -_savedPostsFuture dynamic
+_ProfileScreenState : +initState() void
+_ProfileScreenState : +onTabSelected() void
+_ProfileScreenState : +build() Widget
+State <|-- _ProfileScreenState
+
+class ProfileTabsEnum
+<<enumeration>> ProfileTabsEnum
+ProfileTabsEnum : +index int
+ProfileTabsEnum : +values$ List~ProfileTabsEnum~
+ProfileTabsEnum : +likedPosts$ ProfileTabsEnum
+ProfileTabsEnum o-- ProfileTabsEnum
+Enum <|.. ProfileTabsEnum
+
+class ChatRoomScreen
+ChatRoomScreen : +build() Widget
+StatelessWidget <|-- ChatRoomScreen
+
+class CheckoutScreen
+CheckoutScreen : +carts List~CartVM~
+CheckoutScreen : +createState() State<CheckoutScreen>
+StatefulWidget <|-- CheckoutScreen
+
+class _CheckoutScreenState
+_CheckoutScreenState : -_orderService OrderService
+_CheckoutScreenState o-- OrderService
+_CheckoutScreenState : -_handleCompleteOrder() void
+_CheckoutScreenState : +build() Widget
+State <|-- _CheckoutScreenState
+
+class HomeScreen
+HomeScreen : +createState() State<HomeScreen>
+StatefulWidget <|-- HomeScreen
+
+class _HomeScreenState
+_HomeScreenState : -_postService PostService
+_HomeScreenState o-- PostService
+_HomeScreenState : +selectedCategory ProductCategory
+_HomeScreenState o-- ProductCategory
+_HomeScreenState : +onCategorySelected() void
+_HomeScreenState : +build() Widget
+State <|-- _HomeScreenState
+
+class FullScreenVideoScreen
+FullScreenVideoScreen : +livestream dynamic
+FullScreenVideoScreen : +createState() State<FullScreenVideoScreen>
+StatefulWidget <|-- FullScreenVideoScreen
+
+class _FullScreenVideoScreenState
+_FullScreenVideoScreenState : +build() Widget
+State <|-- _FullScreenVideoScreenState
+
+class MerchantChatScreen
+MerchantChatScreen : +targetUserName String
+MerchantChatScreen : +chatRoomId int
+MerchantChatScreen : +build() Widget
+StatelessWidget <|-- MerchantChatScreen
+
+class MerchantOrdersScreen
+MerchantOrdersScreen : +createState() State<MerchantOrdersScreen>
+StatefulWidget <|-- MerchantOrdersScreen
+
+class _MerchantOrdersScreenState
+_MerchantOrdersScreenState : -_orderService OrderService
+_MerchantOrdersScreenState o-- OrderService
+_MerchantOrdersScreenState : -_updateOrderStatus() dynamic
+_MerchantOrdersScreenState : +build() Widget
+State <|-- _MerchantOrdersScreenState
+
+class MerchantPostsScreen
+MerchantPostsScreen : +createState() State<MerchantPostsScreen>
+StatefulWidget <|-- MerchantPostsScreen
+
+class _MerchantPostsScreenState
+_MerchantPostsScreenState : -_postService PostService
+_MerchantPostsScreenState o-- PostService
+_MerchantPostsScreenState : -_showEditPost() void
+_MerchantPostsScreenState : -_deletePost() dynamic
+_MerchantPostsScreenState : -_showPostForm() void
+_MerchantPostsScreenState : +build() Widget
+State <|-- _MerchantPostsScreenState
+
+class MerchantLiveScreen
+MerchantLiveScreen : +createState() State<MerchantLiveScreen>
+StatefulWidget <|-- MerchantLiveScreen
+
+class _MerchantLiveScreenState
+_MerchantLiveScreenState : -_liveStreamService LiveStreamService
+_MerchantLiveScreenState o-- LiveStreamService
+_MerchantLiveScreenState : -_liveStreamsFuture dynamic
+_MerchantLiveScreenState : +initState() void
+_MerchantLiveScreenState : -_loadLiveStreams() void
+_MerchantLiveScreenState : -_handleCreate() dynamic
+_MerchantLiveScreenState : -_handleEdit() dynamic
+_MerchantLiveScreenState : -_handleDelete() dynamic
+_MerchantLiveScreenState : +build() Widget
+State <|-- _MerchantLiveScreenState
+
+class MerchantProductsScreen
+MerchantProductsScreen : +createState() State<MerchantProductsScreen>
+StatefulWidget <|-- MerchantProductsScreen
+
+class _MerchantProductsScreenState
+_MerchantProductsScreenState : -_productService ProductService
+_MerchantProductsScreenState o-- ProductService
+_MerchantProductsScreenState : -_products List~ProductVM~
+_MerchantProductsScreenState : +build() Widget
+_MerchantProductsScreenState : -_showProductForm() void
+_MerchantProductsScreenState : -_deleteProduct() dynamic
+State <|-- _MerchantProductsScreenState
+
+class MerchantChatRoomScreen
+MerchantChatRoomScreen : +build() Widget
+StatelessWidget <|-- MerchantChatRoomScreen
+
+class AuthScreen
+AuthScreen : +createState() State<AuthScreen>
+StatefulWidget <|-- AuthScreen
+
+class _AuthScreenState
+_AuthScreenState : +isLogIn bool
+_AuthScreenState : -_authService AuthService
+_AuthScreenState o-- AuthService
+_AuthScreenState : +handleSignUp() void
+_AuthScreenState : +handleLogIn() void
+_AuthScreenState : +handleSwitchTab() void
+_AuthScreenState : +build() Widget
+State <|-- _AuthScreenState
+
+class LogIn
+LogIn : +onLogIn dynamic FunctionLogInDTO
+LogIn o-- dynamic FunctionLogInDTO
+LogIn : +createState() State<LogIn>
+StatefulWidget <|-- LogIn
+
+class _LogInState
+_LogInState : -_formKey GlobalKey~FormState~
+_LogInState o-- GlobalKey~FormState~
+_LogInState : +emailController TextEditingController
+_LogInState o-- TextEditingController
+_LogInState : +passwordController TextEditingController
+_LogInState o-- TextEditingController
+_LogInState : -_handleSubmit() void
+_LogInState : +build() Widget
+State <|-- _LogInState
+
+class SignUp
+SignUp : +onSignUp dynamic FunctionSignUpDTO
+SignUp o-- dynamic FunctionSignUpDTO
+SignUp : +createState() State<SignUp>
+StatefulWidget <|-- SignUp
+
+class _SignUpState
+_SignUpState : -_formKey GlobalKey~FormState~
+_SignUpState o-- GlobalKey~FormState~
+_SignUpState : +profileImageUrl String
+_SignUpState : +emailController TextEditingController
+_SignUpState o-- TextEditingController
+_SignUpState : +usernameController TextEditingController
+_SignUpState o-- TextEditingController
+_SignUpState : +passwordController TextEditingController
+_SignUpState o-- TextEditingController
+_SignUpState : +bioController TextEditingController
+_SignUpState o-- TextEditingController
+_SignUpState : +phoneController TextEditingController
+_SignUpState o-- TextEditingController
+_SignUpState : +addressController TextEditingController
+_SignUpState o-- TextEditingController
+_SignUpState : -_handleSubmit() void
+_SignUpState : +build() Widget
+State <|-- _SignUpState
+
+class CategoryBar
+CategoryBar : +onCategorySelected void FunctionProductCategory
+CategoryBar o-- void FunctionProductCategory
+CategoryBar : +createState() State<CategoryBar>
+StatefulWidget <|-- CategoryBar
+
+class _CategoryBarState
+_CategoryBarState : +selectedCategory ProductCategory
+_CategoryBarState o-- ProductCategory
+_CategoryBarState : +build() Widget
+State <|-- _CategoryBarState
+
+class PostSlider
+PostSlider : +posts List~PostVM~
+PostSlider : +createState() State<PostSlider>
+StatefulWidget <|-- PostSlider
+
+class _PostSliderState
+_PostSliderState : -_controller PageController
+_PostSliderState o-- PageController
+_PostSliderState : +initState() void
+_PostSliderState : +dispose() void
+_PostSliderState : +build() Widget
+State <|-- _PostSliderState
+
+class _SimilarItemCard
+_SimilarItemCard : +post PostVM
+_SimilarItemCard o-- PostVM
+_SimilarItemCard : +createState() State<_SimilarItemCard>
+StatefulWidget <|-- _SimilarItemCard
+
+class _SimilarItemCardState
+_SimilarItemCardState : +isAdded bool
+_SimilarItemCardState : +build() Widget
+State <|-- _SimilarItemCardState
+
+class ProductItem
+ProductItem : +product PostProductVM
+ProductItem o-- PostProductVM
+ProductItem : +createState() State<ProductItem>
+StatefulWidget <|-- ProductItem
+
+class _ProductItemState
+_ProductItemState : +build() Widget
+State <|-- _ProductItemState
+
+class _AddToCartButton
+_AddToCartButton : +product PostProductVM
+_AddToCartButton o-- PostProductVM
+_AddToCartButton : +createState() State<_AddToCartButton>
+StatefulWidget <|-- _AddToCartButton
+
+class _AddToCartButtonState
+_AddToCartButtonState : -_cartService CartService
+_AddToCartButtonState o-- CartService
+_AddToCartButtonState : +isAddedToCart bool
+_AddToCartButtonState : +initState() void
+_AddToCartButtonState : +onAdd() void
+_AddToCartButtonState : +build() Widget
+State <|-- _AddToCartButtonState
+
+class PostItem
+PostItem : +post PostVM
+PostItem o-- PostVM
+PostItem : +onPostDeleted void Function?
+PostItem o-- void Function
+PostItem : +onPostUpdated void FunctionPostVM?
+PostItem o-- void FunctionPostVM
+PostItem : +createState() State<PostItem>
+StatefulWidget <|-- PostItem
+
+class _PostItemState
+_PostItemState : -_postLikeService PostLikeService
+_PostItemState o-- PostLikeService
+_PostItemState : -_postSaveService PostSaveService
+_PostItemState o-- PostSaveService
+_PostItemState : +isLiked bool
+_PostItemState : +isSaved bool
+_PostItemState : +likesCount int
+_PostItemState : +savesCount int
+_PostItemState : +initState() void
+_PostItemState : +handlePostLike() void
+_PostItemState : +handlePostSave() void
+_PostItemState : -_showPostForm() void
+_PostItemState : -_deletePost() dynamic
+_PostItemState : +build() Widget
+State <|-- _PostItemState
+
+class UsernameContainer
+UsernameContainer : +profile ImageProvider~Object~
+UsernameContainer o-- ImageProvider~Object~
+UsernameContainer : +username String
+UsernameContainer : +rating String
+UsernameContainer : +merchantId int
+UsernameContainer : +bio String
+UsernameContainer : +build() Widget
+StatelessWidget <|-- UsernameContainer
+
+class ChatInput
+ChatInput : +onSend dynamic FunctionString
+ChatInput o-- dynamic FunctionString
+ChatInput : -_controller TextEditingController
+ChatInput o-- TextEditingController
+ChatInput : +handleSend() void
+ChatInput : +build() Widget
+StatelessWidget <|-- ChatInput
+
+class Chat
+Chat : +chatRoomId int
+Chat : +createState() State<Chat>
+StatefulWidget <|-- Chat
+
+class _ChatState
+_ChatState : -_controller TextEditingController
+_ChatState o-- TextEditingController
+_ChatState : -_scrollController ScrollController
+_ChatState o-- ScrollController
+_ChatState : -_chatService ChatService
+_ChatState o-- ChatService
+_ChatState : -_chats List~ChatVM~
+_ChatState : +initState() void
+_ChatState : +dispose() void
+_ChatState : -_scrollToBottom() void
+_ChatState : -_handleSend() dynamic
+_ChatState : +build() Widget
+State <|-- _ChatState
+
+class UserScaffold
+UserScaffold : +initialIndex int
+UserScaffold : +createState() State<UserScaffold>
+StatefulWidget <|-- UserScaffold
+
+class _UserScaffoldState
+_UserScaffoldState : -_tabs$ List~Widget~
+_UserScaffoldState : -_currentIndex int
+_UserScaffoldState : +initState() void
+_UserScaffoldState : +build() Widget
+State <|-- _UserScaffoldState
+
+class CheckoutCard
+CheckoutCard : +cart CartVM
+CheckoutCard o-- CartVM
+CheckoutCard : +subtotal double
+CheckoutCard : +build() Widget
+StatelessWidget <|-- CheckoutCard
+
+class _CheckoutProductItem
+_CheckoutProductItem : +item CartItemVM
+_CheckoutProductItem o-- CartItemVM
+_CheckoutProductItem : +build() Widget
+StatelessWidget <|-- _CheckoutProductItem
+
+class CheckoutForm
+CheckoutForm : +onComplete dynamic FunctionString?, String?, String?
+CheckoutForm o-- dynamic FunctionString, String, String
+CheckoutForm : +createState() State<CheckoutForm>
+StatefulWidget <|-- CheckoutForm
+
+class _CheckoutFormState
+_CheckoutFormState : -_formKey GlobalKey~FormState~
+_CheckoutFormState o-- GlobalKey~FormState~
+_CheckoutFormState : -_addressController TextEditingController
+_CheckoutFormState o-- TextEditingController
+_CheckoutFormState : -_phoneController TextEditingController
+_CheckoutFormState o-- TextEditingController
+_CheckoutFormState : -_notesController TextEditingController
+_CheckoutFormState o-- TextEditingController
+_CheckoutFormState : +initState() void
+_CheckoutFormState : -_decoration() InputDecoration
+_CheckoutFormState : +build() Widget
+State <|-- _CheckoutFormState
+
+class LiveStreamProductItem
+LiveStreamProductItem : +product LiveStreamProductsVM
+LiveStreamProductItem o-- LiveStreamProductsVM
+LiveStreamProductItem : +createState() State<LiveStreamProductItem>
+StatefulWidget <|-- LiveStreamProductItem
+
+class _LiveStreamProductItemState
+_LiveStreamProductItemState : +build() Widget
+State <|-- _LiveStreamProductItemState
+
+class _AddToCartButton
+_AddToCartButton : +product LiveStreamProductsVM
+_AddToCartButton o-- LiveStreamProductsVM
+_AddToCartButton : +createState() State<_AddToCartButton>
+StatefulWidget <|-- _AddToCartButton
+
+class _AddToCartButtonState
+_AddToCartButtonState : -_cartService CartService
+_AddToCartButtonState o-- CartService
+_AddToCartButtonState : +isAddedToCart bool
+_AddToCartButtonState : +initState() void
+_AddToCartButtonState : +onAdd() void
+_AddToCartButtonState : +build() Widget
+State <|-- _AddToCartButtonState
+
+class LiveStreamChat
+LiveStreamChat : +liveStreamChats List~LiveStreamChatVM~
+LiveStreamChat : +createState() State<LiveStreamChat>
+StatefulWidget <|-- LiveStreamChat
+
+class _LiveStreamChatState
+_LiveStreamChatState : -_listKey GlobalKey~AnimatedListState~
+_LiveStreamChatState o-- GlobalKey~AnimatedListState~
+_LiveStreamChatState : -_visibleChats List~LiveStreamChatVM~
+_LiveStreamChatState : -_timer Timer?
+_LiveStreamChatState o-- Timer
+_LiveStreamChatState : -_index int
+_LiveStreamChatState : +initState() void
+_LiveStreamChatState : -_startStreaming() void
+_LiveStreamChatState : +dispose() void
+_LiveStreamChatState : +build() Widget
+State <|-- _LiveStreamChatState
+
+class LiveStream
+LiveStream : +livestream LiveStreamVM
+LiveStream o-- LiveStreamVM
+LiveStream : +createState() State<LiveStream>
+StatefulWidget <|-- LiveStream
+
+class _LiveStreamState
+_LiveStreamState : -_controller VideoPlayerController
+_LiveStreamState o-- VideoPlayerController
+_LiveStreamState : -_liveStreamChatService LiveStreamChatService
+_LiveStreamState o-- LiveStreamChatService
+_LiveStreamState : +initState() void
+_LiveStreamState : +dispose() void
+_LiveStreamState : -_togglePlay() void
+_LiveStreamState : +build() Widget
+State <|-- _LiveStreamState
+
+class LiveStreamProducts
+LiveStreamProducts : +liveStreamId int
+LiveStreamProducts : -_liveStreamProductsService LiveStreamProductsService
+LiveStreamProducts o-- LiveStreamProductsService
+LiveStreamProducts : +build() Widget
+StatelessWidget <|-- LiveStreamProducts
+
+class SavedPosts
+SavedPosts : +savedPosts List~UserProfileLikedSavedPostsVM~
+SavedPosts : +build() Widget
+StatelessWidget <|-- SavedPosts
+
+class ProfileTabs
+ProfileTabs : +selectedTab ProfileTabsEnum
+ProfileTabs o-- ProfileTabsEnum
+ProfileTabs : +onTabSelected void FunctionProfileTabsEnum
+ProfileTabs o-- void FunctionProfileTabsEnum
+ProfileTabs : +build() Widget
+StatelessWidget <|-- ProfileTabs
+
+class _ProfileTabButton
+_ProfileTabButton : +icon IconData
+_ProfileTabButton o-- IconData
+_ProfileTabButton : +label String
+_ProfileTabButton : +selected bool
+_ProfileTabButton : +onTap void Function
+_ProfileTabButton o-- void Function
+_ProfileTabButton : +build() Widget
+StatelessWidget <|-- _ProfileTabButton
+
+class LikedPosts
+LikedPosts : +likedPosts List~UserProfileLikedSavedPostsVM~
+LikedPosts : +build() Widget
+StatelessWidget <|-- LikedPosts
+
+class PhotoContainer
+PhotoContainer : +post UserProfileLikedSavedPostsVM
+PhotoContainer o-- UserProfileLikedSavedPostsVM
+PhotoContainer : +build() Widget
+StatelessWidget <|-- PhotoContainer
+
+class ProfileInfo
+ProfileInfo : +username String
+ProfileInfo : +profileImage String
+ProfileInfo : +bio String
+ProfileInfo : -_handleLogout() void
+ProfileInfo : +build() Widget
+StatelessWidget <|-- ProfileInfo
+
+class ChatroomTile
+ChatroomTile : +chatRoom ChatRoomVM
+ChatroomTile o-- ChatRoomVM
+ChatroomTile : +build() Widget
+StatelessWidget <|-- ChatroomTile
+
+class MerchantProfileTabs
+MerchantProfileTabs : +selectedTab MerchantProfileTabsEnum
+MerchantProfileTabs o-- MerchantProfileTabsEnum
+MerchantProfileTabs : +onTabSelected dynamic FunctionMerchantProfileTabsEnum
+MerchantProfileTabs o-- dynamic FunctionMerchantProfileTabsEnum
+MerchantProfileTabs : +build() Widget
+StatelessWidget <|-- MerchantProfileTabs
+
+class _TabButton
+_TabButton : +icon IconData
+_TabButton o-- IconData
+_TabButton : +label String
+_TabButton : +selected bool
+_TabButton : +onTap void Function
+_TabButton o-- void Function
+_TabButton : +build() Widget
+StatelessWidget <|-- _TabButton
+
+class MerchantProducts
+MerchantProducts : -_merchantService MerchantService
+MerchantProducts o-- MerchantService
+MerchantProducts : +merchantId int
+MerchantProducts : +build() Widget
+StatelessWidget <|-- MerchantProducts
+
+class _HorizontalProductCard
+_HorizontalProductCard : +product MerchantProductsVM
+_HorizontalProductCard o-- MerchantProductsVM
+_HorizontalProductCard : +build() Widget
+StatelessWidget <|-- _HorizontalProductCard
+
+class _AddToCartButton
+_AddToCartButton : +productId int
+_AddToCartButton : +isAdded bool
+_AddToCartButton : +createState() State<_AddToCartButton>
+StatefulWidget <|-- _AddToCartButton
+
+class _AddToCartButtonState
+_AddToCartButtonState : -_cartService CartService
+_AddToCartButtonState o-- CartService
+_AddToCartButtonState : +isAddedToCart bool
+_AddToCartButtonState : +initState() void
+_AddToCartButtonState : -_onAddToCart() void
+_AddToCartButtonState : +build() Widget
+State <|-- _AddToCartButtonState
+
+class MerchantLiveStreams
+MerchantLiveStreams : -_merchantService MerchantService
+MerchantLiveStreams o-- MerchantService
+MerchantLiveStreams : +merchantId int
+MerchantLiveStreams : +build() Widget
+StatelessWidget <|-- MerchantLiveStreams
+
+class _VideoContainer
+_VideoContainer : +livestream MerchantLivestreamsVM
+_VideoContainer o-- MerchantLivestreamsVM
+_VideoContainer : -_liveStreamService LiveStreamService
+_VideoContainer o-- LiveStreamService
+_VideoContainer : +build() Widget
+StatelessWidget <|-- _VideoContainer
+
+class MerchantInfo
+MerchantInfo : +merchant MerchantVM
+MerchantInfo o-- MerchantVM
+MerchantInfo : +build() Widget
+StatelessWidget <|-- MerchantInfo
+
+class MerchantPosts
+MerchantPosts : -_merchantService MerchantService
+MerchantPosts o-- MerchantService
+MerchantPosts : +merchantId int
+MerchantPosts : +build() Widget
+StatelessWidget <|-- MerchantPosts
+
+class _PhotoContainer
+_PhotoContainer : +post MerchantPostsVM
+_PhotoContainer o-- MerchantPostsVM
+_PhotoContainer : +build() Widget
+StatelessWidget <|-- _PhotoContainer
+
+class QuantityChooser
+QuantityChooser : +cartId int
+QuantityChooser : +quantity int
+QuantityChooser : +availableQuantity int
+QuantityChooser : +onQuantityChanged dynamic Functionint, int
+QuantityChooser o-- dynamic Functionint, int
+QuantityChooser : +onDelete dynamic Functionint
+QuantityChooser o-- dynamic Functionint
+QuantityChooser : +createState() State<QuantityChooser>
+StatefulWidget <|-- QuantityChooser
+
+class _QuantityChooserState
+_QuantityChooserState : +quantity int
+_QuantityChooserState : +initState() void
+_QuantityChooserState : -_increase() void
+_QuantityChooserState : -_decrease() void
+_QuantityChooserState : +build() Widget
+State <|-- _QuantityChooserState
+
+class CartItemWrapper
+CartItemWrapper : +cart CartVM
+CartItemWrapper o-- CartVM
+CartItemWrapper : +onQuantityChanged dynamic Functionint, int
+CartItemWrapper o-- dynamic Functionint, int
+CartItemWrapper : +onRemoved dynamic Functionint
+CartItemWrapper o-- dynamic Functionint
+CartItemWrapper : +createState() State<CartItemWrapper>
+StatefulWidget <|-- CartItemWrapper
+
+class _CartItemWrapperState
+_CartItemWrapperState : +items List~CartItemVM~
+_CartItemWrapperState : -_cartService CartService
+_CartItemWrapperState o-- CartService
+_CartItemWrapperState : +initState() void
+_CartItemWrapperState : -_handleItemRemoved() void
+_CartItemWrapperState : -_handlePlaceOrder() void
+_CartItemWrapperState : -_calculateTotal() double
+_CartItemWrapperState : -_handleQuantityChanged() void
+_CartItemWrapperState : +build() Widget
+State <|-- _CartItemWrapperState
+
+class CartItem
+CartItem : +item CartItemVM
+CartItem o-- CartItemVM
+CartItem : +onRemoved dynamic Functionint
+CartItem o-- dynamic Functionint
+CartItem : +onQuantityChanged dynamic Functionint, int
+CartItem o-- dynamic Functionint, int
+CartItem : +createState() State<CartItem>
+StatefulWidget <|-- CartItem
+
+class _CartItemState
+_CartItemState : +initState() void
+_CartItemState : +build() Widget
+State <|-- _CartItemState
+
+class OrderItem
+OrderItem : +order OrderVM
+OrderItem o-- OrderVM
+OrderItem : -_getOrderStatusEnum() OrderStatusEnum?
+OrderItem : +build() Widget
+StatelessWidget <|-- OrderItem
+
+class Appbar
+Appbar : +title String
+Appbar : +icon IconData?
+Appbar o-- IconData
+Appbar : +navigateTo Widget?
+Appbar o-- Widget
+Appbar : +build() Widget
+StatelessWidget <|-- Appbar
+
+class NavBarItems
+NavBarItems : +label String
+NavBarItems : +icon IconData
+NavBarItems o-- IconData
+
+class Navbar
+Navbar : +onNavigate void Functionint
+Navbar o-- void Functionint
+Navbar : +currentIndex int
+Navbar : +tabs List~NavBarItems~
+Navbar : +build() Widget
+StatelessWidget <|-- Navbar
+
+class MediaCarousel
+MediaCarousel : +medias List~MediaModel~
+MediaCarousel : +createState() State<MediaCarousel>
+StatefulWidget <|-- MediaCarousel
+
+class _MediaCarouselState
+_MediaCarouselState : +controller PageController
+_MediaCarouselState o-- PageController
+_MediaCarouselState : -_page int
+_MediaCarouselState : -_videoControllers Map~int, VideoPlayerController~
+_MediaCarouselState : -_onPageChanged() void
+_MediaCarouselState : +initState() void
+_MediaCarouselState : -_initializeVideoControllers() void
+_MediaCarouselState : +dispose() void
+_MediaCarouselState : +build() Widget
+State <|-- _MediaCarouselState
+
+class MyApp
+MyApp : +build() Widget
+StatelessWidget <|-- MyApp
+
+class PostEditForm
+PostEditForm : +post PostVM
+PostEditForm o-- PostVM
+PostEditForm : +onSaved void FunctionPostVM?
+PostEditForm o-- void FunctionPostVM
+PostEditForm : +createState() State<PostEditForm>
+StatefulWidget <|-- PostEditForm
+
+class _PostEditFormState
+_PostEditFormState : -_formKey GlobalKey~FormState~
+_PostEditFormState o-- GlobalKey~FormState~
+_PostEditFormState : -_captionCtrl TextEditingController
+_PostEditFormState o-- TextEditingController
+_PostEditFormState : -_promoMedias List~MediaModel~
+_PostEditFormState : -_selectedProducts List~AddProductsModel~
+_PostEditFormState : -_saving bool
+_PostEditFormState : -_service PostService
+_PostEditFormState o-- PostService
+_PostEditFormState : -_productService ProductService
+_PostEditFormState o-- ProductService
+_PostEditFormState : +initState() void
+_PostEditFormState : +dispose() void
+_PostEditFormState : -_addMedia() dynamic
+_PostEditFormState : -_removeMedia() void
+_PostEditFormState : -_addProduct() void
+_PostEditFormState : -_removeProduct() void
+_PostEditFormState : -_submit() dynamic
+_PostEditFormState : +build() Widget
+State <|-- _PostEditFormState
+
+class PostForm
+PostForm : +post PostVM?
+PostForm o-- PostVM
+PostForm : +onSaved void FunctionPostVM?
+PostForm o-- void FunctionPostVM
+PostForm : +createState() State<PostForm>
+StatefulWidget <|-- PostForm
+
+class _PostFormState
+_PostFormState : -_formKey GlobalKey~FormState~
+_PostFormState o-- GlobalKey~FormState~
+_PostFormState : -_captionCtrl TextEditingController
+_PostFormState o-- TextEditingController
+_PostFormState : -_promoMedias List~MediaModel~
+_PostFormState : -_selectedProducts List~AddProductsModel~
+_PostFormState : -_saving bool
+_PostFormState : -_service PostService
+_PostFormState o-- PostService
+_PostFormState : -_productService ProductService
+_PostFormState o-- ProductService
+_PostFormState : +initState() void
+_PostFormState : +dispose() void
+_PostFormState : -_addMedia() dynamic
+_PostFormState : -_removeMedia() void
+_PostFormState : -_addProduct() void
+_PostFormState : -_removeProduct() void
+_PostFormState : -_submit() dynamic
+_PostFormState : +build() Widget
+State <|-- _PostFormState
+
+class ProductItem
+ProductItem : +product PostProductVM
+ProductItem o-- PostProductVM
+ProductItem : +createState() State<ProductItem>
+StatefulWidget <|-- ProductItem
+
+class _ProductItemState
+_ProductItemState : +build() Widget
+State <|-- _ProductItemState
+
+class PostItem
+PostItem : +post PostVM
+PostItem o-- PostVM
+PostItem : +onEdit void Function?
+PostItem o-- void Function
+PostItem : +onDelete void Function?
+PostItem o-- void Function
+PostItem : +createState() State<PostItem>
+StatefulWidget <|-- PostItem
+
+class _PostItemState
+_PostItemState : -_postService PostService
+_PostItemState o-- PostService
+_PostItemState : +initState() void
+_PostItemState : +handleDeletePost() void
+_PostItemState : +build() Widget
+State <|-- _PostItemState
+
+class ProductsUpdateForm
+ProductsUpdateForm : +product ProductVM
+ProductsUpdateForm o-- ProductVM
+ProductsUpdateForm : +onSaved void FunctionProductVM?
+ProductsUpdateForm o-- void FunctionProductVM
+ProductsUpdateForm : +createState() State<ProductsUpdateForm>
+StatefulWidget <|-- ProductsUpdateForm
+
+class _ProductsUpdateFormState
+_ProductsUpdateFormState : -_formKey GlobalKey~FormState~
+_ProductsUpdateFormState o-- GlobalKey~FormState~
+_ProductsUpdateFormState : -_nameCtrl TextEditingController
+_ProductsUpdateFormState o-- TextEditingController
+_ProductsUpdateFormState : -_descCtrl TextEditingController
+_ProductsUpdateFormState o-- TextEditingController
+_ProductsUpdateFormState : -_priceCtrl TextEditingController
+_ProductsUpdateFormState o-- TextEditingController
+_ProductsUpdateFormState : -_qtyCtrl TextEditingController
+_ProductsUpdateFormState o-- TextEditingController
+_ProductsUpdateFormState : -_saving bool
+_ProductsUpdateFormState : -_service ProductService
+_ProductsUpdateFormState o-- ProductService
+_ProductsUpdateFormState : +imageUrl String?
+_ProductsUpdateFormState : +initState() void
+_ProductsUpdateFormState : +dispose() void
+_ProductsUpdateFormState : -_pickImage() dynamic
+_ProductsUpdateFormState : -_submit() dynamic
+_ProductsUpdateFormState : +build() Widget
+State <|-- _ProductsUpdateFormState
+
+class MerchantProductItem
+MerchantProductItem : +product ProductVM
+MerchantProductItem o-- ProductVM
+MerchantProductItem : +onEdit void Function
+MerchantProductItem o-- void Function
+MerchantProductItem : +onDelete void Function
+MerchantProductItem o-- void Function
+MerchantProductItem : +build() Widget
+StatelessWidget <|-- MerchantProductItem
+
+class ProductsCreateForm
+ProductsCreateForm : +onSaved void FunctionProductVM?
+ProductsCreateForm o-- void FunctionProductVM
+ProductsCreateForm : +createState() State<ProductsCreateForm>
+StatefulWidget <|-- ProductsCreateForm
+
+class _ProductsCreateFormState
+_ProductsCreateFormState : -_formKey GlobalKey~FormState~
+_ProductsCreateFormState o-- GlobalKey~FormState~
+_ProductsCreateFormState : -_nameCtrl TextEditingController
+_ProductsCreateFormState o-- TextEditingController
+_ProductsCreateFormState : -_descCtrl TextEditingController
+_ProductsCreateFormState o-- TextEditingController
+_ProductsCreateFormState : -_priceCtrl TextEditingController
+_ProductsCreateFormState o-- TextEditingController
+_ProductsCreateFormState : -_qtyCtrl TextEditingController
+_ProductsCreateFormState o-- TextEditingController
+_ProductsCreateFormState : -_saving bool
+_ProductsCreateFormState : -_service ProductService
+_ProductsCreateFormState o-- ProductService
+_ProductsCreateFormState : +imageUrl String?
+_ProductsCreateFormState : +dispose() void
+_ProductsCreateFormState : -_pickImage() dynamic
+_ProductsCreateFormState : -_submit() dynamic
+_ProductsCreateFormState : +build() Widget
+State <|-- _ProductsCreateFormState
+
+class MerchantScaffold
+MerchantScaffold : +initialIndex int
+MerchantScaffold : +createState() State<MerchantScaffold>
+StatefulWidget <|-- MerchantScaffold
+
+class _MerchantScaffoldState
+_MerchantScaffoldState : -_tabs$ List~Widget~
+_MerchantScaffoldState : -_currentIndex int
+_MerchantScaffoldState : +initState() void
+_MerchantScaffoldState : +build() Widget
+State <|-- _MerchantScaffoldState
+
+class MerchantAppBar
+MerchantAppBar : +title String
+MerchantAppBar : +actions List~Widget~?
+MerchantAppBar : +preferredSize Size
+MerchantAppBar o-- Size
+MerchantAppBar : +build() Widget
+StatelessWidget <|-- MerchantAppBar
+PreferredSizeWidget <|.. MerchantAppBar
+
+class _ProductSelectorContent
+_ProductSelectorContent : +productService ProductService
+_ProductSelectorContent o-- ProductService
+_ProductSelectorContent : +selectedProducts List~AddProductsModel~
+_ProductSelectorContent : +onProductsSelected dynamic FunctionList~AddProductsModel~
+_ProductSelectorContent o-- dynamic FunctionList~AddProductsModel~
+_ProductSelectorContent : +createState() State<_ProductSelectorContent>
+StatefulWidget <|-- _ProductSelectorContent
+
+class _ProductSelectorContentState
+_ProductSelectorContentState : +build() Widget
+State <|-- _ProductSelectorContentState
+
+class AddProductsModel
+AddProductsModel : +id int
+AddProductsModel : +name String
+AddProductsModel : +price double
+AddProductsModel : +medias List~MediaModel~
+
+class ProductsSection
+ProductsSection : +selectedProducts List~AddProductsModel~
+ProductsSection : +onAddProduct void Function
+ProductsSection o-- void Function
+ProductsSection : +onRemoveProduct void Functionint
+ProductsSection o-- void Functionint
+ProductsSection : +build() Widget
+StatelessWidget <|-- ProductsSection
+
+class MediaSection
+MediaSection : +medias List~MediaModel~
+MediaSection : +onAddMedia void Function
+MediaSection o-- void Function
+MediaSection : +onRemoveMedia void Functionint
+MediaSection o-- void Functionint
+MediaSection : +build() Widget
+StatelessWidget <|-- MediaSection
+
+class ChatInput
+ChatInput : +onSend dynamic FunctionString
+ChatInput o-- dynamic FunctionString
+ChatInput : -_chatService ChatService
+ChatInput o-- ChatService
+ChatInput : -_controller TextEditingController
+ChatInput o-- TextEditingController
+ChatInput : +handleSend() void
+ChatInput : +build() Widget
+StatelessWidget <|-- ChatInput
+
+class MerchantChat
+MerchantChat : +chatRoomId int
+MerchantChat : +createState() State<MerchantChat>
+StatefulWidget <|-- MerchantChat
+
+class _MerchantChatState
+_MerchantChatState : -_controller TextEditingController
+_MerchantChatState o-- TextEditingController
+_MerchantChatState : -_scrollController ScrollController
+_MerchantChatState o-- ScrollController
+_MerchantChatState : -_chatService ChatService
+_MerchantChatState o-- ChatService
+_MerchantChatState : +initState() void
+_MerchantChatState : +dispose() void
+_MerchantChatState : -_scrollToBottom() void
+_MerchantChatState : -_handleSend() dynamic
+_MerchantChatState : +build() Widget
+State <|-- _MerchantChatState
+
+class ChatroomTile
+ChatroomTile : +chatRoom MerchantChatRoomVM
+ChatroomTile o-- MerchantChatRoomVM
+ChatroomTile : +build() Widget
+StatelessWidget <|-- ChatroomTile
+
+class OrderItem
+OrderItem : +order OrderMerchantVM
+OrderItem o-- OrderMerchantVM
+OrderItem : +onStatusUpdate dynamic Functionint, String
+OrderItem o-- dynamic Functionint, String
+OrderItem : -_deleteOrder() dynamic
+OrderItem : -_showStatusMenu() dynamic
+OrderItem : -_formatDate() String
+OrderItem : +build() Widget
+StatelessWidget <|-- OrderItem
+
+class LiveStreamEditForm
+LiveStreamEditForm : +liveStream MerchantLiveStreamsVM
+LiveStreamEditForm o-- MerchantLiveStreamsVM
+LiveStreamEditForm : +createState() State<LiveStreamEditForm>
+StatefulWidget <|-- LiveStreamEditForm
+
+class _LiveStreamEditFormState
+_LiveStreamEditFormState : -_formKey GlobalKey~FormState~
+_LiveStreamEditFormState o-- GlobalKey~FormState~
+_LiveStreamEditFormState : +titleController TextEditingController
+_LiveStreamEditFormState o-- TextEditingController
+_LiveStreamEditFormState : +streamUrl String
+_LiveStreamEditFormState : +thumbnailUrl String?
+_LiveStreamEditFormState : -_selectedProducts List~AddProductsModel~
+_LiveStreamEditFormState : -_productService ProductService
+_LiveStreamEditFormState o-- ProductService
+_LiveStreamEditFormState : +initState() void
+_LiveStreamEditFormState : -_handleSubmit() void
+_LiveStreamEditFormState : -_pickVideo() dynamic
+_LiveStreamEditFormState : -_pickThumbnail() dynamic
+_LiveStreamEditFormState : -_addProduct() void
+_LiveStreamEditFormState : -_removeProduct() void
+_LiveStreamEditFormState : +build() Widget
+State <|-- _LiveStreamEditFormState
+
+class LiveStreamCreateForm
+LiveStreamCreateForm : +createState() State<LiveStreamCreateForm>
+StatefulWidget <|-- LiveStreamCreateForm
+
+class _LiveStreamCreateFormState
+_LiveStreamCreateFormState : -_formKey GlobalKey~FormState~
+_LiveStreamCreateFormState o-- GlobalKey~FormState~
+_LiveStreamCreateFormState : +titleController TextEditingController
+_LiveStreamCreateFormState o-- TextEditingController
+_LiveStreamCreateFormState : +streamUrl String
+_LiveStreamCreateFormState : +thumbnailUrl String?
+_LiveStreamCreateFormState : -_selectedProducts List~AddProductsModel~
+_LiveStreamCreateFormState : -_productService ProductService
+_LiveStreamCreateFormState o-- ProductService
+_LiveStreamCreateFormState : -_handleSubmit() void
+_LiveStreamCreateFormState : -_pickVideo() dynamic
+_LiveStreamCreateFormState : -_pickThumbnail() dynamic
+_LiveStreamCreateFormState : -_addProduct() void
+_LiveStreamCreateFormState : -_removeProduct() void
+_LiveStreamCreateFormState : +build() Widget
+State <|-- _LiveStreamCreateFormState
+
+class LiveStreamItem
+LiveStreamItem : +liveStream MerchantLiveStreamsVM
+LiveStreamItem o-- MerchantLiveStreamsVM
+LiveStreamItem : +onDelete void Function
+LiveStreamItem o-- void Function
+LiveStreamItem : +onEdit void Function?
+LiveStreamItem o-- void Function
+LiveStreamItem : -_showDeleteDialog() dynamic
+LiveStreamItem : -_openFullScreen() void
+LiveStreamItem : +build() Widget
+StatelessWidget <|-- LiveStreamItem
+
+class AppSession
+AppSession : +instance$ AppSession
+AppSession o-- AppSession
+AppSession : -_userRepository UserRepository
+AppSession o-- UserRepository
+AppSession : -_merchantRepository MerchantRepository
+AppSession o-- MerchantRepository
+AppSession : -_keyUserId$ String
+AppSession : -_keyUsername$ String
+AppSession : -_keyRole$ String
+AppSession : -_keyPhone$ String
+AppSession : -_keyAddress$ String
+AppSession : -_keyMerchantId$ String
+AppSession : -_keyMerchantUsername$ String
+AppSession : -_keyMerchantProfileImageUrl$ String
+AppSession : -_userId int?
+AppSession : -_username String?
+AppSession : -_phone String?
+AppSession : -_address String?
+AppSession : -_merchantId int?
+AppSession : -_merchantUsername String?
+AppSession : -_merchantProfileImageUrl String?
+AppSession : -_role Role?
+AppSession o-- Role
+AppSession : +isLoggedIn bool
+AppSession : +userId int?
+AppSession : +username String?
+AppSession : +phone String?
+AppSession : +address String?
+AppSession : +role Role?
+AppSession o-- Role
+AppSession : +merchantId int?
+AppSession : +merchantUsername String?
+AppSession : +merchantProfileImageUrl String?
+AppSession : +init() dynamic
+AppSession : +login() dynamic
+AppSession : +signUpUser() dynamic
+AppSession : +logout() dynamic
+
+class OrderStatusEnum
+<<enumeration>> OrderStatusEnum
+OrderStatusEnum : +index int
+OrderStatusEnum : +values$ List~OrderStatusEnum~
+OrderStatusEnum : +waiting$ OrderStatusEnum
+OrderStatusEnum o-- OrderStatusEnum
+Enum <|.. OrderStatusEnum
+
+class Role
+<<enumeration>> Role
+Role : +index int
+Role : +values$ List~Role~
+Role : +user$ Role
+Role o-- Role
+Enum <|.. Role
+
+class UserTabs
+<<enumeration>> UserTabs
+UserTabs : +index int
+UserTabs : +values$ List~UserTabs~
+UserTabs : +home$ UserTabs
+UserTabs o-- UserTabs
+Enum <|.. UserTabs
+
+class MerchantTabs
+<<enumeration>> MerchantTabs
+MerchantTabs : +index int
+MerchantTabs : +values$ List~MerchantTabs~
+MerchantTabs : +orders$ MerchantTabs
+MerchantTabs o-- MerchantTabs
+Enum <|.. MerchantTabs
+
+class MediaType
+<<enumeration>> MediaType
+MediaType : +index int
+MediaType : +values$ List~MediaType~
+MediaType : +image$ MediaType
+MediaType o-- MediaType
+MediaType : +video$ MediaType
+MediaType o-- MediaType
+Enum <|.. MediaType
+
+class Clauses
+Clauses : +where$ _Where
+Clauses o-- _Where
+Clauses : +orderBy$ _OrderBy
+Clauses o-- _OrderBy
+Clauses : +like$ _Like
+Clauses o-- _Like
+
+class _Where
+_Where : +clause String
+_Where : +args List~Object?~
+_Where : +eq() _Where
+_Where : +and() _Where
+_Where : +or() _Where
+_Where : +gt() _Where
+_Where : +gte() _Where
+_Where : +lt() _Where
+_Where : +lte() _Where
+_Where : +not() _Where
+_Where : +isNull() _Where
+_Where : +isNotNull() _Where
+_Where : +inVal() _Where
+_Where : +notInVal() _Where
+_Where : +between() _Where
+_Where : +notBetween() _Where
+_Where : +neq() _Where
+
+class _OrderBy
+_OrderBy : +clause String
+_OrderBy : +asc() _OrderBy
+_OrderBy : +desc() _OrderBy
+_OrderBy : +caseWhen() _OrderBy
+_OrderBy : +thenBy() _OrderBy
+
+class _Like
+_Like : +clause String
+_Like : +args List~Object?~
+_Like : +like() _Like
+_Like : +notLike() _Like
+
+class Hasher
+Hasher : +md5Hash()$ String
+Hasher : +sha256Hash()$ String
+Hasher : +sha512Hash()$ String
+
+class Validator
+Validator : +validateUsername()$ String?
+Validator : +validateEmail()$ String?
+Validator : +validatePassword()$ String?
+
+class AppError
+AppError : +type ErrorType
+AppError o-- ErrorType
+AppError : +message String?
+Exception <|.. AppError
+
+class ErrorType
+<<enumeration>> ErrorType
+ErrorType : +index int
+ErrorType : +values$ List~ErrorType~
+ErrorType : +NOT_FOUND$ ErrorType
+ErrorType o-- ErrorType
+ErrorType : +ALREADY_EXISTS$ ErrorType
+ErrorType o-- ErrorType
+ErrorType : +DB_ERROR$ ErrorType
+ErrorType o-- ErrorType
+ErrorType : +CACHE_ERROR$ ErrorType
+ErrorType o-- ErrorType
+ErrorType : +CORRUPTED_DATA$ ErrorType
+ErrorType o-- ErrorType
+ErrorType : +INVALID_INPUT$ ErrorType
+ErrorType o-- ErrorType
+ErrorType : +MISSING_INPUT$ ErrorType
+ErrorType o-- ErrorType
+ErrorType : +INVALID_STATE$ ErrorType
+ErrorType o-- ErrorType
+ErrorType : +UNAUTHORIZED$ ErrorType
+ErrorType o-- ErrorType
+ErrorType : +SESSION_EXPIRED$ ErrorType
+ErrorType o-- ErrorType
+ErrorType : +FORBIDDEN$ ErrorType
+ErrorType o-- ErrorType
+ErrorType : +OPERATION_NOT_ALLOWED$ ErrorType
+ErrorType o-- ErrorType
+ErrorType : +LIMIT_REACHED$ ErrorType
+ErrorType o-- ErrorType
+ErrorType : +INTERNAL_ERROR$ ErrorType
+ErrorType o-- ErrorType
+ErrorType : +UNKNOWN$ ErrorType
+ErrorType o-- ErrorType
+Enum <|.. ErrorType
+
+class MediaModel
+MediaModel : +url String
+MediaModel : +type MediaType
+MediaModel o-- MediaType
+
+class MediaPickerSheet
+MediaPickerSheet : +show()$ dynamic
+
+class MediaPicker
+MediaPicker : -_picker$ ImagePicker
+MediaPicker o-- ImagePicker
+MediaPicker : +pickAndStoreMedia()$ dynamic
+
+class AppDatabase
+AppDatabase : -_instance$ AppDatabase
+AppDatabase o-- AppDatabase
+AppDatabase : -_db$ Database?
+AppDatabase o-- Database
+AppDatabase : +database dynamic
+AppDatabase : -_init() dynamic
+AppDatabase : +close() dynamic
+
+class ProductCategoryMapsTable
+ProductCategoryMapsTable : +tableName String
+ProductCategoryMapsTable : +cols ProductCategoryMapsCols
+ProductCategoryMapsTable o-- ProductCategoryMapsCols
+DbTable <|.. ProductCategoryMapsTable
+
+class ProductCategoryMapsCols
+ProductCategoryMapsCols : +productIdCol$ String
+ProductCategoryMapsCols : +categoryIdCol$ String
+ProductCategoryMapsCols : +productId String
+ProductCategoryMapsCols : +categoryId String
+BaseCols <|-- ProductCategoryMapsCols
+
+class ChatRoomsTable
+ChatRoomsTable : +tableName String
+ChatRoomsTable : +cols ChatRoomsCols
+ChatRoomsTable o-- ChatRoomsCols
+DbTable <|.. ChatRoomsTable
+
+class ChatRoomsCols
+ChatRoomsCols : +userIdCol$ String
+ChatRoomsCols : +merchantIdCol$ String
+ChatRoomsCols : +userId String
+ChatRoomsCols : +merchantId String
+BaseCols <|-- ChatRoomsCols
+
+class OrderProductsTable
+OrderProductsTable : +tableName String
+OrderProductsTable : +cols OrderProductsCols
+OrderProductsTable o-- OrderProductsCols
+DbTable <|.. OrderProductsTable
+
+class OrderProductsCols
+OrderProductsCols : +orderIdCol$ String
+OrderProductsCols : +productIdCol$ String
+OrderProductsCols : +quantityCol$ String
+OrderProductsCols : +orderId String
+OrderProductsCols : +productId String
+OrderProductsCols : +quantity String
+BaseCols <|-- OrderProductsCols
+
+class ReviewsTable
+ReviewsTable : +tableName String
+ReviewsTable : +cols ReviewsCols
+ReviewsTable o-- ReviewsCols
+DbTable <|.. ReviewsTable
+
+class ReviewsCols
+ReviewsCols : +userIdCol$ String
+ReviewsCols : +merchantIdCol$ String
+ReviewsCols : +textCol$ String
+ReviewsCols : +ratingCol$ String
+ReviewsCols : +userId String
+ReviewsCols : +merchantId String
+ReviewsCols : +text String
+ReviewsCols : +rating String
+BaseCols <|-- ReviewsCols
+
+class MerchantsTable
+MerchantsTable : +tableName String
+MerchantsTable : +cols MerchantsCols
+MerchantsTable o-- MerchantsCols
+DbTable <|.. MerchantsTable
+
+class MerchantsCols
+MerchantsCols : +userIdCol$ String
+MerchantsCols : +ratingCol$ String
+MerchantsCols : +usernameCol$ String
+MerchantsCols : +bioCol$ String
+MerchantsCols : +emailCol$ String
+MerchantsCols : +profileImageCol$ String
+MerchantsCols : +passwordHashCol$ String
+MerchantsCols : +userId String
+MerchantsCols : +rating String
+MerchantsCols : +username String
+MerchantsCols : +email String
+MerchantsCols : +bio String
+MerchantsCols : +profileImage String
+MerchantsCols : +passwordHash String
+BaseCols <|-- MerchantsCols
+
+class ProductMediasTable
+ProductMediasTable : +tableName String
+ProductMediasTable : +cols ProductMediasCols
+ProductMediasTable o-- ProductMediasCols
+DbTable <|.. ProductMediasTable
+
+class ProductMediasCols
+ProductMediasCols : +productIdCol$ String
+ProductMediasCols : +urlCol$ String
+ProductMediasCols : +mediaTypeCol$ String
+ProductMediasCols : +productId String
+ProductMediasCols : +url String
+ProductMediasCols : +mediaType String
+BaseCols <|-- ProductMediasCols
+
+class UsersTable
+UsersTable : +tableName String
+UsersTable : +cols UsersCols
+UsersTable o-- UsersCols
+DbTable <|.. UsersTable
+
+class UsersCols
+UsersCols : +usernameCol$ String
+UsersCols : +emailCol$ String
+UsersCols : +passwordHashCol$ String
+UsersCols : +phoneCol$ String
+UsersCols : +addressCol$ String
+UsersCols : +notesCol$ String
+UsersCols : +profileImageUrlCol$ String
+UsersCols : +bioCol$ String
+UsersCols : +username String
+UsersCols : +email String
+UsersCols : +passwordHash String
+UsersCols : +phone String
+UsersCols : +address String
+UsersCols : +notes String
+UsersCols : +profileImageUrl String
+UsersCols : +bio String
+BaseCols <|-- UsersCols
+
+class LiveStreamProductsTable
+LiveStreamProductsTable : +tableName String
+LiveStreamProductsTable : +cols LiveStreamProductsCols
+LiveStreamProductsTable o-- LiveStreamProductsCols
+DbTable <|.. LiveStreamProductsTable
+
+class LiveStreamProductsCols
+LiveStreamProductsCols : +liveStreamIdCol$ String
+LiveStreamProductsCols : +productIdCol$ String
+LiveStreamProductsCols : +liveStreamId String
+LiveStreamProductsCols : +productId String
+BaseCols <|-- LiveStreamProductsCols
+
+class ProductsTable
+ProductsTable : +tableName String
+ProductsTable : +cols ProductsCols
+ProductsTable o-- ProductsCols
+DbTable <|.. ProductsTable
+
+class ProductsCols
+ProductsCols : +merchantIdCol$ String
+ProductsCols : +nameCol$ String
+ProductsCols : +descriptionCol$ String
+ProductsCols : +priceCol$ String
+ProductsCols : +quantityCol$ String
+ProductsCols : +merchantId String
+ProductsCols : +name String
+ProductsCols : +description String
+ProductsCols : +price String
+ProductsCols : +quantity String
+BaseCols <|-- ProductsCols
+
+class PostSavesTable
+PostSavesTable : +tableName String
+PostSavesTable : +cols PostSavesCols
+PostSavesTable o-- PostSavesCols
+DbTable <|.. PostSavesTable
+
+class PostSavesCols
+PostSavesCols : +userIdCol$ String
+PostSavesCols : +postIdCol$ String
+PostSavesCols : +userId String
+PostSavesCols : +postId String
+BaseCols <|-- PostSavesCols
+
+class LiveStreamsTable
+LiveStreamsTable : +tableName String
+LiveStreamsTable : +cols LiveStreamsCols
+LiveStreamsTable o-- LiveStreamsCols
+DbTable <|.. LiveStreamsTable
+
+class LiveStreamsCols
+LiveStreamsCols : +merchantIdCol$ String
+LiveStreamsCols : +titleCol$ String
+LiveStreamsCols : +streamUrlCol$ String
+LiveStreamsCols : +thumbnailUrlCol$ String
+LiveStreamsCols : +viewCountCol$ String
+LiveStreamsCols : +merchantId String
+LiveStreamsCols : +title String
+LiveStreamsCols : +streamUrl String
+LiveStreamsCols : +thumbnailUrl String
+LiveStreamsCols : +viewCount String
+BaseCols <|-- LiveStreamsCols
+
+class ChatsTable
+ChatsTable : +tableName String
+ChatsTable : +cols ChatsCols
+ChatsTable o-- ChatsCols
+DbTable <|.. ChatsTable
+
+class ChatsCols
+ChatsCols : +chatRoomIdCol$ String
+ChatsCols : +senderIdCol$ String
+ChatsCols : +textCol$ String
+ChatsCols : +chatRoomId String
+ChatsCols : +senderId String
+ChatsCols : +text String
+BaseCols <|-- ChatsCols
+
+class CartsTable
+CartsTable : +tableName String
+CartsTable : +cols CartsCols
+CartsTable o-- CartsCols
+DbTable <|.. CartsTable
+
+class CartsCols
+CartsCols : +userIdCol$ String
+CartsCols : +productIdCol$ String
+CartsCols : +quantityCol$ String
+CartsCols : +userId String
+CartsCols : +productId String
+CartsCols : +quantity String
+BaseCols <|-- CartsCols
+
+class PromoMediasTable
+PromoMediasTable : +tableName String
+PromoMediasTable : +cols PromoMediasCols
+PromoMediasTable o-- PromoMediasCols
+DbTable <|.. PromoMediasTable
+
+class PromoMediasCols
+PromoMediasCols : +postIdCol$ String
+PromoMediasCols : +urlCol$ String
+PromoMediasCols : +mediaTypeCol$ String
+PromoMediasCols : +postId String
+PromoMediasCols : +url String
+PromoMediasCols : +mediaType String
+BaseCols <|-- PromoMediasCols
+
+class OrdersTable
+OrdersTable : +tableName String
+OrdersTable : +cols OrdersCols
+OrdersTable o-- OrdersCols
+DbTable <|.. OrdersTable
+
+class OrdersCols
+OrdersCols : +userIdCol$ String
+OrdersCols : +merchantIdCol$ String
+OrdersCols : +statusCol$ String
+OrdersCols : +userId String
+OrdersCols : +merchantId String
+OrdersCols : +status String
+BaseCols <|-- OrdersCols
+
+class PostProductsTable
+PostProductsTable : +tableName String
+PostProductsTable : +cols PostProductsCols
+PostProductsTable o-- PostProductsCols
+DbTable <|.. PostProductsTable
+
+class PostProductsCols
+PostProductsCols : +postIdCol$ String
+PostProductsCols : +productIdCol$ String
+PostProductsCols : +postId String
+PostProductsCols : +productId String
+BaseCols <|-- PostProductsCols
+
+class FollowersTable
+FollowersTable : +tableName String
+FollowersTable : +cols FollowersCols
+FollowersTable o-- FollowersCols
+DbTable <|.. FollowersTable
+
+class FollowersCols
+FollowersCols : +followerIdCol$ String
+FollowersCols : +followedIdCol$ String
+FollowersCols : +followerId String
+FollowersCols : +followedId String
+BaseCols <|-- FollowersCols
+
+class Tables
+Tables : +users$ UsersTable
+Tables o-- UsersTable
+Tables : +merchants$ MerchantsTable
+Tables o-- MerchantsTable
+Tables : +productCategories$ ProductCategoriesTable
+Tables o-- ProductCategoriesTable
+Tables : +products$ ProductsTable
+Tables o-- ProductsTable
+Tables : +productCategoryMaps$ ProductCategoryMapsTable
+Tables o-- ProductCategoryMapsTable
+Tables : +productMedias$ ProductMediasTable
+Tables o-- ProductMediasTable
+Tables : +posts$ PostsTable
+Tables o-- PostsTable
+Tables : +postProducts$ PostProductsTable
+Tables o-- PostProductsTable
+Tables : +promoMedias$ PromoMediasTable
+Tables o-- PromoMediasTable
+Tables : +postLikes$ PostLikesTable
+Tables o-- PostLikesTable
+Tables : +postSaves$ PostSavesTable
+Tables o-- PostSavesTable
+Tables : +liveStreams$ LiveStreamsTable
+Tables o-- LiveStreamsTable
+Tables : +liveStreamProducts$ LiveStreamProductsTable
+Tables o-- LiveStreamProductsTable
+Tables : +liveStreamChats$ LiveStreamChatsTable
+Tables o-- LiveStreamChatsTable
+Tables : +chatRooms$ ChatRoomsTable
+Tables o-- ChatRoomsTable
+Tables : +chats$ ChatsTable
+Tables o-- ChatsTable
+Tables : +carts$ CartsTable
+Tables o-- CartsTable
+Tables : +orders$ OrdersTable
+Tables o-- OrdersTable
+Tables : +orderProducts$ OrderProductsTable
+Tables o-- OrderProductsTable
+Tables : +reviews$ ReviewsTable
+Tables o-- ReviewsTable
+Tables : +followers$ FollowersTable
+Tables o-- FollowersTable
+Tables : +id$ String
+
+class DbTable
+<<abstract>> DbTable
+DbTable : +tableName String
+DbTable : +cols T
+
+class BaseCols
+<<abstract>> BaseCols
+BaseCols : +idCol$ String
+BaseCols : +createdAtCol$ String
+BaseCols : +updatedAtCol$ String
+BaseCols : +id String
+BaseCols : +createdAt String
+BaseCols : +updatedAt String
+
+class LiveStreamChatsTable
+LiveStreamChatsTable : +tableName String
+LiveStreamChatsTable : +cols LiveStreamChatsCols
+LiveStreamChatsTable o-- LiveStreamChatsCols
+DbTable <|.. LiveStreamChatsTable
+
+class LiveStreamChatsCols
+LiveStreamChatsCols : +liveStreamIdCol$ String
+LiveStreamChatsCols : +userIdCol$ String
+LiveStreamChatsCols : +textCol$ String
+LiveStreamChatsCols : +liveStreamId String
+LiveStreamChatsCols : +userId String
+LiveStreamChatsCols : +text String
+BaseCols <|-- LiveStreamChatsCols
+
+class PostLikesTable
+PostLikesTable : +tableName String
+PostLikesTable : +cols PostLikesCols
+PostLikesTable o-- PostLikesCols
+DbTable <|.. PostLikesTable
+
+class PostLikesCols
+PostLikesCols : +userIdCol$ String
+PostLikesCols : +postIdCol$ String
+PostLikesCols : +userId String
+PostLikesCols : +postId String
+BaseCols <|-- PostLikesCols
+
+class ProductCategoriesTable
+ProductCategoriesTable : +tableName String
+ProductCategoriesTable : +cols ProductCategoriesCols
+ProductCategoriesTable o-- ProductCategoriesCols
+DbTable <|.. ProductCategoriesTable
+
+class ProductCategoriesCols
+ProductCategoriesCols : +nameCol$ String
+ProductCategoriesCols : +name String
+BaseCols <|-- ProductCategoriesCols
+
+class PostsTable
+PostsTable : +tableName String
+PostsTable : +cols PostsCols
+PostsTable o-- PostsCols
+DbTable <|.. PostsTable
+
+class PostsCols
+PostsCols : +merchantIdCol$ String
+PostsCols : +captionCol$ String
+PostsCols : +merchantId String
+PostsCols : +caption String
+BaseCols <|-- PostsCols
+
+class CacheValue
+CacheValue : +single Cacheable?
+CacheValue o-- Cacheable
+CacheValue : +many List~Cacheable~?
+
+class Single
+Single : +data Cacheable
+Single o-- Cacheable
+Single : +single Cacheable?
+Single o-- Cacheable
+CacheValue <|-- Single
+
+class Many
+Many : +data List~Cacheable~
+Many : +many List~Cacheable~?
+CacheValue <|-- Many
+
+class CacheInterface
+<<abstract>> CacheInterface
+CacheInterface : +set()* void
+CacheInterface : +get()* CacheValue?
+CacheInterface : +del()* void
+CacheInterface : +delByPrefix()* void
+CacheInterface : +delByPattern()* void
+CacheInterface : +exists()* bool
+CacheInterface : +flushAll()* void
+CacheInterface : +getSize()* int
+
+class Cache
+Cache : -_instance$ Cache
+Cache o-- Cache
+Cache : -_cache Map~String, CacheValue~
+Cache : +set() void
+Cache : +get() CacheValue?
+Cache : +del() void
+Cache : +delByPrefix() void
+Cache : +delByPattern() void
+Cache : +exists() bool
+Cache : +flushAll() void
+Cache : +getSize() int
+Cache : +expectMany() List<Cacheable>
+Cache : +expectSingle() Cacheable
+CacheInterface <|.. Cache
+
+class ProductRepository
+ProductRepository : +tableName String
+ProductRepository : +fromMap() ProductModel
+ProductRepository : +toMap() Map<String, dynamic>
+BaseRepository <|-- ProductRepository
+
+class PostSaveRepository
+PostSaveRepository : +tableName String
+PostSaveRepository : +fromMap() PostSaveModel
+PostSaveRepository : +toMap() Map<String, dynamic>
+BaseRepository <|-- PostSaveRepository
+
+class UserRepository
+UserRepository : +tableName String
+UserRepository : +fromMap() UserModel
+UserRepository : +toMap() Map<String, dynamic>
+UserRepository : +getUserByEmailAndPassword() dynamic
+BaseRepository <|-- UserRepository
+
+class OrderProductRepository
+OrderProductRepository : +tableName String
+OrderProductRepository : +fromMap() OrderProductModel
+OrderProductRepository : +toMap() Map<String, dynamic>
+BaseRepository <|-- OrderProductRepository
+
+class MerchantRepository
+MerchantRepository : +tableName String
+MerchantRepository : +fromMap() MerchantModel
+MerchantRepository : +toMap() Map<String, dynamic>
+MerchantRepository : +getMerchantByEmailAndPassword() dynamic
+BaseRepository <|-- MerchantRepository
+
+class FollowerRepository
+FollowerRepository : +tableName String
+FollowerRepository : +fromMap() FollowerModel
+FollowerRepository : +toMap() Map<String, dynamic>
+BaseRepository <|-- FollowerRepository
+
+class PostLikeRepository
+PostLikeRepository : +tableName String
+PostLikeRepository : +fromMap() PostLikeModel
+PostLikeRepository : +toMap() Map<String, dynamic>
+BaseRepository <|-- PostLikeRepository
+
+class ChatRoomRepository
+ChatRoomRepository : +tableName String
+ChatRoomRepository : +fromMap() ChatRoomModel
+ChatRoomRepository : +toMap() Map<String, dynamic>
+BaseRepository <|-- ChatRoomRepository
+
+class ProductMediaRepository
+ProductMediaRepository : +tableName String
+ProductMediaRepository : +fromMap() ProductMediaModel
+ProductMediaRepository : +toMap() Map<String, dynamic>
+BaseRepository <|-- ProductMediaRepository
+
+class LiveStreamProductRepository
+LiveStreamProductRepository : +tableName String
+LiveStreamProductRepository : +fromMap() LiveStreamProductModel
+LiveStreamProductRepository : +toMap() Map<String, dynamic>
+BaseRepository <|-- LiveStreamProductRepository
+
+class BaseRepositoryInterface
+<<abstract>> BaseRepositoryInterface
+BaseRepositoryInterface : +tableName String
+BaseRepositoryInterface : +getAll()* dynamic
+BaseRepositoryInterface : +getById()* dynamic
+BaseRepositoryInterface : +insert()* dynamic
+BaseRepositoryInterface : +update()* dynamic
+BaseRepositoryInterface : +delete()* dynamic
+BaseRepositoryInterface : +fromMap()* T
+BaseRepositoryInterface : +toMap()* Map<String, dynamic>
+BaseRepositoryInterface : +queryThisTable()* dynamic
+
+class BaseRepository
+<<abstract>> BaseRepository
+BaseRepository : -_appDatabase AppDatabase
+BaseRepository o-- AppDatabase
+BaseRepository : -_cache Cache
+BaseRepository o-- Cache
+BaseRepository : +database dynamic
+BaseRepository : +getAll() dynamic
+BaseRepository : +getById() dynamic
+BaseRepository : +insert() dynamic
+BaseRepository : +update() dynamic
+BaseRepository : +delete() dynamic
+BaseRepository : +queryThisTable() dynamic
+BaseRepository : -_getBaseCacheKey() String
+BaseRepository : -_getQueryCacheKey() String
+BaseRepository : -_expectMany() List<T>
+BaseRepository : -_expectSingle() T
+BaseRepositoryInterface <|.. BaseRepository
+
+class ProductCategoryRepository
+ProductCategoryRepository : +tableName String
+ProductCategoryRepository : +fromMap() ProductCategoryModel
+ProductCategoryRepository : +toMap() Map<String, dynamic>
+BaseRepository <|-- ProductCategoryRepository
+
+class OrderRepository
+OrderRepository : +tableName String
+OrderRepository : +fromMap() OrderModel
+OrderRepository : +toMap() Map<String, dynamic>
+BaseRepository <|-- OrderRepository
+
+class LiveStreamChatRepository
+LiveStreamChatRepository : +tableName String
+LiveStreamChatRepository : +fromMap() LiveStreamChatModel
+LiveStreamChatRepository : +toMap() Map<String, dynamic>
+BaseRepository <|-- LiveStreamChatRepository
+
+class PromoMediaRepository
+PromoMediaRepository : +tableName String
+PromoMediaRepository : +fromMap() PromoMediaModel
+PromoMediaRepository : +toMap() Map<String, dynamic>
+BaseRepository <|-- PromoMediaRepository
+
+class ChatRepository
+ChatRepository : +tableName String
+ChatRepository : +fromMap() ChatModel
+ChatRepository : +toMap() Map<String, dynamic>
+BaseRepository <|-- ChatRepository
+
+class PostRepository
+PostRepository : +tableName String
+PostRepository : +fromMap() PostModel
+PostRepository : +toMap() Map<String, dynamic>
+BaseRepository <|-- PostRepository
+
+class CartRepository
+CartRepository : +tableName String
+CartRepository : +fromMap() CartModel
+CartRepository : +toMap() Map<String, dynamic>
+BaseRepository <|-- CartRepository
+
+class ReviewRepository
+ReviewRepository : +tableName String
+ReviewRepository : +fromMap() ReviewModel
+ReviewRepository : +toMap() Map<String, dynamic>
+BaseRepository <|-- ReviewRepository
+
+class LiveStreamRepository
+LiveStreamRepository : +tableName String
+LiveStreamRepository : +fromMap() LiveStreamModel
+LiveStreamRepository : +toMap() Map<String, dynamic>
+BaseRepository <|-- LiveStreamRepository
+
+class PostProductsRepository
+PostProductsRepository : +tableName String
+PostProductsRepository : +fromMap() PostProductModel
+PostProductsRepository : +toMap() Map<String, dynamic>
+BaseRepository <|-- PostProductsRepository
+
+class ProductCategoryMapsRepository
+ProductCategoryMapsRepository : +tableName String
+ProductCategoryMapsRepository : +fromMap() ProductCategoryMapModel
+ProductCategoryMapsRepository : +toMap() Map<String, dynamic>
+BaseRepository <|-- ProductCategoryMapsRepository
+
+class Cacheable
+
+class ProgressStatus
+<<enumeration>> ProgressStatus
+ProgressStatus : +index int
+ProgressStatus : +values$ List~ProgressStatus~
+ProgressStatus : +waiting$ ProgressStatus
+ProgressStatus o-- ProgressStatus
+Enum <|.. ProgressStatus
+
+class ProductCategory
+<<enumeration>> ProductCategory
+ProductCategory : +index int
+ProductCategory : +values$ List~ProductCategory~
+ProductCategory : +all$ ProductCategory
+ProductCategory o-- ProductCategory
+Enum <|.. ProductCategory
+
+class UserModel
+UserModel : +id int
+UserModel : +username String
+UserModel : +passwordHash String
+UserModel : +profileImageUrl String?
+UserModel : +phone String?
+UserModel : +address String?
+UserModel : +bio String?
+UserModel : +createdAt DateTime
+UserModel : +updatedAt DateTime
+Cacheable <|-- UserModel
+
+class FollowerModel
+FollowerModel : +id int
+FollowerModel : +followerId int
+FollowerModel : +followedId int
+FollowerModel : +createdAt DateTime
+FollowerModel : +updatedAt DateTime
+Cacheable <|-- FollowerModel
+
+class MerchantModel
+MerchantModel : +id int
+MerchantModel : +userId int
+MerchantModel : +rating double
+MerchantModel : +username String
+MerchantModel : +email String
+MerchantModel : +bio String
+MerchantModel : +profileImage String
+MerchantModel : +createdAt DateTime
+MerchantModel : +updatedAt DateTime
+Cacheable <|-- MerchantModel
+
+class ProductModel
+ProductModel : +id int
+ProductModel : +merchantId int
+ProductModel : +name String
+ProductModel : +description String?
+ProductModel : +price double
+ProductModel : +quantity int
+ProductModel : +createdAt DateTime
+ProductModel : +updatedAt DateTime
+Cacheable <|-- ProductModel
+
+class ProductCategoryModel
+ProductCategoryModel : +id int
+ProductCategoryModel : +name String
+Cacheable <|-- ProductCategoryModel
+
+class ProductCategoryMapModel
+ProductCategoryMapModel : +id int
+ProductCategoryMapModel : +productId int
+ProductCategoryMapModel : +categoryId int
+Cacheable <|-- ProductCategoryMapModel
+
+class ProductMediaModel
+ProductMediaModel : +id int
+ProductMediaModel : +productId int
+ProductMediaModel : +url String
+ProductMediaModel : +mediaType String?
+ProductMediaModel : +createdAt DateTime
+ProductMediaModel : +updatedAt DateTime
+Cacheable <|-- ProductMediaModel
+
+class ReviewModel
+ReviewModel : +id int
+ReviewModel : +userId int
+ReviewModel : +merchantId int
+ReviewModel : +text String?
+ReviewModel : +rating double?
+ReviewModel : +createdAt DateTime
+ReviewModel : +updatedAt DateTime
+Cacheable <|-- ReviewModel
+
+class CartModel
+CartModel : +id int
+CartModel : +userId int
+CartModel : +productId int
+CartModel : +quantity int
+CartModel : +createdAt String
+CartModel : +updatedAt String
+Cacheable <|-- CartModel
+
+class OrderModel
+OrderModel : +id int
+OrderModel : +userId int
+OrderModel : +merchantId int
+OrderModel : +status String
+OrderModel : +createdAt DateTime
+OrderModel : +updatedAt DateTime
+Cacheable <|-- OrderModel
+
+class OrderProductModel
+OrderProductModel : +id int
+OrderProductModel : +orderId int
+OrderProductModel : +productId int
+OrderProductModel : +quantity int
+Cacheable <|-- OrderProductModel
+
+class PostModel
+PostModel : +id int
+PostModel : +merchantId int
+PostModel : +caption String?
+PostModel : +createdAt DateTime
+PostModel : +updatedAt DateTime
+Cacheable <|-- PostModel
+
+class PostProductModel
+PostProductModel : +id int
+PostProductModel : +postId int
+PostProductModel : +productId int
+Cacheable <|-- PostProductModel
+
+class PostLikeModel
+PostLikeModel : +id int
+PostLikeModel : +userId int
+PostLikeModel : +postId int
+PostLikeModel : +createdAt DateTime
+PostLikeModel : +updatedAt DateTime
+Cacheable <|-- PostLikeModel
+
+class PostSaveModel
+PostSaveModel : +id int
+PostSaveModel : +userId int
+PostSaveModel : +postId int
+PostSaveModel : +createdAt DateTime
+PostSaveModel : +updatedAt DateTime
+Cacheable <|-- PostSaveModel
+
+class ChatModel
+ChatModel : +id int
+ChatModel : +chatRoomId int
+ChatModel : +senderId int
+ChatModel : +text String
+ChatModel : +createdAt String
+ChatModel : +updatedAt String
+Cacheable <|-- ChatModel
+
+class ChatRoomModel
+ChatRoomModel : +id int
+ChatRoomModel : +userId int
+ChatRoomModel : +merchantId int
+ChatRoomModel : +createdAt String
+ChatRoomModel : +updatedAt String
+Cacheable <|-- ChatRoomModel
+
+class LiveStreamModel
+LiveStreamModel : +id int
+LiveStreamModel : +merchantId int
+LiveStreamModel : +title String
+LiveStreamModel : +streamUrl String
+LiveStreamModel : +thumbnailUrl String?
+LiveStreamModel : +viewCount int
+LiveStreamModel : +createdAt String
+LiveStreamModel : +updatedAt String
+Cacheable <|-- LiveStreamModel
+
+class LiveStreamChatModel
+LiveStreamChatModel : +id int
+LiveStreamChatModel : +liveStreamId int
+LiveStreamChatModel : +userId int
+LiveStreamChatModel : +text String
+LiveStreamChatModel : +createdAt String
+LiveStreamChatModel : +updatedAt String
+Cacheable <|-- LiveStreamChatModel
+
+class LiveStreamProductModel
+LiveStreamProductModel : +id int
+LiveStreamProductModel : +liveStreamId int
+LiveStreamProductModel : +productId int
+Cacheable <|-- LiveStreamProductModel
+
+class PromoMediaModel
+PromoMediaModel : +id int
+PromoMediaModel : +postId int
+PromoMediaModel : +url String
+PromoMediaModel : +mediaType String
+PromoMediaModel : +createdAt DateTime
+PromoMediaModel : +updatedAt DateTime
+Cacheable <|-- PromoMediaModel
+
+class UserVM
+UserVM : +id int
+UserVM : +username String
+UserVM : +profileImageUrl String?
+UserVM : +bio String?
+UserVM : +createdAt DateTime
+UserVM : +updatedAt DateTime
+Cacheable <|-- UserVM
+
+class CartVM
+CartVM : +merchant CartMerchantVM
+CartVM o-- CartMerchantVM
+CartVM : +items List~CartItemVM~
+Cacheable <|-- CartVM
+
+class CartItemVM
+CartItemVM : +id int
+CartItemVM : +userId int
+CartItemVM : +productId int
+CartItemVM : +name String
+CartItemVM : +price double
+CartItemVM : +image String
+CartItemVM : +quantity int
+CartItemVM : +availableQuantity int
+CartItemVM : +createdAt DateTime
+CartItemVM : +updatedAt DateTime
+
+class CartMerchantVM
+CartMerchantVM : +id int
+CartMerchantVM : +username String
+CartMerchantVM : +profileImage String
+
+class OrderVM
+OrderVM : +id int
+OrderVM : +merchantName String
+OrderVM : +merchantProfileImage String
+OrderVM : +status String
+OrderVM : +products List~OrderProductVM~
+OrderVM : +totalPrice int
+OrderVM : +createdAt DateTime
+Cacheable <|-- OrderVM
+
+class OrderProductVM
+OrderProductVM : +id int
+OrderProductVM : +productName String
+OrderProductVM : +productImageUrl String
+OrderProductVM : +quantity int
+Cacheable <|-- OrderProductVM
+
+class PostVM
+PostVM : +id int
+PostVM : +merchantId int
+PostVM : +caption String?
+PostVM : +promoMedias List~PromoMediaModel~?
+PostVM : +createdAt DateTime
+PostVM : +updatedAt DateTime
+PostVM : +likesCount int
+PostVM : +savesCount int
+PostVM : +isLiked bool
+PostVM : +isSaved bool
+PostVM : +merchant PostMerchantVM
+PostVM o-- PostMerchantVM
+PostVM : +products List~PostProductVM~
+Cacheable <|-- PostVM
+
+class PostProductVM
+PostProductVM : +id int
+PostProductVM : +name String
+PostProductVM : +medias List~MediaModel~
+PostProductVM : +price double
+PostProductVM : +quantity int
+PostProductVM : +description String
+PostProductVM : +category ProductCategory
+PostProductVM o-- ProductCategory
+PostProductVM : +isAddedToCart bool
+Cacheable <|-- PostProductVM
+
+class PostMerchantVM
+PostMerchantVM : +id int
+PostMerchantVM : +name String
+PostMerchantVM : +bio String
+PostMerchantVM : +profileImage String
+PostMerchantVM : +username String
+PostMerchantVM : +rating double
+Cacheable <|-- PostMerchantVM
+
+class ChatVM
+ChatVM : +id int
+ChatVM : +isMine bool
+ChatVM : +text String
+ChatVM : +createdAt DateTime
+ChatVM : +updatedAt DateTime
+Cacheable <|-- ChatVM
+
+class ChatRoomVM
+ChatRoomVM : +id int
+ChatRoomVM : +merchantName String
+ChatRoomVM : +merchantProfileImage String
+ChatRoomVM : +timeAgo String
+ChatRoomVM : +latestText String
+Cacheable <|-- ChatRoomVM
+
+class LiveStreamVM
+LiveStreamVM : +id int
+LiveStreamVM : +merchantId int
+LiveStreamVM : +title String
+LiveStreamVM : +streamUrl String
+LiveStreamVM : +thumbnailUrl String?
+LiveStreamVM : +viewCount int
+LiveStreamVM : +createdAt String
+LiveStreamVM : +updatedAt String
+LiveStreamVM : +merchantName String?
+LiveStreamVM : +merchantProfileImage String?
+LiveStreamVM : +productNames List~String~?
+LiveStreamVM : +chatCount int
+Cacheable <|-- LiveStreamVM
+
+class LiveStreamChatVM
+LiveStreamChatVM : +id int
+LiveStreamChatVM : +username String
+LiveStreamChatVM : +profileImage String
+LiveStreamChatVM : +text String
+Cacheable <|-- LiveStreamChatVM
+
+class MerchantVM
+MerchantVM : +id int
+MerchantVM : +username String
+MerchantVM : +profileImage String
+MerchantVM : +bio String
+MerchantVM : +rating double
+MerchantVM : +createdAt DateTime
+MerchantVM : +updatedAt DateTime
+Cacheable <|-- MerchantVM
+
+class UserProfileVM
+UserProfileVM : +id int
+UserProfileVM : +username String
+UserProfileVM : +profileImageUrl String
+UserProfileVM : +bio String
+UserProfileVM : +createdAt DateTime
+UserProfileVM : +updatedAt DateTime
+Cacheable <|-- UserProfileVM
+
+class UserProfileLikedSavedPostsVM
+UserProfileLikedSavedPostsVM : +id int
+UserProfileLikedSavedPostsVM : +imageUrl String
+UserProfileLikedSavedPostsVM : +caption String
+Cacheable <|-- UserProfileLikedSavedPostsVM
+
+class MerchantPostsVM
+MerchantPostsVM : +id int
+MerchantPostsVM : +caption String
+MerchantPostsVM : +imageUrl String
+Cacheable <|-- MerchantPostsVM
+
+class MerchantLivestreamsVM
+MerchantLivestreamsVM : +id int
+MerchantLivestreamsVM : +title String
+MerchantLivestreamsVM : +thumbnailUrl String
+Cacheable <|-- MerchantLivestreamsVM
+
+class MerchantProductsVM
+MerchantProductsVM : +id int
+MerchantProductsVM : +name String
+MerchantProductsVM : +image String
+MerchantProductsVM : +quantity int
+MerchantProductsVM : +price double
+MerchantProductsVM : +isAddedToCart bool
+Cacheable <|-- MerchantProductsVM
+
+class LiveStreamProductsVM
+LiveStreamProductsVM : +id int
+LiveStreamProductsVM : +name String
+LiveStreamProductsVM : +price double
+LiveStreamProductsVM : +quantity int
+LiveStreamProductsVM : +medias List~MediaModel~
+Cacheable <|-- LiveStreamProductsVM
+
+class ProductMediaVM
+ProductMediaVM : +id int
+ProductMediaVM : +productId int
+ProductMediaVM : +url String
+ProductMediaVM : +mediaType String?
+ProductMediaVM : +createdAt DateTime
+ProductMediaVM : +updatedAt DateTime
+ProductMediaVM : +isVideo bool
+ProductMediaVM : +isImage bool
+Cacheable <|-- ProductMediaVM
+
+class PromoMediaVM
+PromoMediaVM : +id int
+PromoMediaVM : +postId int
+PromoMediaVM : +url String
+PromoMediaVM : +mediaType MediaType?
+PromoMediaVM o-- MediaType
+PromoMediaVM : +createdAt DateTime
+PromoMediaVM : +updatedAt DateTime
+PromoMediaVM : +isVideo bool
+PromoMediaVM : +isImage bool
+Cacheable <|-- PromoMediaVM
+
+class ProductVM
+ProductVM : +id int
+ProductVM : +merchantId int
+ProductVM : +name String
+ProductVM : +description String?
+ProductVM : +price double
+ProductVM : +quantity int
+ProductVM : +createdAt DateTime
+ProductVM : +updatedAt DateTime
+ProductVM : +merchantName String?
+ProductVM : +merchantProfileImage String?
+ProductVM : +mediaUrls List~String~?
+ProductVM : +categories List~String~?
+ProductVM : +primaryImageUrl String?
+Cacheable <|-- ProductVM
+
+class OrderMerchantVM
+OrderMerchantVM : +id int
+OrderMerchantVM : +username String
+OrderMerchantVM : +userProfileImage String
+OrderMerchantVM : +status OrderStatusEnum
+OrderMerchantVM o-- OrderStatusEnum
+OrderMerchantVM : +products List~OrderProductMerchantVM~
+OrderMerchantVM : +totalPrice int
+OrderMerchantVM : +createdAt DateTime
+Cacheable <|-- OrderMerchantVM
+
+class OrderProductMerchantVM
+OrderProductMerchantVM : +id int
+OrderProductMerchantVM : +productName String
+OrderProductMerchantVM : +productImageUrl String
+OrderProductMerchantVM : +quantity int
+Cacheable <|-- OrderProductMerchantVM
+
+class MerchantChatRoomVM
+MerchantChatRoomVM : +id int
+MerchantChatRoomVM : +buyerName String
+MerchantChatRoomVM : +buyerProfileImage String
+MerchantChatRoomVM : +timeAgo String
+MerchantChatRoomVM : +latestText String
+Cacheable <|-- MerchantChatRoomVM
+
+class MerchantChatVM
+MerchantChatVM : +id int
+MerchantChatVM : +isMine bool
+MerchantChatVM : +text String
+MerchantChatVM : +createdAt DateTime
+MerchantChatVM : +updatedAt DateTime
+Cacheable <|-- MerchantChatVM
+
+class MerchantLiveStreamsVM
+MerchantLiveStreamsVM : +id int
+MerchantLiveStreamsVM : +title String
+MerchantLiveStreamsVM : +streamUrl String
+MerchantLiveStreamsVM : +thumbnailUrl String?
+MerchantLiveStreamsVM : +viewCount int
+MerchantLiveStreamsVM : +createdAt String
+MerchantLiveStreamsVM : +updatedAt String
+MerchantLiveStreamsVM : +products List~MerchantLiveStreamsProductsVM~?
+Cacheable <|-- MerchantLiveStreamsVM
+
+class MerchantLiveStreamsProductsVM
+MerchantLiveStreamsProductsVM : +id int
+MerchantLiveStreamsProductsVM : +name String
+MerchantLiveStreamsProductsVM : +price double
+MerchantLiveStreamsProductsVM : +quantity int
+MerchantLiveStreamsProductsVM : +imageUrls List~String~
+Cacheable <|-- MerchantLiveStreamsProductsVM
+
+class CreateCartDTO
+CreateCartDTO : +productId int
+CreateCartDTO : +quantity int
+
+class UpdateCartDTO
+UpdateCartDTO : +quantity int?
+
+class CreateOrderDTO
+CreateOrderDTO : +merchantId int
+CreateOrderDTO : +address String?
+CreateOrderDTO : +phone String?
+CreateOrderDTO : +notes String?
+CreateOrderDTO : +orderItems List~OrderProductDTO~
+
+class UpdateOrderDTO
+UpdateOrderDTO : +status String?
+
+class OrderProductDTO
+OrderProductDTO : +productId int
+OrderProductDTO : +quantity int
+
+class CreateChatDTO
+CreateChatDTO : +chatRoomId int
+CreateChatDTO : +text String
+
+class UpdateChatDTO
+UpdateChatDTO : +text String?
+
+class CreateChatRoomDTO
+CreateChatRoomDTO : +merchantId int
+
+class CreateLiveStreamChatDTO
+CreateLiveStreamChatDTO : +liveStreamId int
+CreateLiveStreamChatDTO : +text String
+
+class CreateProductDTO
+CreateProductDTO : +name String
+CreateProductDTO : +description String?
+CreateProductDTO : +price double
+CreateProductDTO : +quantity int
+CreateProductDTO : +imageUrl String?
+
+class UpdateProductDTO
+UpdateProductDTO : +name String?
+UpdateProductDTO : +description String?
+UpdateProductDTO : +price double?
+UpdateProductDTO : +quantity int?
+UpdateProductDTO : +imageUrl String?
+
+class CreatePostDTO
+CreatePostDTO : +caption String?
+CreatePostDTO : +productIds List~int~?
+CreatePostDTO : +promoMedias List~MediaModel~?
+
+class UpdatePostDTO
+UpdatePostDTO : +caption String?
+UpdatePostDTO : +productIds List~int~?
+UpdatePostDTO : +promoMedias List~MediaModel~?
+
+class CreateLiveStreamDTO
+CreateLiveStreamDTO : +title String
+CreateLiveStreamDTO : +streamUrl String
+CreateLiveStreamDTO : +thumbnailUrl String?
+CreateLiveStreamDTO : +productIds List~int~?
+
+class UpdateLiveStreamDTO
+UpdateLiveStreamDTO : +title String?
+UpdateLiveStreamDTO : +streamUrl String?
+UpdateLiveStreamDTO : +thumbnailUrl String?
+UpdateLiveStreamDTO : +productIds List~int~?
+
+class LogInDTO
+LogInDTO : +email String
+LogInDTO : +password String
+
+class SignUpDTO
+SignUpDTO : +username String
+SignUpDTO : +email String
+SignUpDTO : +password String
+SignUpDTO : +phone String
+SignUpDTO : +address String
+SignUpDTO : +profileImageUrl String
+SignUpDTO : +bio String
+
+class ChatRoomService
+ChatRoomService : +currentUserId dynamic
+ChatRoomService : -_chatRoomRepository ChatRoomRepository
+ChatRoomService o-- ChatRoomRepository
+ChatRoomService : -_merchantRepository MerchantRepository
+ChatRoomService o-- MerchantRepository
+ChatRoomService : -_chatRepository ChatRepository
+ChatRoomService o-- ChatRepository
+ChatRoomService : -_cache Cache
+ChatRoomService o-- Cache
+ChatRoomService : -_baseCacheKey String
+ChatRoomService : +createChatRoom() dynamic
+ChatRoomService : +getChatRoomId() dynamic
+ChatRoomService : +getAllChatRooms() dynamic
+
+class CartService
+CartService : -_cartRepository CartRepository
+CartService o-- CartRepository
+CartService : -_productRepository ProductRepository
+CartService o-- ProductRepository
+CartService : -_merchantRepository MerchantRepository
+CartService o-- MerchantRepository
+CartService : -_productMediaRepository ProductMediaRepository
+CartService o-- ProductMediaRepository
+CartService : -_cache Cache
+CartService o-- Cache
+CartService : +currentUserId dynamic
+CartService : -_baseCacheKey String
+CartService : +getCarts() dynamic
+CartService : +deleteCart() dynamic
+CartService : +createCart() dynamic
+CartService : +updateCart() dynamic
+
+class PostLikeService
+PostLikeService : +currentUserId dynamic
+PostLikeService : -_postLikeRepository PostLikeRepository
+PostLikeService o-- PostLikeRepository
+PostLikeService : -_cache Cache
+PostLikeService o-- Cache
+PostLikeService : +merchantSideCacheKeyPattern String
+PostLikeService : +likePost() dynamic
+PostLikeService : +unlikePost() dynamic
+
+class OrderService
+OrderService : +currentUserId dynamic
+OrderService : -_orderRepository OrderRepository
+OrderService o-- OrderRepository
+OrderService : -_orderProductRepository OrderProductRepository
+OrderService o-- OrderProductRepository
+OrderService : -_cartRepository CartRepository
+OrderService o-- CartRepository
+OrderService : -_merchantRepository MerchantRepository
+OrderService o-- MerchantRepository
+OrderService : -_productRepository ProductRepository
+OrderService o-- ProductRepository
+OrderService : -_productMediaRepository ProductMediaRepository
+OrderService o-- ProductMediaRepository
+OrderService : -_userRepository UserRepository
+OrderService o-- UserRepository
+OrderService : -_cache Cache
+OrderService o-- Cache
+OrderService : -_baseCacheKey String
+OrderService : +merchantSideCacheKeyPattern String
+OrderService : +getAllOrders() dynamic
+OrderService : +createOrders() dynamic
+
+class ChatService
+ChatService : -_chatRepository ChatRepository
+ChatService o-- ChatRepository
+ChatService : -_cache Cache
+ChatService o-- Cache
+ChatService : +currentUserId dynamic
+ChatService : -_baseCacheKey String
+ChatService : +merchantSideCacheKeyPattern String
+ChatService : +createChat() dynamic
+ChatService : +getChatsByChatRoomId() dynamic
+
+class MerchantService
+MerchantService : +currentUserId dynamic
+MerchantService : -_merchantRepository MerchantRepository
+MerchantService o-- MerchantRepository
+MerchantService : -_postRepository PostRepository
+MerchantService o-- PostRepository
+MerchantService : -_promoMediaRepository PromoMediaRepository
+MerchantService o-- PromoMediaRepository
+MerchantService : -_liveStreamRepository LiveStreamRepository
+MerchantService o-- LiveStreamRepository
+MerchantService : -_productRepository ProductRepository
+MerchantService o-- ProductRepository
+MerchantService : -_productMediaRepository ProductMediaRepository
+MerchantService o-- ProductMediaRepository
+MerchantService : -_cartRepository CartRepository
+MerchantService o-- CartRepository
+MerchantService : -_cache Cache
+MerchantService o-- Cache
+MerchantService : -_baseCacheKey String
+MerchantService : +getMerchantById() dynamic
+MerchantService : +getMerchantPosts() dynamic
+MerchantService : +getMerchantLiveStreams() dynamic
+MerchantService : +getMerchantProducts() dynamic
+
+class LiveStreamService
+LiveStreamService : +currentUserId dynamic
+LiveStreamService : -_liveStreamRepository LiveStreamRepository
+LiveStreamService o-- LiveStreamRepository
+LiveStreamService : -_cache Cache
+LiveStreamService o-- Cache
+LiveStreamService : -_baseCacheKey String
+LiveStreamService : +getLiveStreamById() dynamic
+LiveStreamService : +getAllLiveStreams() dynamic
+
+class LiveStreamProductsService
+LiveStreamProductsService : +currentUserId dynamic
+LiveStreamProductsService : -_liveStreamProductRepository LiveStreamProductRepository
+LiveStreamProductsService o-- LiveStreamProductRepository
+LiveStreamProductsService : -_productRepository ProductRepository
+LiveStreamProductsService o-- ProductRepository
+LiveStreamProductsService : -_productMediaRepository ProductMediaRepository
+LiveStreamProductsService o-- ProductMediaRepository
+LiveStreamProductsService : -_cache Cache
+LiveStreamProductsService o-- Cache
+LiveStreamProductsService : -_baseCacheKey String
+LiveStreamProductsService : +getLiveStreamProductsByLiveStreamId() dynamic
+
+class PostService
+PostService : +currentUserId dynamic
+PostService : -_postRepository PostRepository
+PostService o-- PostRepository
+PostService : -_merchantRepository MerchantRepository
+PostService o-- MerchantRepository
+PostService : -_postProductsRepository PostProductsRepository
+PostService o-- PostProductsRepository
+PostService : -_promoMediaRepository PromoMediaRepository
+PostService o-- PromoMediaRepository
+PostService : -_postLikeRepository PostLikeRepository
+PostService o-- PostLikeRepository
+PostService : -_postSaveRepository PostSaveRepository
+PostService o-- PostSaveRepository
+PostService : -_productRepository ProductRepository
+PostService o-- ProductRepository
+PostService : -_productMediaRepository ProductMediaRepository
+PostService o-- ProductMediaRepository
+PostService : -_productCategoryRepository ProductCategoryRepository
+PostService o-- ProductCategoryRepository
+PostService : -_productCategoryMapsRepository ProductCategoryMapsRepository
+PostService o-- ProductCategoryMapsRepository
+PostService : -_cartRepository CartRepository
+PostService o-- CartRepository
+PostService : -_cache Cache
+PostService o-- Cache
+PostService : -_baseCacheKey String
+PostService : +merchantSideCacheKeyPattern String
+PostService : +getAllPosts() dynamic
+PostService : +createPost() dynamic
+PostService : +getPostById() dynamic
+PostService : +getSimilarPosts() dynamic
+PostService : -_buildPostVMs() dynamic
+PostService : -_getPostsByCategory() dynamic
+
+class UserService
+UserService : +currentUserId int
+UserService : -_userRepository UserRepository
+UserService o-- UserRepository
+UserService : -_postRepository PostRepository
+UserService o-- PostRepository
+UserService : -_postLikeRepository PostLikeRepository
+UserService o-- PostLikeRepository
+UserService : -_postSaveRepository PostSaveRepository
+UserService o-- PostSaveRepository
+UserService : -_promoMediaRepository PromoMediaRepository
+UserService o-- PromoMediaRepository
+UserService : -_cache Cache
+UserService o-- Cache
+UserService : -_baseCacheKey String
+UserService : +getUserById() dynamic
+UserService : +getUserProfile() dynamic
+UserService : +getLikedPosts() dynamic
+UserService : +getSavedPosts() dynamic
+
+class PostSaveService
+PostSaveService : +currentUserId dynamic
+PostSaveService : -_cache Cache
+PostSaveService o-- Cache
+PostSaveService : +merchantSideCacheKeyPattern String
+PostSaveService : -_postSaveRepository PostSaveRepository
+PostSaveService o-- PostSaveRepository
+PostSaveService : +savePost() dynamic
+PostSaveService : +unsavePost() dynamic
+
+class LiveStreamChatService
+LiveStreamChatService : +currentUserId dynamic
+LiveStreamChatService : -_liveStreamChatRepository LiveStreamChatRepository
+LiveStreamChatService o-- LiveStreamChatRepository
+LiveStreamChatService : -_userRepository UserRepository
+LiveStreamChatService o-- UserRepository
+LiveStreamChatService : -_cache Cache
+LiveStreamChatService o-- Cache
+LiveStreamChatService : -_baseCacheKey String
+LiveStreamChatService : +merchantSideCacheKeyPattern String
+LiveStreamChatService : +getAllLiveStreamChatByLiveStreamId() dynamic
+LiveStreamChatService : +createLiveStreamChat() dynamic
+
+class AuthService
+AuthService : +login() dynamic
+AuthService : +signUpUser() dynamic
+AuthService : +logout() dynamic
+
+class ChatRoomService
+ChatRoomService : +currentMerchantId dynamic
+ChatRoomService : -_chatRoomRepository ChatRoomRepository
+ChatRoomService o-- ChatRoomRepository
+ChatRoomService : -_userRepository UserRepository
+ChatRoomService o-- UserRepository
+ChatRoomService : -_chatRepository ChatRepository
+ChatRoomService o-- ChatRepository
+ChatRoomService : -_cache Cache
+ChatRoomService o-- Cache
+ChatRoomService : -_baseCacheKey String
+ChatRoomService : +getAllChatRooms() dynamic
+
+class ProductService
+ProductService : +currentMerchantId dynamic
+ProductService : -_productRepository ProductRepository
+ProductService o-- ProductRepository
+ProductService : -_productMediaRepository ProductMediaRepository
+ProductService o-- ProductMediaRepository
+ProductService : -_cache Cache
+ProductService o-- Cache
+ProductService : -_baseCacheKey String
+ProductService : +userSideCacheKeyPattern String
+ProductService : +getAllProducts() dynamic
+ProductService : +getAllProductsForCurrentMerchant() dynamic
+ProductService : +createProduct() dynamic
+ProductService : +getProductById() dynamic
+ProductService : +updateProduct() dynamic
+ProductService : +deleteProduct() dynamic
+
+class OrderService
+OrderService : +currentMerchantId dynamic
+OrderService : -_orderRepository OrderRepository
+OrderService o-- OrderRepository
+OrderService : -_orderProductRepository OrderProductRepository
+OrderService o-- OrderProductRepository
+OrderService : -_productRepository ProductRepository
+OrderService o-- ProductRepository
+OrderService : -_productMediaRepository ProductMediaRepository
+OrderService o-- ProductMediaRepository
+OrderService : -_cache Cache
+OrderService o-- Cache
+OrderService : -_baseCacheKey String
+OrderService : +userSideCacheKeyPattern String
+OrderService : +getAllOrders() dynamic
+OrderService : +updateOrder() dynamic
+OrderService : +deleteOrder() dynamic
+
+class ChatService
+ChatService : -_chatRepository ChatRepository
+ChatService o-- ChatRepository
+ChatService : -_cache Cache
+ChatService o-- Cache
+ChatService : +currentMerchantId dynamic
+ChatService : -_baseCacheKey String
+ChatService : +userSideCacheKeyPattern String
+ChatService : +createChat() dynamic
+ChatService : +getChatsByChatRoomId() dynamic
+
+class LiveStreamService
+LiveStreamService : +currentMerchantId dynamic
+LiveStreamService : -_liveStreamRepository LiveStreamRepository
+LiveStreamService o-- LiveStreamRepository
+LiveStreamService : -_liveStreamChatRepository LiveStreamChatRepository
+LiveStreamService o-- LiveStreamChatRepository
+LiveStreamService : -_liveStreamProductRepository LiveStreamProductRepository
+LiveStreamService o-- LiveStreamProductRepository
+LiveStreamService : -_productRepository ProductRepository
+LiveStreamService o-- ProductRepository
+LiveStreamService : -_productMediaRepository ProductMediaRepository
+LiveStreamService o-- ProductMediaRepository
+LiveStreamService : -_cache Cache
+LiveStreamService o-- Cache
+LiveStreamService : -_baseCacheKey String
+LiveStreamService : +userSideCacheKeyPattern String
+LiveStreamService : +getAllLiveStreams() dynamic
+LiveStreamService : +getLiveStreamById() dynamic
+LiveStreamService : +createLiveStream() dynamic
+LiveStreamService : +updateLiveStream() dynamic
+LiveStreamService : +deleteLiveStream() dynamic
+
+class PostService
+PostService : +currentMerchantId dynamic
+PostService : -_postRepository PostRepository
+PostService o-- PostRepository
+PostService : -_merchantRepository MerchantRepository
+PostService o-- MerchantRepository
+PostService : -_postProductsRepository PostProductsRepository
+PostService o-- PostProductsRepository
+PostService : -_promoMediaRepository PromoMediaRepository
+PostService o-- PromoMediaRepository
+PostService : -_postLikeRepository PostLikeRepository
+PostService o-- PostLikeRepository
+PostService : -_postSaveRepository PostSaveRepository
+PostService o-- PostSaveRepository
+PostService : -_productRepository ProductRepository
+PostService o-- ProductRepository
+PostService : -_productMediaRepository ProductMediaRepository
+PostService o-- ProductMediaRepository
+PostService : -_productCategoryRepository ProductCategoryRepository
+PostService o-- ProductCategoryRepository
+PostService : -_productCategoryMapsRepository ProductCategoryMapsRepository
+PostService o-- ProductCategoryMapsRepository
+PostService : -_cartRepository CartRepository
+PostService o-- CartRepository
+PostService : -_cache Cache
+PostService o-- Cache
+PostService : -_baseCacheKey String
+PostService : +userSideCacheKeyPattern String
+PostService : +getAllPosts() dynamic
+PostService : +getAllPostsForCurrentMerchant() dynamic
+PostService : +createPost() dynamic
+PostService : +getPostById() dynamic
+PostService : +updatePost() dynamic
+PostService : +deletePost() dynamic
+PostService : -_buildPostVMs() dynamic
+PostService : -_getPostsByCategory() dynamic
+PostService : -_getPostsByCategoryForCurrentMerchant() dynamic
+

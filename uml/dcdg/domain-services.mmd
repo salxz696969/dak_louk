@@ -1,0 +1,327 @@
+%% DAK LOUK DOMAIN – SERVICES (merchant / user)
+classDiagram
+class ChatRoomService
+ChatRoomService : +currentUserId dynamic
+ChatRoomService : -_chatRoomRepository ChatRoomRepository
+ChatRoomService o-- ChatRoomRepository
+ChatRoomService : -_merchantRepository MerchantRepository
+ChatRoomService o-- MerchantRepository
+ChatRoomService : -_chatRepository ChatRepository
+ChatRoomService o-- ChatRepository
+ChatRoomService : -_cache Cache
+ChatRoomService o-- Cache
+ChatRoomService : -_baseCacheKey String
+ChatRoomService : +createChatRoom() dynamic
+ChatRoomService : +getChatRoomId() dynamic
+ChatRoomService : +getAllChatRooms() dynamic
+
+class CartService
+CartService : -_cartRepository CartRepository
+CartService o-- CartRepository
+CartService : -_productRepository ProductRepository
+CartService o-- ProductRepository
+CartService : -_merchantRepository MerchantRepository
+CartService o-- MerchantRepository
+CartService : -_productMediaRepository ProductMediaRepository
+CartService o-- ProductMediaRepository
+CartService : -_cache Cache
+CartService o-- Cache
+CartService : +currentUserId dynamic
+CartService : -_baseCacheKey String
+CartService : +getCarts() dynamic
+CartService : +deleteCart() dynamic
+CartService : +createCart() dynamic
+CartService : +updateCart() dynamic
+
+class PostLikeService
+PostLikeService : +currentUserId dynamic
+PostLikeService : -_postLikeRepository PostLikeRepository
+PostLikeService o-- PostLikeRepository
+PostLikeService : -_cache Cache
+PostLikeService o-- Cache
+PostLikeService : +merchantSideCacheKeyPattern String
+PostLikeService : +likePost() dynamic
+PostLikeService : +unlikePost() dynamic
+
+class OrderService
+OrderService : +currentUserId dynamic
+OrderService : -_orderRepository OrderRepository
+OrderService o-- OrderRepository
+OrderService : -_orderProductRepository OrderProductRepository
+OrderService o-- OrderProductRepository
+OrderService : -_cartRepository CartRepository
+OrderService o-- CartRepository
+OrderService : -_merchantRepository MerchantRepository
+OrderService o-- MerchantRepository
+OrderService : -_productRepository ProductRepository
+OrderService o-- ProductRepository
+OrderService : -_productMediaRepository ProductMediaRepository
+OrderService o-- ProductMediaRepository
+OrderService : -_userRepository UserRepository
+OrderService o-- UserRepository
+OrderService : -_cache Cache
+OrderService o-- Cache
+OrderService : -_baseCacheKey String
+OrderService : +merchantSideCacheKeyPattern String
+OrderService : +getAllOrders() dynamic
+OrderService : +createOrders() dynamic
+
+class ChatService
+ChatService : -_chatRepository ChatRepository
+ChatService o-- ChatRepository
+ChatService : -_cache Cache
+ChatService o-- Cache
+ChatService : +currentUserId dynamic
+ChatService : -_baseCacheKey String
+ChatService : +merchantSideCacheKeyPattern String
+ChatService : +createChat() dynamic
+ChatService : +getChatsByChatRoomId() dynamic
+
+class MerchantService
+MerchantService : +currentUserId dynamic
+MerchantService : -_merchantRepository MerchantRepository
+MerchantService o-- MerchantRepository
+MerchantService : -_postRepository PostRepository
+MerchantService o-- PostRepository
+MerchantService : -_promoMediaRepository PromoMediaRepository
+MerchantService o-- PromoMediaRepository
+MerchantService : -_liveStreamRepository LiveStreamRepository
+MerchantService o-- LiveStreamRepository
+MerchantService : -_productRepository ProductRepository
+MerchantService o-- ProductRepository
+MerchantService : -_productMediaRepository ProductMediaRepository
+MerchantService o-- ProductMediaRepository
+MerchantService : -_cartRepository CartRepository
+MerchantService o-- CartRepository
+MerchantService : -_cache Cache
+MerchantService o-- Cache
+MerchantService : -_baseCacheKey String
+MerchantService : +getMerchantById() dynamic
+MerchantService : +getMerchantPosts() dynamic
+MerchantService : +getMerchantLiveStreams() dynamic
+MerchantService : +getMerchantProducts() dynamic
+
+class LiveStreamService
+LiveStreamService : +currentUserId dynamic
+LiveStreamService : -_liveStreamRepository LiveStreamRepository
+LiveStreamService o-- LiveStreamRepository
+LiveStreamService : -_cache Cache
+LiveStreamService o-- Cache
+LiveStreamService : -_baseCacheKey String
+LiveStreamService : +getLiveStreamById() dynamic
+LiveStreamService : +getAllLiveStreams() dynamic
+
+class LiveStreamProductsService
+LiveStreamProductsService : +currentUserId dynamic
+LiveStreamProductsService : -_liveStreamProductRepository LiveStreamProductRepository
+LiveStreamProductsService o-- LiveStreamProductRepository
+LiveStreamProductsService : -_productRepository ProductRepository
+LiveStreamProductsService o-- ProductRepository
+LiveStreamProductsService : -_productMediaRepository ProductMediaRepository
+LiveStreamProductsService o-- ProductMediaRepository
+LiveStreamProductsService : -_cache Cache
+LiveStreamProductsService o-- Cache
+LiveStreamProductsService : -_baseCacheKey String
+LiveStreamProductsService : +getLiveStreamProductsByLiveStreamId() dynamic
+
+class PostService
+PostService : +currentUserId dynamic
+PostService : -_postRepository PostRepository
+PostService o-- PostRepository
+PostService : -_merchantRepository MerchantRepository
+PostService o-- PostRepository
+PostService : -_postProductsRepository PostProductsRepository
+PostService o-- PostProductsRepository
+PostService : -_promoMediaRepository PromoMediaRepository
+PostService o-- PromoMediaRepository
+PostService : -_postLikeRepository PostLikeRepository
+PostService o-- PostLikeRepository
+PostService : -_postSaveRepository PostSaveRepository
+PostService o-- PostSaveRepository
+PostService : -_productRepository ProductRepository
+PostService o-- ProductRepository
+PostService : -_productMediaRepository ProductMediaRepository
+PostService o-- ProductMediaRepository
+PostService : -_productCategoryRepository ProductCategoryRepository
+PostService o-- ProductCategoryRepository
+PostService : -_productCategoryMapsRepository ProductCategoryMapsRepository
+PostService o-- ProductCategoryMapsRepository
+PostService : -_cartRepository CartRepository
+PostService o-- CartRepository
+PostService : -_cache Cache
+PostService o-- Cache
+PostService : -_baseCacheKey String
+PostService : +merchantSideCacheKeyPattern String
+PostService : +getAllPosts() dynamic
+PostService : +createPost() dynamic
+PostService : +getPostById() dynamic
+PostService : +getSimilarPosts() dynamic
+PostService : -_buildPostVMs() dynamic
+PostService : -_getPostsByCategory() dynamic
+
+class UserService
+UserService : +currentUserId int
+UserService : -_userRepository UserRepository
+UserService o-- UserRepository
+UserService : -_postRepository PostRepository
+UserService o-- PostRepository
+UserService : -_postLikeRepository PostLikeRepository
+UserService o-- PostLikeRepository
+UserService : -_postSaveRepository PostSaveRepository
+UserService o-- PostSaveRepository
+UserService : -_promoMediaRepository PromoMediaRepository
+UserService o-- PromoMediaRepository
+UserService : -_cache Cache
+UserService o-- Cache
+UserService : -_baseCacheKey String
+UserService : +getUserById() dynamic
+UserService : +getUserProfile() dynamic
+UserService : +getLikedPosts() dynamic
+UserService : +getSavedPosts() dynamic
+
+class PostSaveService
+PostSaveService : +currentUserId dynamic
+PostSaveService : -_cache Cache
+PostSaveService o-- Cache
+PostSaveService : +merchantSideCacheKeyPattern String
+PostSaveService : -_postSaveRepository PostSaveRepository
+PostSaveService o-- PostSaveRepository
+PostSaveService : +savePost() dynamic
+PostSaveService : +unsavePost() dynamic
+
+class LiveStreamChatService
+LiveStreamChatService : +currentUserId dynamic
+LiveStreamChatService : -_liveStreamChatRepository LiveStreamChatRepository
+LiveStreamChatService o-- LiveStreamChatRepository
+LiveStreamChatService : -_userRepository UserRepository
+LiveStreamChatService o-- UserRepository
+LiveStreamChatService : -_cache Cache
+LiveStreamChatService o-- Cache
+LiveStreamChatService : -_baseCacheKey String
+LiveStreamChatService : +merchantSideCacheKeyPattern String
+LiveStreamChatService : +getAllLiveStreamChatByLiveStreamId() dynamic
+LiveStreamChatService : +createLiveStreamChat() dynamic
+
+class AuthService
+AuthService : +login() dynamic
+AuthService : +signUpUser() dynamic
+AuthService : +logout() dynamic
+
+class ChatRoomService
+ChatRoomService : +currentMerchantId dynamic
+ChatRoomService : -_chatRoomRepository ChatRoomRepository
+ChatRoomService o-- ChatRoomRepository
+ChatRoomService : -_userRepository UserRepository
+ChatRoomService o-- UserRepository
+ChatRoomService : -_chatRepository ChatRepository
+ChatRoomService o-- ChatRepository
+ChatRoomService : -_cache Cache
+ChatRoomService o-- Cache
+ChatRoomService : -_baseCacheKey String
+ChatRoomService : +getAllChatRooms() dynamic
+
+class ProductService
+ProductService : +currentMerchantId dynamic
+ProductService : -_productRepository ProductRepository
+ProductService o-- ProductRepository
+ProductService : -_productMediaRepository ProductMediaRepository
+ProductService o-- ProductMediaRepository
+ProductService : -_cache Cache
+ProductService o-- Cache
+ProductService : -_baseCacheKey String
+ProductService : +userSideCacheKeyPattern String
+ProductService : +getAllProducts() dynamic
+ProductService : +getAllProductsForCurrentMerchant() dynamic
+ProductService : +createProduct() dynamic
+ProductService : +getProductById() dynamic
+ProductService : +updateProduct() dynamic
+ProductService : +deleteProduct() dynamic
+
+class OrderService
+OrderService : +currentMerchantId dynamic
+OrderService : -_orderRepository OrderRepository
+OrderService o-- OrderRepository
+OrderService : -_orderProductRepository OrderProductRepository
+OrderService o-- OrderProductRepository
+OrderService : -_productRepository ProductRepository
+OrderService o-- ProductRepository
+OrderService : -_productMediaRepository ProductMediaRepository
+OrderService o-- ProductMediaRepository
+OrderService : -_cache Cache
+OrderService o-- Cache
+OrderService : -_baseCacheKey String
+OrderService : +userSideCacheKeyPattern String
+OrderService : +getAllOrders() dynamic
+OrderService : +updateOrder() dynamic
+OrderService : +deleteOrder() dynamic
+
+class ChatService
+ChatService : -_chatRepository ChatRepository
+ChatService o-- ChatRepository
+ChatService : -_cache Cache
+ChatService o-- Cache
+ChatService : +currentMerchantId dynamic
+ChatService : -_baseCacheKey String
+ChatService : +userSideCacheKeyPattern String
+ChatService : +createChat() dynamic
+ChatService : +getChatsByChatRoomId() dynamic
+
+class LiveStreamService
+LiveStreamService : +currentMerchantId dynamic
+LiveStreamService : -_liveStreamRepository LiveStreamRepository
+LiveStreamService o-- LiveStreamRepository
+LiveStreamService : -_liveStreamChatRepository LiveStreamChatRepository
+LiveStreamService o-- LiveStreamChatRepository
+LiveStreamService : -_liveStreamProductRepository LiveStreamProductRepository
+LiveStreamService o-- LiveStreamProductRepository
+LiveStreamService : -_productRepository ProductRepository
+LiveStreamService o-- ProductRepository
+LiveStreamService : -_productMediaRepository ProductMediaRepository
+LiveStreamService o-- ProductMediaRepository
+LiveStreamService : -_cache Cache
+LiveStreamService o-- Cache
+LiveStreamService : -_baseCacheKey String
+LiveStreamService : +userSideCacheKeyPattern String
+LiveStreamService : +getAllLiveStreams() dynamic
+LiveStreamService : +getLiveStreamById() dynamic
+LiveStreamService : +createLiveStream() dynamic
+LiveStreamService : +updateLiveStream() dynamic
+LiveStreamService : +deleteLiveStream() dynamic
+
+class PostService
+PostService : +currentMerchantId dynamic
+PostService : -_postRepository PostRepository
+PostService o-- PostRepository
+PostService : -_merchantRepository MerchantRepository
+PostService o-- MerchantRepository
+PostService : -_postProductsRepository PostProductsRepository
+PostService o-- PostProductsRepository
+PostService : -_promoMediaRepository PromoMediaRepository
+PostService o-- PromoMediaRepository
+PostService : -_postLikeRepository PostLikeRepository
+PostService o-- PostLikeRepository
+PostService : -_postSaveRepository PostSaveRepository
+PostService o-- PostSaveRepository
+PostService : -_productRepository ProductRepository
+PostService o-- ProductRepository
+PostService : -_productMediaRepository ProductMediaRepository
+PostService o-- ProductMediaRepository
+PostService : -_productCategoryRepository ProductCategoryRepository
+PostService o-- ProductCategoryRepository
+PostService : -_productCategoryMapsRepository ProductCategoryMapsRepository
+PostService o-- ProductCategoryMapsRepository
+PostService : -_cartRepository CartRepository
+PostService o-- CartRepository
+PostService : -_cache Cache
+PostService o-- Cache
+PostService : -_baseCacheKey String
+PostService : +userSideCacheKeyPattern String
+PostService : +getAllPosts() dynamic
+PostService : +getAllPostsForCurrentMerchant() dynamic
+PostService : +createPost() dynamic
+PostService : +getPostById() dynamic
+PostService : +updatePost() dynamic
+PostService : +deletePost() dynamic
+PostService : -_buildPostVMs() dynamic
+PostService : -_getPostsByCategory() dynamic
+PostService : -_getPostsByCategoryForCurrentMerchant() dynamic

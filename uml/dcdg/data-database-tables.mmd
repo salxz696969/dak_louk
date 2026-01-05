@@ -1,0 +1,384 @@
+%% DAK LOUK DATA – DATABASE / TABLES
+classDiagram
+class ProductCategoryMapsTable
+ProductCategoryMapsTable : +tableName String
+ProductCategoryMapsTable : +cols ProductCategoryMapsCols
+ProductCategoryMapsTable o-- ProductCategoryMapsCols
+DbTable <|.. ProductCategoryMapsTable
+
+class ProductCategoryMapsCols
+ProductCategoryMapsCols : +productIdCol$ String
+ProductCategoryMapsCols : +categoryIdCol$ String
+ProductCategoryMapsCols : +productId String
+ProductCategoryMapsCols : +categoryId String
+BaseCols <|-- ProductCategoryMapsCols
+
+class ChatRoomsTable
+ChatRoomsTable : +tableName String
+ChatRoomsTable : +cols ChatRoomsCols
+ChatRoomsTable o-- ChatRoomsCols
+DbTable <|.. ChatRoomsTable
+
+class ChatRoomsCols
+ChatRoomsCols : +userIdCol$ String
+ChatRoomsCols : +merchantIdCol$ String
+ChatRoomsCols : +userId String
+ChatRoomsCols : +merchantId String
+BaseCols <|-- ChatRoomsCols
+
+class OrderProductsTable
+OrderProductsTable : +tableName String
+OrderProductsTable : +cols OrderProductsCols
+OrderProductsTable o-- OrderProductsCols
+DbTable <|.. OrderProductsTable
+
+class OrderProductsCols
+OrderProductsCols : +orderIdCol$ String
+OrderProductsCols : +productIdCol$ String
+OrderProductsCols : +quantityCol$ String
+OrderProductsCols : +orderId String
+OrderProductsCols : +productId String
+OrderProductsCols : +quantity String
+BaseCols <|-- OrderProductsCols
+
+class ReviewsTable
+ReviewsTable : +tableName String
+ReviewsTable : +cols ReviewsCols
+ReviewsTable o-- ReviewsCols
+DbTable <|.. ReviewsTable
+
+class ReviewsCols
+ReviewsCols : +userIdCol$ String
+ReviewsCols : +merchantIdCol$ String
+ReviewsCols : +textCol$ String
+ReviewsCols : +ratingCol$ String
+ReviewsCols : +userId String
+ReviewsCols : +merchantId String
+ReviewsCols : +text String
+ReviewsCols : +rating String
+BaseCols <|-- ReviewsCols
+
+class MerchantsTable
+MerchantsTable : +tableName String
+MerchantsTable : +cols MerchantsCols
+MerchantsTable o-- MerchantsCols
+DbTable <|.. MerchantsTable
+
+class MerchantsCols
+MerchantsCols : +userIdCol$ String
+MerchantsCols : +ratingCol$ String
+MerchantsCols : +usernameCol$ String
+MerchantsCols : +bioCol$ String
+MerchantsCols : +emailCol$ String
+MerchantsCols : +profileImageCol$ String
+MerchantsCols : +passwordHashCol$ String
+MerchantsCols : +userId String
+MerchantsCols : +rating String
+MerchantsCols : +username String
+MerchantsCols : +email String
+MerchantsCols : +bio String
+MerchantsCols : +profileImage String
+MerchantsCols : +passwordHash String
+BaseCols <|-- MerchantsCols
+
+class ProductMediasTable
+ProductMediasTable : +tableName String
+ProductMediasTable : +cols ProductMediasCols
+ProductMediasTable o-- ProductMediasCols
+DbTable <|.. ProductMediasTable
+
+class ProductMediasCols
+ProductMediasCols : +productIdCol$ String
+ProductMediasCols : +urlCol$ String
+ProductMediasCols : +mediaTypeCol$ String
+ProductMediasCols : +productId String
+ProductMediasCols : +url String
+ProductMediasCols : +mediaType String
+BaseCols <|-- ProductMediasCols
+
+class UsersTable
+UsersTable : +tableName String
+UsersTable : +cols UsersCols
+UsersTable o-- UsersCols
+DbTable <|.. UsersTable
+
+class UsersCols
+UsersCols : +usernameCol$ String
+UsersCols : +emailCol$ String
+UsersCols : +passwordHashCol$ String
+UsersCols : +phoneCol$ String
+UsersCols : +addressCol$ String
+UsersCols : +notesCol$ String
+UsersCols : +profileImageUrlCol$ String
+UsersCols : +bioCol$ String
+UsersCols : +username String
+UsersCols : +email String
+UsersCols : +passwordHash String
+UsersCols : +phone String
+UsersCols : +address String
+UsersCols : +notes String
+UsersCols : +profileImageUrl String
+UsersCols : +bio String
+BaseCols <|-- UsersCols
+
+class LiveStreamProductsTable
+LiveStreamProductsTable : +tableName String
+LiveStreamProductsTable : +cols LiveStreamProductsCols
+LiveStreamProductsTable o-- LiveStreamProductsCols
+DbTable <|.. LiveStreamProductsTable
+
+class LiveStreamProductsCols
+LiveStreamProductsCols : +liveStreamIdCol$ String
+LiveStreamProductsCols : +productIdCol$ String
+LiveStreamProductsCols : +liveStreamId String
+LiveStreamProductsCols : +productId String
+BaseCols <|-- LiveStreamProductsCols
+
+class ProductsTable
+ProductsTable : +tableName String
+ProductsTable : +cols ProductsCols
+ProductsTable o-- ProductsCols
+DbTable <|.. ProductsTable
+
+class ProductsCols
+ProductsCols : +merchantIdCol$ String
+ProductsCols : +nameCol$ String
+ProductsCols : +descriptionCol$ String
+ProductsCols : +priceCol$ String
+ProductsCols : +quantityCol$ String
+ProductsCols : +merchantId String
+ProductsCols : +name String
+ProductsCols : +description String
+ProductsCols : +price String
+ProductsCols : +quantity String
+BaseCols <|-- ProductsCols
+
+class PostSavesTable
+PostSavesTable : +tableName String
+PostSavesTable : +cols PostSavesCols
+PostSavesTable o-- PostSavesCols
+DbTable <|.. PostSavesTable
+
+class PostSavesCols
+PostSavesCols : +userIdCol$ String
+PostSavesCols : +postIdCol$ String
+PostSavesCols : +userId String
+PostSavesCols : +postId String
+BaseCols <|-- PostSavesCols
+
+class LiveStreamsTable
+LiveStreamsTable : +tableName String
+LiveStreamsTable : +cols LiveStreamsCols
+LiveStreamsTable o-- LiveStreamsCols
+DbTable <|.. LiveStreamsTable
+
+class LiveStreamsCols
+LiveStreamsCols : +merchantIdCol$ String
+LiveStreamsCols : +titleCol$ String
+LiveStreamsCols : +streamUrlCol$ String
+LiveStreamsCols : +thumbnailUrlCol$ String
+LiveStreamsCols : +viewCountCol$ String
+LiveStreamsCols : +merchantId String
+LiveStreamsCols : +title String
+LiveStreamsCols : +streamUrl String
+LiveStreamsCols : +thumbnailUrl String
+LiveStreamsCols : +viewCount String
+BaseCols <|-- LiveStreamsCols
+
+class ChatsTable
+ChatsTable : +tableName String
+ChatsTable : +cols ChatsCols
+ChatsTable o-- ChatsCols
+DbTable <|.. ChatsTable
+
+class ChatsCols
+ChatsCols : +chatRoomIdCol$ String
+ChatsCols : +senderIdCol$ String
+ChatsCols : +textCol$ String
+ChatsCols : +chatRoomId String
+ChatsCols : +senderId String
+ChatsCols : +text String
+BaseCols <|-- ChatsCols
+
+class CartsTable
+CartsTable : +tableName String
+CartsTable : +cols CartsCols
+CartsTable o-- CartsCols
+DbTable <|.. CartsTable
+
+class CartsCols
+CartsCols : +userIdCol$ String
+CartsCols : +productIdCol$ String
+CartsCols : +quantityCol$ String
+CartsCols : +userId String
+CartsCols : +productId String
+CartsCols : +quantity String
+BaseCols <|-- CartsCols
+
+class PromoMediasTable
+PromoMediasTable : +tableName String
+PromoMediasTable : +cols PromoMediasCols
+PromoMediasTable o-- PromoMediasCols
+DbTable <|.. PromoMediasTable
+
+class PromoMediasCols
+PromoMediasCols : +postIdCol$ String
+PromoMediasCols : +urlCol$ String
+PromoMediasCols : +mediaTypeCol$ String
+PromoMediasCols : +postId String
+PromoMediasCols : +url String
+PromoMediasCols : +mediaType String
+BaseCols <|-- PromoMediasCols
+
+class OrdersTable
+OrdersTable : +tableName String
+OrdersTable : +cols OrdersCols
+OrdersTable o-- OrdersCols
+DbTable <|.. OrdersTable
+
+class OrdersCols
+OrdersCols : +userIdCol$ String
+OrdersCols : +merchantIdCol$ String
+OrdersCols : +statusCol$ String
+OrdersCols : +userId String
+OrdersCols : +merchantId String
+OrdersCols : +status String
+BaseCols <|-- OrdersCols
+
+class PostProductsTable
+PostProductsTable : +tableName String
+PostProductsTable : +cols PostProductsCols
+PostProductsTable o-- PostProductsCols
+DbTable <|.. PostProductsTable
+
+class PostProductsCols
+PostProductsCols : +postIdCol$ String
+PostProductsCols : +productIdCol$ String
+PostProductsCols : +postId String
+PostProductsCols : +productId String
+BaseCols <|-- PostProductsCols
+
+class FollowersTable
+FollowersTable : +tableName String
+FollowersTable : +cols FollowersCols
+FollowersTable o-- FollowersCols
+DbTable <|.. FollowersTable
+
+class FollowersCols
+FollowersCols : +followerIdCol$ String
+FollowersCols : +followedIdCol$ String
+FollowersCols : +followerId String
+FollowersCols : +followedId String
+BaseCols <|-- FollowersCols
+
+class Tables
+Tables : +users$ UsersTable
+Tables o-- UsersTable
+Tables : +merchants$ MerchantsTable
+Tables o-- MerchantsTable
+Tables : +productCategories$ ProductCategoriesTable
+Tables o-- ProductCategoriesTable
+Tables : +products$ ProductsTable
+Tables o-- ProductsTable
+Tables : +productCategoryMaps$ ProductCategoryMapsTable
+Tables o-- ProductCategoryMapsTable
+Tables : +productMedias$ ProductMediasTable
+Tables o-- ProductMediasTable
+Tables : +posts$ PostsTable
+Tables o-- PostsTable
+Tables : +postProducts$ PostProductsTable
+Tables o-- PostProductsTable
+Tables : +promoMedias$ PromoMediasTable
+Tables o-- PromoMediasTable
+Tables : +postLikes$ PostLikesTable
+Tables o-- PostLikesTable
+Tables : +postSaves$ PostSavesTable
+Tables o-- PostSavesTable
+Tables : +liveStreams$ LiveStreamsTable
+Tables o-- LiveStreamsTable
+Tables : +liveStreamProducts$ LiveStreamProductsTable
+Tables o-- LiveStreamProductsTable
+Tables : +liveStreamChats$ LiveStreamChatsTable
+Tables o-- LiveStreamChatsTable
+Tables : +chatRooms$ ChatRoomsTable
+Tables o-- ChatRoomsTable
+Tables : +chats$ ChatsTable
+Tables o-- ChatsTable
+Tables : +carts$ CartsTable
+Tables o-- CartsTable
+Tables : +orders$ OrdersTable
+Tables o-- OrdersTable
+Tables : +orderProducts$ OrderProductsTable
+Tables o-- OrderProductsTable
+Tables : +reviews$ ReviewsTable
+Tables o-- ReviewsTable
+Tables : +followers$ FollowersTable
+Tables o-- FollowersTable
+Tables : +id$ String
+
+class DbTable
+<<abstract>> DbTable
+DbTable : +tableName String
+DbTable : +cols T
+
+class BaseCols
+<<abstract>> BaseCols
+BaseCols : +idCol$ String
+BaseCols : +createdAtCol$ String
+BaseCols : +updatedAtCol$ String
+BaseCols : +id String
+BaseCols : +createdAt String
+BaseCols : +updatedAt String
+
+class LiveStreamChatsTable
+LiveStreamChatsTable : +tableName String
+LiveStreamChatsTable : +cols LiveStreamChatsCols
+LiveStreamChatsTable o-- LiveStreamChatsCols
+DbTable <|.. LiveStreamChatsTable
+
+class LiveStreamChatsCols
+LiveStreamChatsCols : +liveStreamIdCol$ String
+LiveStreamChatsCols : +userIdCol$ String
+LiveStreamChatsCols : +textCol$ String
+LiveStreamChatsCols : +liveStreamId String
+LiveStreamChatsCols : +userId String
+LiveStreamChatsCols : +text String
+BaseCols <|-- LiveStreamChatsCols
+
+class PostLikesTable
+PostLikesTable : +tableName String
+PostLikesTable : +cols PostLikesCols
+PostLikesTable o-- PostLikesCols
+DbTable <|.. PostLikesTable
+
+class PostLikesCols
+PostLikesCols : +userIdCol$ String
+PostLikesCols : +postIdCol$ String
+PostLikesCols : +userId String
+PostLikesCols : +postId String
+BaseCols <|-- PostLikesCols
+
+class ProductCategoriesTable
+ProductCategoriesTable : +tableName String
+ProductCategoriesTable : +cols ProductCategoriesCols
+ProductCategoriesTable o-- ProductCategoriesCols
+DbTable <|.. ProductCategoriesTable
+
+class ProductCategoriesCols
+ProductCategoriesCols : +nameCol$ String
+ProductCategoriesCols : +name String
+BaseCols <|-- ProductCategoriesCols
+
+class PostsTable
+PostsTable : +tableName String
+PostsTable : +cols PostsCols
+PostsTable o-- PostsCols
+DbTable <|.. PostsTable
+
+class PostsCols
+PostsCols : +merchantIdCol$ String
+PostsCols : +captionCol$ String
+PostsCols : +merchantId String
+PostsCols : +caption String
+BaseCols <|-- PostsCols
+

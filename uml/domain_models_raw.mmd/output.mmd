@@ -1,0 +1,192 @@
+classDiagram
+class ProductModel 
+id: int
+merchantId: int
+name: String
+description: String?
+price: double
+quantity: int
+createdAt: DateTime
+updatedAt: DateTime
+
+Cacheable <|-- ProductModel
+ProductModel ..> DateTime
+class OrderProductModel 
+id: int
+orderId: int
+productId: int
+quantity: int
+
+Cacheable <|-- OrderProductModel
+class CartModel 
+id: int
+userId: int
+productId: int
+quantity: int
+createdAt: String
+updatedAt: String
+
+Cacheable <|-- CartModel
+class UserModel 
+id: int
+username: String
+passwordHash: String
+profileImageUrl: String?
+phone: String?
+address: String?
+bio: String?
+createdAt: DateTime
+updatedAt: DateTime
+
+Cacheable <|-- UserModel
+UserModel ..> DateTime
+class MerchantModel 
+id: int
+userId: int
+rating: double
+username: String
+email: String
+bio: String
+profileImage: String
+createdAt: DateTime
+updatedAt: DateTime
+
+Cacheable <|-- MerchantModel
+MerchantModel ..> DateTime
+class OrderModel 
+id: int
+userId: int
+merchantId: int
+status: String
+createdAt: DateTime
+updatedAt: DateTime
+
+Cacheable <|-- OrderModel
+OrderModel ..> DateTime
+class PostSaveModel 
+id: int
+userId: int
+postId: int
+createdAt: DateTime
+updatedAt: DateTime
+
+Cacheable <|-- PostSaveModel
+PostSaveModel ..> DateTime
+class PostModel 
+id: int
+merchantId: int
+caption: String?
+createdAt: DateTime
+updatedAt: DateTime
+
+Cacheable <|-- PostModel
+PostModel ..> DateTime
+class ProductMediaModel 
+id: int
+productId: int
+url: String
+mediaType: String?
+createdAt: DateTime
+updatedAt: DateTime
+
+Cacheable <|-- ProductMediaModel
+ProductMediaModel ..> DateTime
+class FollowerModel 
+id: int
+followerId: int
+followedId: int
+createdAt: DateTime
+updatedAt: DateTime
+
+Cacheable <|-- FollowerModel
+FollowerModel ..> DateTime
+class LiveStreamProductModel 
+id: int
+liveStreamId: int
+productId: int
+
+Cacheable <|-- LiveStreamProductModel
+class PromoMediaModel 
+id: int
+postId: int
+url: String
+mediaType: String
+createdAt: DateTime
+updatedAt: DateTime
+
+Cacheable <|-- PromoMediaModel
+PromoMediaModel ..> DateTime
+class PostLikeModel 
+id: int
+userId: int
+postId: int
+createdAt: DateTime
+updatedAt: DateTime
+
+Cacheable <|-- PostLikeModel
+PostLikeModel ..> DateTime
+class LiveStreamChatModel 
+id: int
+liveStreamId: int
+userId: int
+text: String
+createdAt: String
+updatedAt: String
+
+Cacheable <|-- LiveStreamChatModel
+class ProductCategoryMapModel 
+id: int
+productId: int
+categoryId: int
+
+Cacheable <|-- ProductCategoryMapModel
+class ChatModel 
+id: int
+chatRoomId: int
+senderId: int
+text: String
+createdAt: String
+updatedAt: String
+
+Cacheable <|-- ChatModel
+class ProductCategoryModel 
+id: int
+name: String
+
+Cacheable <|-- ProductCategoryModel
+class ReviewModel 
+id: int
+userId: int
+merchantId: int
+text: String?
+rating: double?
+createdAt: DateTime
+updatedAt: DateTime
+
+Cacheable <|-- ReviewModel
+ReviewModel ..> DateTime
+class ChatRoomModel 
+id: int
+userId: int
+merchantId: int
+createdAt: String
+updatedAt: String
+
+Cacheable <|-- ChatRoomModel
+class LiveStreamModel 
+id: int
+merchantId: int
+title: String
+streamUrl: String
+thumbnailUrl: String?
+viewCount: int
+createdAt: String
+updatedAt: String
+
+Cacheable <|-- LiveStreamModel
+class PostProductModel 
+id: int
+postId: int
+productId: int
+
+Cacheable <|-- PostProductModel

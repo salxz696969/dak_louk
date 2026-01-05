@@ -1,0 +1,133 @@
+classDiagram
+class LogInDTO 
+email: String
+password: String
+
+class SignUpDTO 
+username: String
+email: String
+password: String
+phone: String
+address: String
+profileImageUrl: String
+bio: String
+
+class CreateChatRoomDTO 
+merchantId: int
+
+class CreateChatDTO 
+chatRoomId: int
+text: String
+
+class UpdateChatDTO 
+text: String?
+
+class OrderProductDTO 
+productId: int
+quantity: int
+
+class CreateCartDTO 
+productId: int
+quantity: int
+
+class UpdateCartDTO 
+quantity: int?
+
+class CreateLiveStreamChatDTO 
+liveStreamId: int
+text: String
+
+class CreateOrderDTO 
+merchantId: int
+address: String?
+phone: String?
+notes: String?
+orderItems: List<OrderProductDTO>
+
+class UpdateOrderDTO 
+status: String?
+
+class CreatePostDTO 
+caption: String?
+productIds: List<int>?
+promoMedias: List<MediaModel>?
+
+class UpdatePostDTO 
+caption: String?
+productIds: List<int>?
+promoMedias: List<MediaModel>?
+
+class CreateChatRoomDTO 
+merchantId: int
+
+class CreateProductMediaDTO 
+url: String
+mediaType: String?
+
+class UpdateProductMediaDTO 
+url: String?
+mediaType: String?
+
+class CreateChatDTO 
+chatRoomId: int
+text: String
+
+class CreateLiveStreamDTO 
+title: String
+streamUrl: String
+thumbnailUrl: String?
+productIds: List<int>?
+
+class UpdateLiveStreamDTO 
+title: String?
+streamUrl: String?
+thumbnailUrl: String?
+productIds: List<int>?
+
+class CreateCartDTO 
+productId: int
+quantity: int
+
+class UpdateCartDTO 
+quantity: int?
+
+class CreateLiveStreamChatDTO 
+liveStreamId: int
+text: String
+
+class CreatePromoMediaDTO 
+url: String
+mediaType: String?
+
+class UpdatePromoMediaDTO 
+url: String?
+mediaType: String?
+
+class CreateProductDTO 
+name: String
+description: String?
+price: double
+quantity: int
+imageUrl: String?
+
+class UpdateProductDTO 
+name: String?
+description: String?
+price: double?
+quantity: int?
+imageUrl: String?
+
+class CreateOrderDTO 
+merchantId: int
+address: String?
+phone: String?
+notes: String?
+orderItems: List<CreateOrderProductDTO>
+
+class CreateOrderProductDTO 
+productId: int
+quantity: int
+
+class UpdateOrderDTO 
+status: String?
+

@@ -1,0 +1,1061 @@
+%% DAK LOUK UI
+classDiagram
+class PostDetailScreen
+PostDetailScreen : +postId int
+PostDetailScreen : +createState() State<PostDetailScreen>
+StatefulWidget <|-- PostDetailScreen
+
+class _PostDetailScreenState
+_PostDetailScreenState : -_postService PostService
+_PostDetailScreenState o-- PostService
+_PostDetailScreenState : +build() Widget
+State <|-- _PostDetailScreenState
+
+class _SimilarItems
+_SimilarItems : +postId int
+_SimilarItems : -_postService PostService
+_SimilarItems o-- PostService
+_SimilarItems : +build() Widget
+StatelessWidget <|-- _SimilarItems
+
+class CartScreen
+CartScreen : +createState() State<CartScreen>
+StatefulWidget <|-- CartScreen
+
+class _CartScreenState
+_CartScreenState : -_cartService CartService
+_CartScreenState o-- CartService
+_CartScreenState : -_cartsFuture dynamic
+_CartScreenState : -_currentCarts List~CartVM~
+_CartScreenState : +initState() void
+_CartScreenState : -_loadCarts() void
+_CartScreenState : -_removeCart() void
+_CartScreenState : -_updateCart() void
+_CartScreenState : -_calculateSubTotal() double
+_CartScreenState : -_handlePlaceAllOrder() void
+_CartScreenState : +build() Widget
+State <|-- _CartScreenState
+
+class ChatScreen
+ChatScreen : +targetUserName String
+ChatScreen : +chatRoomId int
+ChatScreen : +build() Widget
+StatelessWidget <|-- ChatScreen
+
+class LiveStreamScreen
+LiveStreamScreen : +createState() State<LiveStreamScreen>
+StatefulWidget <|-- LiveStreamScreen
+
+class _LiveStreamScreenState
+_LiveStreamScreenState : -_liveStreamService LiveStreamService
+_LiveStreamScreenState o-- LiveStreamService
+_LiveStreamScreenState : +build() Widget
+State <|-- _LiveStreamScreenState
+
+class MerchantProfileScreen
+MerchantProfileScreen : +merchant MerchantVM
+MerchantProfileScreen o-- MerchantVM
+MerchantProfileScreen : +createState() State<MerchantProfileScreen>
+StatefulWidget <|-- MerchantProfileScreen
+
+class _MerchantProfileScreenState
+_MerchantProfileScreenState : +selectedTab MerchantProfileTabsEnum
+_MerchantProfileScreenState o-- MerchantProfileTabsEnum
+_MerchantProfileScreenState : +onTabSelected() void
+_MerchantProfileScreenState : +initState() void
+_MerchantProfileScreenState : +build() Widget
+State <|-- _MerchantProfileScreenState
+
+class MerchantProfileTabsEnum
+<<enumeration>> MerchantProfileTabsEnum
+MerchantProfileTabsEnum : +index int
+MerchantProfileTabsEnum : +values$ List~MerchantProfileTabsEnum~
+MerchantProfileTabsEnum : +posts$ MerchantProfileTabsEnum
+MerchantProfileTabsEnum o-- MerchantProfileTabsEnum
+Enum <|.. MerchantProfileTabsEnum
+
+class OrdersScreen
+OrdersScreen : +createState() State<OrdersScreen>
+StatefulWidget <|-- OrdersScreen
+
+class _OrdersScreenState
+_OrdersScreenState : -_orderService OrderService
+_OrdersScreenState o-- OrderService
+_OrdersScreenState : +build() Widget
+State <|-- _OrdersScreenState
+
+class ProfileScreen
+ProfileScreen : +createState() State<ProfileScreen>
+StatefulWidget <|-- ProfileScreen
+
+class _ProfileScreenState
+_ProfileScreenState : -_userService UserService
+_ProfileScreenState o-- UserService
+_ProfileScreenState : +selectedTab ProfileTabsEnum
+_ProfileScreenState o-- ProfileTabsEnum
+_ProfileScreenState : -_userFuture dynamic
+_ProfileScreenState : -_likedPostsFuture dynamic
+_ProfileScreenState : -_savedPostsFuture dynamic
+_ProfileScreenState : +initState() void
+_ProfileScreenState : +onTabSelected() void
+_ProfileScreenState : +build() Widget
+State <|-- _ProfileScreenState
+
+class ProfileTabsEnum
+<<enumeration>> ProfileTabsEnum
+ProfileTabsEnum : +index int
+ProfileTabsEnum : +values$ List~ProfileTabsEnum~
+ProfileTabsEnum : +likedPosts$ ProfileTabsEnum
+ProfileTabsEnum o-- ProfileTabsEnum
+Enum <|.. ProfileTabsEnum
+
+class ChatRoomScreen
+ChatRoomScreen : +build() Widget
+StatelessWidget <|-- ChatRoomScreen
+
+class CheckoutScreen
+CheckoutScreen : +carts List~CartVM~
+CheckoutScreen : +createState() State<CheckoutScreen>
+StatefulWidget <|-- CheckoutScreen
+
+class _CheckoutScreenState
+_CheckoutScreenState : -_orderService OrderService
+_CheckoutScreenState o-- OrderService
+_CheckoutScreenState : -_handleCompleteOrder() void
+_CheckoutScreenState : +build() Widget
+State <|-- _CheckoutScreenState
+
+class HomeScreen
+HomeScreen : +createState() State<HomeScreen>
+StatefulWidget <|-- HomeScreen
+
+class _HomeScreenState
+_HomeScreenState : -_postService PostService
+_HomeScreenState o-- PostService
+_HomeScreenState : +selectedCategory ProductCategory
+_HomeScreenState o-- ProductCategory
+_HomeScreenState : +onCategorySelected() void
+_HomeScreenState : +build() Widget
+State <|-- _HomeScreenState
+
+class FullScreenVideoScreen
+FullScreenVideoScreen : +livestream dynamic
+FullScreenVideoScreen : +createState() State<FullScreenVideoScreen>
+StatefulWidget <|-- FullScreenVideoScreen
+
+class _FullScreenVideoScreenState
+_FullScreenVideoScreenState : +build() Widget
+State <|-- _FullScreenVideoScreenState
+
+class MerchantChatScreen
+MerchantChatScreen : +targetUserName String
+MerchantChatScreen : +chatRoomId int
+MerchantChatScreen : +build() Widget
+StatelessWidget <|-- MerchantChatScreen
+
+class MerchantOrdersScreen
+MerchantOrdersScreen : +createState() State<MerchantOrdersScreen>
+StatefulWidget <|-- MerchantOrdersScreen
+
+class _MerchantOrdersScreenState
+_MerchantOrdersScreenState : -_orderService OrderService
+_MerchantOrdersScreenState o-- OrderService
+_MerchantOrdersScreenState : -_updateOrderStatus() dynamic
+_MerchantOrdersScreenState : +build() Widget
+State <|-- _MerchantOrdersScreenState
+
+class MerchantPostsScreen
+MerchantPostsScreen : +createState() State<MerchantPostsScreen>
+StatefulWidget <|-- MerchantPostsScreen
+
+class _MerchantPostsScreenState
+_MerchantPostsScreenState : -_postService PostService
+_MerchantPostsScreenState o-- PostService
+_MerchantPostsScreenState : -_showEditPost() void
+_MerchantPostsScreenState : -_deletePost() dynamic
+_MerchantPostsScreenState : -_showPostForm() void
+_MerchantPostsScreenState : +build() Widget
+State <|-- _MerchantPostsScreenState
+
+class MerchantLiveScreen
+MerchantLiveScreen : +createState() State<MerchantLiveScreen>
+StatefulWidget <|-- MerchantLiveScreen
+
+class _MerchantLiveScreenState
+_MerchantLiveScreenState : -_liveStreamService LiveStreamService
+_MerchantLiveScreenState o-- LiveStreamService
+_MerchantLiveScreenState : -_liveStreamsFuture dynamic
+_MerchantLiveScreenState : +initState() void
+_MerchantLiveScreenState : -_loadLiveStreams() void
+_MerchantLiveScreenState : -_handleCreate() dynamic
+_MerchantLiveScreenState : -_handleEdit() dynamic
+_MerchantLiveScreenState : -_handleDelete() dynamic
+_MerchantLiveScreenState : +build() Widget
+State <|-- _MerchantLiveScreenState
+
+class MerchantProductsScreen
+MerchantProductsScreen : +createState() State<MerchantProductsScreen>
+StatefulWidget <|-- MerchantProductsScreen
+
+class _MerchantProductsScreenState
+_MerchantProductsScreenState : -_productService ProductService
+_MerchantProductsScreenState o-- ProductService
+_MerchantProductsScreenState : -_products List~ProductVM~
+_MerchantProductsScreenState : +build() Widget
+_MerchantProductsScreenState : -_showProductForm() void
+_MerchantProductsScreenState : -_deleteProduct() dynamic
+State <|-- _MerchantProductsScreenState
+
+class MerchantChatRoomScreen
+MerchantChatRoomScreen : +build() Widget
+StatelessWidget <|-- MerchantChatRoomScreen
+
+class AuthScreen
+AuthScreen : +createState() State<AuthScreen>
+StatefulWidget <|-- AuthScreen
+
+class _AuthScreenState
+_AuthScreenState : +isLogIn bool
+_AuthScreenState : -_authService AuthService
+_AuthScreenState o-- AuthService
+_AuthScreenState : +handleSignUp() void
+_AuthScreenState : +handleLogIn() void
+_AuthScreenState : +handleSwitchTab() void
+_AuthScreenState : +build() Widget
+State <|-- _AuthScreenState
+
+class LogIn
+LogIn : +onLogIn dynamic FunctionLogInDTO
+LogIn o-- dynamic FunctionLogInDTO
+LogIn : +createState() State<LogIn>
+StatefulWidget <|-- LogIn
+
+class _LogInState
+_LogInState : -_formKey GlobalKey~FormState~
+_LogInState o-- GlobalKey~FormState~
+_LogInState : +emailController TextEditingController
+_LogInState o-- TextEditingController
+_LogInState : +passwordController TextEditingController
+_LogInState o-- TextEditingController
+_LogInState : -_handleSubmit() void
+_LogInState : +build() Widget
+State <|-- _LogInState
+
+class SignUp
+SignUp : +onSignUp dynamic FunctionSignUpDTO
+SignUp o-- dynamic FunctionSignUpDTO
+SignUp : +createState() State<SignUp>
+StatefulWidget <|-- SignUp
+
+class _SignUpState
+_SignUpState : -_formKey GlobalKey~FormState~
+_SignUpState o-- GlobalKey~FormState~
+_SignUpState : +profileImageUrl String
+_SignUpState : +emailController TextEditingController
+_SignUpState o-- TextEditingController
+_SignUpState : +usernameController TextEditingController
+_SignUpState o-- TextEditingController
+_SignUpState : +passwordController TextEditingController
+_SignUpState o-- TextEditingController
+_SignUpState : +bioController TextEditingController
+_SignUpState o-- TextEditingController
+_SignUpState : +phoneController TextEditingController
+_SignUpState o-- TextEditingController
+_SignUpState : +addressController TextEditingController
+_SignUpState o-- TextEditingController
+_SignUpState : -_handleSubmit() void
+_SignUpState : +build() Widget
+State <|-- _SignUpState
+
+class CategoryBar
+CategoryBar : +onCategorySelected void FunctionProductCategory
+CategoryBar o-- void FunctionProductCategory
+CategoryBar : +createState() State<CategoryBar>
+StatefulWidget <|-- CategoryBar
+
+class _CategoryBarState
+_CategoryBarState : +selectedCategory ProductCategory
+_CategoryBarState o-- ProductCategory
+_CategoryBarState : +build() Widget
+State <|-- _CategoryBarState
+
+class PostSlider
+PostSlider : +posts List~PostVM~
+PostSlider : +createState() State<PostSlider>
+StatefulWidget <|-- PostSlider
+
+class _PostSliderState
+_PostSliderState : -_controller PageController
+_PostSliderState o-- PageController
+_PostSliderState : +initState() void
+_PostSliderState : +dispose() void
+_PostSliderState : +build() Widget
+State <|-- _PostSliderState
+
+class _SimilarItemCard
+_SimilarItemCard : +post PostVM
+_SimilarItemCard o-- PostVM
+_SimilarItemCard : +createState() State<_SimilarItemCard>
+StatefulWidget <|-- _SimilarItemCard
+
+class _SimilarItemCardState
+_SimilarItemCardState : +isAdded bool
+_SimilarItemCardState : +build() Widget
+State <|-- _SimilarItemCardState
+
+class ProductItem
+ProductItem : +product PostProductVM
+ProductItem o-- PostProductVM
+ProductItem : +createState() State<ProductItem>
+StatefulWidget <|-- ProductItem
+
+class _ProductItemState
+_ProductItemState : +build() Widget
+State <|-- _ProductItemState
+
+class _AddToCartButton
+_AddToCartButton : +product PostProductVM
+_AddToCartButton o-- PostProductVM
+_AddToCartButton : +createState() State<_AddToCartButton>
+StatefulWidget <|-- _AddToCartButton
+
+class _AddToCartButtonState
+_AddToCartButtonState : -_cartService CartService
+_AddToCartButtonState o-- CartService
+_AddToCartButtonState : +isAddedToCart bool
+_AddToCartButtonState : +initState() void
+_AddToCartButtonState : +onAdd() void
+_AddToCartButtonState : +build() Widget
+State <|-- _AddToCartButtonState
+
+class PostItem
+PostItem : +post PostVM
+PostItem o-- PostVM
+PostItem : +onPostDeleted void Function?
+PostItem o-- void Function
+PostItem : +onPostUpdated void FunctionPostVM?
+PostItem o-- void FunctionPostVM
+PostItem : +createState() State<PostItem>
+StatefulWidget <|-- PostItem
+
+class _PostItemState
+_PostItemState : -_postLikeService PostLikeService
+_PostItemState o-- PostLikeService
+_PostItemState : -_postSaveService PostSaveService
+_PostItemState o-- PostSaveService
+_PostItemState : +isLiked bool
+_PostItemState : +isSaved bool
+_PostItemState : +likesCount int
+_PostItemState : +savesCount int
+_PostItemState : +initState() void
+_PostItemState : +handlePostLike() void
+_PostItemState : +handlePostSave() void
+_PostItemState : -_showPostForm() void
+_PostItemState : -_deletePost() dynamic
+_PostItemState : +build() Widget
+State <|-- _PostItemState
+
+class UsernameContainer
+UsernameContainer : +profile ImageProvider~Object~
+UsernameContainer o-- ImageProvider~Object~
+UsernameContainer : +username String
+UsernameContainer : +rating String
+UsernameContainer : +merchantId int
+UsernameContainer : +bio String
+UsernameContainer : +build() Widget
+StatelessWidget <|-- UsernameContainer
+
+class ChatInput
+ChatInput : +onSend dynamic FunctionString
+ChatInput o-- dynamic FunctionString
+ChatInput : -_controller TextEditingController
+ChatInput o-- TextEditingController
+ChatInput : +handleSend() void
+ChatInput : +build() Widget
+StatelessWidget <|-- ChatInput
+
+class Chat
+Chat : +chatRoomId int
+Chat : +createState() State<Chat>
+StatefulWidget <|-- Chat
+
+class _ChatState
+_ChatState : -_controller TextEditingController
+_ChatState o-- TextEditingController
+_ChatState : -_scrollController ScrollController
+_ChatState o-- ScrollController
+_ChatState : -_chatService ChatService
+_ChatState o-- ChatService
+_ChatState : -_chats List~ChatVM~
+_ChatState : +initState() void
+_ChatState : +dispose() void
+_ChatState : -_scrollToBottom() void
+_ChatState : -_handleSend() dynamic
+_ChatState : +build() Widget
+State <|-- _ChatState
+
+class UserScaffold
+UserScaffold : +initialIndex int
+UserScaffold : +createState() State<UserScaffold>
+StatefulWidget <|-- UserScaffold
+
+class _UserScaffoldState
+_UserScaffoldState : -_tabs$ List~Widget~
+_UserScaffoldState : -_currentIndex int
+_UserScaffoldState : +initState() void
+_UserScaffoldState : +build() Widget
+State <|-- _UserScaffoldState
+
+class CheckoutCard
+CheckoutCard : +cart CartVM
+CheckoutCard o-- CartVM
+CheckoutCard : +subtotal double
+CheckoutCard : +build() Widget
+StatelessWidget <|-- CheckoutCard
+
+class _CheckoutProductItem
+_CheckoutProductItem : +item CartItemVM
+_CheckoutProductItem o-- CartItemVM
+_CheckoutProductItem : +build() Widget
+StatelessWidget <|-- _CheckoutProductItem
+
+class CheckoutForm
+CheckoutForm : +onComplete dynamic FunctionString?, String?, String?
+CheckoutForm o-- dynamic FunctionString, String, String
+CheckoutForm : +createState() State<CheckoutForm>
+StatefulWidget <|-- CheckoutForm
+
+class _CheckoutFormState
+_CheckoutFormState : -_formKey GlobalKey~FormState~
+_CheckoutFormState o-- GlobalKey~FormState~
+_CheckoutFormState : -_addressController TextEditingController
+_CheckoutFormState o-- TextEditingController
+_CheckoutFormState : -_phoneController TextEditingController
+_CheckoutFormState o-- TextEditingController
+_CheckoutFormState : -_notesController TextEditingController
+_CheckoutFormState o-- TextEditingController
+_CheckoutFormState : +initState() void
+_CheckoutFormState : -_decoration() InputDecoration
+_CheckoutFormState : +build() Widget
+State <|-- _CheckoutFormState
+
+class LiveStreamProductItem
+LiveStreamProductItem : +product LiveStreamProductsVM
+LiveStreamProductItem o-- LiveStreamProductsVM
+LiveStreamProductItem : +createState() State<LiveStreamProductItem>
+StatefulWidget <|-- LiveStreamProductItem
+
+class _LiveStreamProductItemState
+_LiveStreamProductItemState : +build() Widget
+State <|-- _LiveStreamProductItemState
+
+class _AddToCartButton
+_AddToCartButton : +product LiveStreamProductsVM
+_AddToCartButton o-- LiveStreamProductsVM
+_AddToCartButton : +createState() State<_AddToCartButton>
+StatefulWidget <|-- _AddToCartButton
+
+class _AddToCartButtonState
+_AddToCartButtonState : -_cartService CartService
+_AddToCartButtonState o-- CartService
+_AddToCartButtonState : +isAddedToCart bool
+_AddToCartButtonState : +initState() void
+_AddToCartButtonState : +onAdd() void
+_AddToCartButtonState : +build() Widget
+State <|-- _AddToCartButtonState
+
+class LiveStreamChat
+LiveStreamChat : +liveStreamChats List~LiveStreamChatVM~
+LiveStreamChat : +createState() State<LiveStreamChat>
+StatefulWidget <|-- LiveStreamChat
+
+class _LiveStreamChatState
+_LiveStreamChatState : -_listKey GlobalKey~AnimatedListState~
+_LiveStreamChatState o-- GlobalKey~AnimatedListState~
+_LiveStreamChatState : -_visibleChats List~LiveStreamChatVM~
+_LiveStreamChatState : -_timer Timer?
+_LiveStreamChatState o-- Timer
+_LiveStreamChatState : -_index int
+_LiveStreamChatState : +initState() void
+_LiveStreamChatState : -_startStreaming() void
+_LiveStreamChatState : +dispose() void
+_LiveStreamChatState : +build() Widget
+State <|-- _LiveStreamChatState
+
+class LiveStream
+LiveStream : +livestream LiveStreamVM
+LiveStream o-- LiveStreamVM
+LiveStream : +createState() State<LiveStream>
+StatefulWidget <|-- LiveStream
+
+class _LiveStreamState
+_LiveStreamState : -_controller VideoPlayerController
+_LiveStreamState o-- VideoPlayerController
+_LiveStreamState : -_liveStreamChatService LiveStreamChatService
+_LiveStreamState o-- LiveStreamChatService
+_LiveStreamState : +initState() void
+_LiveStreamState : +dispose() void
+_LiveStreamState : -_togglePlay() void
+_LiveStreamState : +build() Widget
+State <|-- _LiveStreamState
+
+class LiveStreamProducts
+LiveStreamProducts : +liveStreamId int
+LiveStreamProducts : -_liveStreamProductsService LiveStreamProductsService
+LiveStreamProducts o-- LiveStreamProductsService
+LiveStreamProducts : +build() Widget
+StatelessWidget <|-- LiveStreamProducts
+
+class SavedPosts
+SavedPosts : +savedPosts List~UserProfileLikedSavedPostsVM~
+SavedPosts : +build() Widget
+StatelessWidget <|-- SavedPosts
+
+class ProfileTabs
+ProfileTabs : +selectedTab ProfileTabsEnum
+ProfileTabs o-- ProfileTabsEnum
+ProfileTabs : +onTabSelected void FunctionProfileTabsEnum
+ProfileTabs o-- void FunctionProfileTabsEnum
+ProfileTabs : +build() Widget
+StatelessWidget <|-- ProfileTabs
+
+class _ProfileTabButton
+_ProfileTabButton : +icon IconData
+_ProfileTabButton o-- IconData
+_ProfileTabButton : +label String
+_ProfileTabButton : +selected bool
+_ProfileTabButton : +onTap void Function
+_ProfileTabButton o-- void Function
+_ProfileTabButton : +build() Widget
+StatelessWidget <|-- _ProfileTabButton
+
+class LikedPosts
+LikedPosts : +likedPosts List~UserProfileLikedSavedPostsVM~
+LikedPosts : +build() Widget
+StatelessWidget <|-- LikedPosts
+
+class PhotoContainer
+PhotoContainer : +post UserProfileLikedSavedPostsVM
+PhotoContainer o-- UserProfileLikedSavedPostsVM
+PhotoContainer : +build() Widget
+StatelessWidget <|-- PhotoContainer
+
+class ProfileInfo
+ProfileInfo : +username String
+ProfileInfo : +profileImage String
+ProfileInfo : +bio String
+ProfileInfo : -_handleLogout() void
+ProfileInfo : +build() Widget
+StatelessWidget <|-- ProfileInfo
+
+class ChatroomTile
+ChatroomTile : +chatRoom ChatRoomVM
+ChatroomTile o-- ChatRoomVM
+ChatroomTile : +build() Widget
+StatelessWidget <|-- ChatroomTile
+
+class MerchantProfileTabs
+MerchantProfileTabs : +selectedTab MerchantProfileTabsEnum
+MerchantProfileTabs o-- MerchantProfileTabsEnum
+MerchantProfileTabs : +onTabSelected dynamic FunctionMerchantProfileTabsEnum
+MerchantProfileTabs o-- dynamic FunctionMerchantProfileTabsEnum
+MerchantProfileTabs : +build() Widget
+StatelessWidget <|-- MerchantProfileTabs
+
+class _TabButton
+_TabButton : +icon IconData
+_TabButton o-- IconData
+_TabButton : +label String
+_TabButton : +selected bool
+_TabButton : +onTap void Function
+_TabButton o-- void Function
+_TabButton : +build() Widget
+StatelessWidget <|-- _TabButton
+
+class MerchantProducts
+MerchantProducts : -_merchantService MerchantService
+MerchantProducts o-- MerchantService
+MerchantProducts : +merchantId int
+MerchantProducts : +build() Widget
+StatelessWidget <|-- MerchantProducts
+
+class _HorizontalProductCard
+_HorizontalProductCard : +product MerchantProductsVM
+_HorizontalProductCard o-- MerchantProductsVM
+_HorizontalProductCard : +build() Widget
+StatelessWidget <|-- _HorizontalProductCard
+
+class _AddToCartButton
+_AddToCartButton : +productId int
+_AddToCartButton : +isAdded bool
+_AddToCartButton : +createState() State<_AddToCartButton>
+StatefulWidget <|-- _AddToCartButton
+
+class _AddToCartButtonState
+_AddToCartButtonState : -_cartService CartService
+_AddToCartButtonState o-- CartService
+_AddToCartButtonState : +isAddedToCart bool
+_AddToCartButtonState : +initState() void
+_AddToCartButtonState : -_onAddToCart() void
+_AddToCartButtonState : +build() Widget
+State <|-- _AddToCartButtonState
+
+class MerchantLiveStreams
+MerchantLiveStreams : -_merchantService MerchantService
+MerchantLiveStreams o-- MerchantService
+MerchantLiveStreams : +merchantId int
+MerchantLiveStreams : +build() Widget
+StatelessWidget <|-- MerchantLiveStreams
+
+class _VideoContainer
+_VideoContainer : +livestream MerchantLivestreamsVM
+_VideoContainer o-- MerchantLivestreamsVM
+_VideoContainer : -_liveStreamService LiveStreamService
+_VideoContainer o-- LiveStreamService
+_VideoContainer : +build() Widget
+StatelessWidget <|-- _VideoContainer
+
+class MerchantInfo
+MerchantInfo : +merchant MerchantVM
+MerchantInfo o-- MerchantVM
+MerchantInfo : +build() Widget
+StatelessWidget <|-- MerchantInfo
+
+class MerchantPosts
+MerchantPosts : -_merchantService MerchantService
+MerchantPosts o-- MerchantService
+MerchantPosts : +merchantId int
+MerchantPosts : +build() Widget
+StatelessWidget <|-- MerchantPosts
+
+class _PhotoContainer
+_PhotoContainer : +post MerchantPostsVM
+_PhotoContainer o-- MerchantPostsVM
+_PhotoContainer : +build() Widget
+StatelessWidget <|-- _PhotoContainer
+
+class QuantityChooser
+QuantityChooser : +cartId int
+QuantityChooser : +quantity int
+QuantityChooser : +availableQuantity int
+QuantityChooser : +onQuantityChanged dynamic Functionint, int
+QuantityChooser o-- dynamic Functionint, int
+QuantityChooser : +onDelete dynamic Functionint
+QuantityChooser o-- dynamic Functionint
+QuantityChooser : +createState() State<QuantityChooser>
+StatefulWidget <|-- QuantityChooser
+
+class _QuantityChooserState
+_QuantityChooserState : +quantity int
+_QuantityChooserState : +initState() void
+_QuantityChooserState : -_increase() void
+_QuantityChooserState : -_decrease() void
+_QuantityChooserState : +build() Widget
+State <|-- _QuantityChooserState
+
+class CartItemWrapper
+CartItemWrapper : +cart CartVM
+CartItemWrapper o-- CartVM
+CartItemWrapper : +onQuantityChanged dynamic Functionint, int
+CartItemWrapper o-- dynamic Functionint, int
+CartItemWrapper : +onRemoved dynamic Functionint
+CartItemWrapper o-- dynamic Functionint
+CartItemWrapper : +createState() State<CartItemWrapper>
+StatefulWidget <|-- CartItemWrapper
+
+class _CartItemWrapperState
+_CartItemWrapperState : +items List~CartItemVM~
+_CartItemWrapperState : -_cartService CartService
+_CartItemWrapperState o-- CartService
+_CartItemWrapperState : +initState() void
+_CartItemWrapperState : -_handleItemRemoved() void
+_CartItemWrapperState : -_handlePlaceOrder() void
+_CartItemWrapperState : -_calculateTotal() double
+_CartItemWrapperState : -_handleQuantityChanged() void
+_CartItemWrapperState : +build() Widget
+State <|-- _CartItemWrapperState
+
+class CartItem
+CartItem : +item CartItemVM
+CartItem o-- CartItemVM
+CartItem : +onRemoved dynamic Functionint
+CartItem o-- dynamic Functionint
+CartItem : +onQuantityChanged dynamic Functionint, int
+CartItem o-- dynamic Functionint, int
+CartItem : +createState() State<CartItem>
+StatefulWidget <|-- CartItem
+
+class _CartItemState
+_CartItemState : +initState() void
+_CartItemState : +build() Widget
+State <|-- _CartItemState
+
+class OrderItem
+OrderItem : +order OrderVM
+OrderItem o-- OrderVM
+OrderItem : -_getOrderStatusEnum() OrderStatusEnum?
+OrderItem : +build() Widget
+StatelessWidget <|-- OrderItem
+
+class Appbar
+Appbar : +title String
+Appbar : +icon IconData?
+Appbar o-- IconData
+Appbar : +navigateTo Widget?
+Appbar o-- Widget
+Appbar : +build() Widget
+StatelessWidget <|-- Appbar
+
+class NavBarItems
+NavBarItems : +label String
+NavBarItems : +icon IconData
+NavBarItems o-- IconData
+
+class Navbar
+Navbar : +onNavigate void Functionint
+Navbar o-- void Functionint
+Navbar : +currentIndex int
+Navbar : +tabs List~NavBarItems~
+Navbar : +build() Widget
+StatelessWidget <|-- Navbar
+
+class MediaCarousel
+MediaCarousel : +medias List~MediaModel~
+MediaCarousel : +createState() State<MediaCarousel>
+StatefulWidget <|-- MediaCarousel
+
+class _MediaCarouselState
+_MediaCarouselState : +controller PageController
+_MediaCarouselState o-- PageController
+_MediaCarouselState : -_page int
+_MediaCarouselState : -_videoControllers Map~int, VideoPlayerController~
+_MediaCarouselState : -_onPageChanged() void
+_MediaCarouselState : +initState() void
+_MediaCarouselState : -_initializeVideoControllers() void
+_MediaCarouselState : +dispose() void
+_MediaCarouselState : +build() Widget
+State <|-- _MediaCarouselState
+
+class MyApp
+MyApp : +build() Widget
+StatelessWidget <|-- MyApp
+
+class PostEditForm
+PostEditForm : +post PostVM
+PostEditForm o-- PostVM
+PostEditForm : +onSaved void FunctionPostVM?
+PostEditForm o-- void FunctionPostVM
+PostEditForm : +createState() State<PostEditForm>
+StatefulWidget <|-- PostEditForm
+
+class _PostEditFormState
+_PostEditFormState : -_formKey GlobalKey~FormState~
+_PostEditFormState o-- GlobalKey~FormState~
+_PostEditFormState : -_captionCtrl TextEditingController
+_PostEditFormState o-- TextEditingController
+_PostEditFormState : -_promoMedias List~MediaModel~
+_PostEditFormState : -_selectedProducts List~AddProductsModel~
+_PostEditFormState : -_saving bool
+_PostEditFormState : -_service PostService
+_PostEditFormState o-- PostService
+_PostEditFormState : -_productService ProductService
+_PostEditFormState o-- ProductService
+_PostEditFormState : +initState() void
+_PostEditFormState : +dispose() void
+_PostEditFormState : -_addMedia() dynamic
+_PostEditFormState : -_removeMedia() void
+_PostEditFormState : -_addProduct() void
+_PostEditFormState : -_removeProduct() void
+_PostEditFormState : -_submit() dynamic
+_PostEditFormState : +build() Widget
+State <|-- _PostEditFormState
+
+class PostForm
+PostForm : +post PostVM?
+PostForm o-- PostVM
+PostForm : +onSaved void FunctionPostVM?
+PostForm o-- void FunctionPostVM
+PostForm : +createState() State<PostForm>
+StatefulWidget <|-- PostForm
+
+class _PostFormState
+_PostFormState : -_formKey GlobalKey~FormState~
+_PostFormState o-- GlobalKey~FormState~
+_PostFormState : -_captionCtrl TextEditingController
+_PostFormState o-- TextEditingController
+_PostFormState : -_promoMedias List~MediaModel~
+_PostFormState : -_selectedProducts List~AddProductsModel~
+_PostFormState : -_saving bool
+_PostFormState : -_service PostService
+_PostFormState o-- PostService
+_PostFormState : -_productService ProductService
+_PostFormState o-- ProductService
+_PostFormState : +initState() void
+_PostFormState : +dispose() void
+_PostFormState : -_addMedia() dynamic
+_PostFormState : -_removeMedia() void
+_PostFormState : -_addProduct() void
+_PostFormState : -_removeProduct() void
+_PostFormState : -_submit() dynamic
+_PostFormState : +build() Widget
+State <|-- _PostFormState
+
+class ProductItem
+ProductItem : +product PostProductVM
+ProductItem o-- PostProductVM
+ProductItem : +createState() State<ProductItem>
+StatefulWidget <|-- ProductItem
+
+class _ProductItemState
+_ProductItemState : +build() Widget
+State <|-- _ProductItemState
+
+class PostItem
+PostItem : +post PostVM
+PostItem o-- PostVM
+PostItem : +onEdit void Function?
+PostItem o-- void Function
+PostItem : +onDelete void Function?
+PostItem o-- void Function
+PostItem : +createState() State<PostItem>
+StatefulWidget <|-- PostItem
+
+class _PostItemState
+_PostItemState : -_postService PostService
+_PostItemState o-- PostService
+_PostItemState : +initState() void
+_PostItemState : +handleDeletePost() void
+_PostItemState : +build() Widget
+State <|-- _PostItemState
+
+class ProductsUpdateForm
+ProductsUpdateForm : +product ProductVM
+ProductsUpdateForm o-- ProductVM
+ProductsUpdateForm : +onSaved void FunctionProductVM?
+ProductsUpdateForm o-- void FunctionProductVM
+ProductsUpdateForm : +createState() State<ProductsUpdateForm>
+StatefulWidget <|-- ProductsUpdateForm
+
+class _ProductsUpdateFormState
+_ProductsUpdateFormState : -_formKey GlobalKey~FormState~
+_ProductsUpdateFormState o-- GlobalKey~FormState~
+_ProductsUpdateFormState : -_nameCtrl TextEditingController
+_ProductsUpdateFormState o-- TextEditingController
+_ProductsUpdateFormState : -_descCtrl TextEditingController
+_ProductsUpdateFormState o-- TextEditingController
+_ProductsUpdateFormState : -_priceCtrl TextEditingController
+_ProductsUpdateFormState o-- TextEditingController
+_ProductsUpdateFormState : -_qtyCtrl TextEditingController
+_ProductsUpdateFormState o-- TextEditingController
+_ProductsUpdateFormState : -_saving bool
+_ProductsUpdateFormState : -_service ProductService
+_ProductsUpdateFormState o-- ProductService
+_ProductsUpdateFormState : +imageUrl String?
+_ProductsUpdateFormState : +initState() void
+_ProductsUpdateFormState : +dispose() void
+_ProductsUpdateFormState : -_pickImage() dynamic
+_ProductsUpdateFormState : -_submit() dynamic
+_ProductsUpdateFormState : +build() Widget
+State <|-- _ProductsUpdateFormState
+
+class MerchantProductItem
+MerchantProductItem : +product ProductVM
+MerchantProductItem o-- ProductVM
+MerchantProductItem : +onEdit void Function
+MerchantProductItem o-- void Function
+MerchantProductItem : +onDelete void Function
+MerchantProductItem o-- void Function
+MerchantProductItem : +build() Widget
+StatelessWidget <|-- MerchantProductItem
+
+class ProductsCreateForm
+ProductsCreateForm : +onSaved void FunctionProductVM?
+ProductsCreateForm o-- void FunctionProductVM
+ProductsCreateForm : +createState() State<ProductsCreateForm>
+StatefulWidget <|-- ProductsCreateForm
+
+class _ProductsCreateFormState
+_ProductsCreateFormState : -_formKey GlobalKey~FormState~
+_ProductsCreateFormState o-- GlobalKey~FormState~
+_ProductsCreateFormState : -_nameCtrl TextEditingController
+_ProductsCreateFormState o-- TextEditingController
+_ProductsCreateFormState : -_descCtrl TextEditingController
+_ProductsCreateFormState o-- TextEditingController
+_ProductsCreateFormState : -_priceCtrl TextEditingController
+_ProductsCreateFormState o-- TextEditingController
+_ProductsCreateFormState : -_qtyCtrl TextEditingController
+_ProductsCreateFormState o-- TextEditingController
+_ProductsCreateFormState : -_saving bool
+_ProductsCreateFormState : -_service ProductService
+_ProductsCreateFormState o-- ProductService
+_ProductsCreateFormState : +imageUrl String?
+_ProductsCreateFormState : +dispose() void
+_ProductsCreateFormState : -_pickImage() dynamic
+_ProductsCreateFormState : -_submit() dynamic
+_ProductsCreateFormState : +build() Widget
+State <|-- _ProductsCreateFormState
+
+class MerchantScaffold
+MerchantScaffold : +initialIndex int
+MerchantScaffold : +createState() State<MerchantScaffold>
+StatefulWidget <|-- MerchantScaffold
+
+class _MerchantScaffoldState
+_MerchantScaffoldState : -_tabs$ List~Widget~
+_MerchantScaffoldState : -_currentIndex int
+_MerchantScaffoldState : +initState() void
+_MerchantScaffoldState : +build() Widget
+State <|-- _MerchantScaffoldState
+
+class MerchantAppBar
+MerchantAppBar : +title String
+MerchantAppBar : +actions List~Widget~?
+MerchantAppBar : +preferredSize Size
+MerchantAppBar o-- Size
+MerchantAppBar : +build() Widget
+StatelessWidget <|-- MerchantAppBar
+PreferredSizeWidget <|.. MerchantAppBar
+
+class _ProductSelectorContent
+_ProductSelectorContent : +productService ProductService
+_ProductSelectorContent o-- ProductService
+_ProductSelectorContent : +selectedProducts List~AddProductsModel~
+_ProductSelectorContent : +onProductsSelected dynamic FunctionList~AddProductsModel~
+_ProductSelectorContent o-- dynamic FunctionList~AddProductsModel~
+_ProductSelectorContent : +createState() State<_ProductSelectorContent>
+StatefulWidget <|-- _ProductSelectorContent
+
+class _ProductSelectorContentState
+_ProductSelectorContentState : +build() Widget
+State <|-- _ProductSelectorContentState
+
+class AddProductsModel
+AddProductsModel : +id int
+AddProductsModel : +name String
+AddProductsModel : +price double
+AddProductsModel : +medias List~MediaModel~
+
+class ProductsSection
+ProductsSection : +selectedProducts List~AddProductsModel~
+ProductsSection : +onAddProduct void Function
+ProductsSection o-- void Function
+ProductsSection : +onRemoveProduct void Functionint
+ProductsSection o-- void Functionint
+ProductsSection : +build() Widget
+StatelessWidget <|-- ProductsSection
+
+class MediaSection
+MediaSection : +medias List~MediaModel~
+MediaSection : +onAddMedia void Function
+MediaSection o-- void Function
+MediaSection : +onRemoveMedia void Functionint
+MediaSection o-- void Functionint
+MediaSection : +build() Widget
+StatelessWidget <|-- MediaSection
+
+class ChatInput
+ChatInput : +onSend dynamic FunctionString
+ChatInput o-- dynamic FunctionString
+ChatInput : -_chatService ChatService
+ChatInput o-- ChatService
+ChatInput : -_controller TextEditingController
+ChatInput o-- TextEditingController
+ChatInput : +handleSend() void
+ChatInput : +build() Widget
+StatelessWidget <|-- ChatInput
+
+class MerchantChat
+MerchantChat : +chatRoomId int
+MerchantChat : +createState() State<MerchantChat>
+StatefulWidget <|-- MerchantChat
+
+class _MerchantChatState
+_MerchantChatState : -_controller TextEditingController
+_MerchantChatState o-- TextEditingController
+_MerchantChatState : -_scrollController ScrollController
+_MerchantChatState o-- ScrollController
+_MerchantChatState : -_chatService ChatService
+_MerchantChatState o-- ChatService
+_MerchantChatState : +initState() void
+_MerchantChatState : +dispose() void
+_MerchantChatState : -_scrollToBottom() void
+_MerchantChatState : -_handleSend() dynamic
+_MerchantChatState : +build() Widget
+State <|-- _MerchantChatState
+
+class ChatroomTile
+ChatroomTile : +chatRoom MerchantChatRoomVM
+ChatroomTile o-- MerchantChatRoomVM
+ChatroomTile : +build() Widget
+StatelessWidget <|-- ChatroomTile
+
+class OrderItem
+OrderItem : +order OrderMerchantVM
+OrderItem o-- OrderMerchantVM
+OrderItem : +onStatusUpdate dynamic Functionint, String
+OrderItem o-- dynamic Functionint, String
+OrderItem : -_deleteOrder() dynamic
+OrderItem : -_showStatusMenu() dynamic
+OrderItem : -_formatDate() String
+OrderItem : +build() Widget
+StatelessWidget <|-- OrderItem
+
+class LiveStreamEditForm
+LiveStreamEditForm : +liveStream MerchantLiveStreamsVM
+LiveStreamEditForm o-- MerchantLiveStreamsVM
+LiveStreamEditForm : +createState() State<LiveStreamEditForm>
+StatefulWidget <|-- LiveStreamEditForm
+
+class _LiveStreamEditFormState
+_LiveStreamEditFormState : -_formKey GlobalKey~FormState~
+_LiveStreamEditFormState o-- GlobalKey~FormState~
+_LiveStreamEditFormState : +titleController TextEditingController
+_LiveStreamEditFormState o-- TextEditingController
+_LiveStreamEditFormState : +streamUrl String
+_LiveStreamEditFormState : +thumbnailUrl String?
+_LiveStreamEditFormState : -_selectedProducts List~AddProductsModel~
+_LiveStreamEditFormState : -_productService ProductService
+_LiveStreamEditFormState o-- ProductService
+_LiveStreamEditFormState : +initState() void
+_LiveStreamEditFormState : -_handleSubmit() void
+_LiveStreamEditFormState : -_pickVideo() dynamic
+_LiveStreamEditFormState : -_pickThumbnail() dynamic
+_LiveStreamEditFormState : -_addProduct() void
+_LiveStreamEditFormState : -_removeProduct() void
+_LiveStreamEditFormState : +build() Widget
+State <|-- _LiveStreamEditFormState
+
+class LiveStreamCreateForm
+LiveStreamCreateForm : +createState() State<LiveStreamCreateForm>
+StatefulWidget <|-- LiveStreamCreateForm
+
+class _LiveStreamCreateFormState
+_LiveStreamCreateFormState : -_formKey GlobalKey~FormState~
+_LiveStreamCreateFormState o-- GlobalKey~FormState~
+_LiveStreamCreateFormState : +titleController TextEditingController
+_LiveStreamCreateFormState o-- TextEditingController
+_LiveStreamCreateFormState : +streamUrl String
+_LiveStreamCreateFormState : +thumbnailUrl String?
+_LiveStreamCreateFormState : -_selectedProducts List~AddProductsModel~
+_LiveStreamCreateFormState : -_productService ProductService
+_LiveStreamCreateFormState o-- ProductService
+_LiveStreamCreateFormState : -_handleSubmit() void
+_LiveStreamCreateFormState : -_pickVideo() dynamic
+_LiveStreamCreateFormState : -_pickThumbnail() dynamic
+_LiveStreamCreateFormState : -_addProduct() void
+_LiveStreamCreateFormState : -_removeProduct() void
+_LiveStreamCreateFormState : +build() Widget
+State <|-- _LiveStreamCreateFormState
+
+class LiveStreamItem
+LiveStreamItem : +liveStream MerchantLiveStreamsVM
+LiveStreamItem o-- MerchantLiveStreamsVM
+LiveStreamItem : +onDelete void Function
+LiveStreamItem o-- void Function
+LiveStreamItem : +onEdit void Function?
+LiveStreamItem o-- void Function
+LiveStreamItem : -_showDeleteDialog() dynamic
+LiveStreamItem : -_openFullScreen() void
+LiveStreamItem : +build() Widget
+StatelessWidget <|-- LiveStreamItem
+

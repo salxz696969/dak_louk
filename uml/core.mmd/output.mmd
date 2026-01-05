@@ -1,0 +1,105 @@
+classDiagram
+class AppSession {
+instance: AppSession
+-userRepository: UserRepository
+-merchantRepository: MerchantRepository
+-keyUserId: null
+-keyUsername: null
+-keyRole: null
+-keyPhone: null
+-keyAddress: null
+-keyMerchantId: null
+-keyMerchantUsername: null
+-keyMerchantProfileImageUrl: null
+-userId: int?
+-username: String?
+-phone: String?
+-address: String?
+-merchantId: int?
+-merchantUsername: String?
+-merchantProfileImageUrl: String?
+-role: Role?
+isLoggedIn(): bool
+userId(): int?
+username(): String?
+phone(): String?
+address(): String?
+role(): Role?
+merchantId(): int?
+merchantUsername(): String?
+merchantProfileImageUrl(): String?
+init(): void
+login(): Role?
+signUpUser(): void
+logout(): void
+}
+AppSession ..> AppSession
+AppSession ..> UserRepository
+AppSession ..> MerchantRepository
+AppSession ..> Role
+class Clauses 
+where: null
+orderBy: null
+like: null
+
+class _Where {
+clause: String
+args: List<Object?>
+eq(): _Where
+and(): _Where
+or(): _Where
+gt(): _Where
+gte(): _Where
+lt(): _Where
+lte(): _Where
+not(): _Where
+isNull(): _Where
+isNotNull(): _Where
+inVal(): _Where
+notInVal(): _Where
+between(): _Where
+notBetween(): _Where
+neq(): _Where
+}
+class _OrderBy {
+clause: String
+asc(): _OrderBy
+desc(): _OrderBy
+caseWhen(): _OrderBy
+thenBy(): _OrderBy
+}
+class _Like {
+clause: String
+args: List<Object?>
+like(): _Like
+notLike(): _Like
+}
+class Hasher {
+md5Hash(): String
+sha256Hash(): String
+sha512Hash(): String
+}
+class Validator {
+validateUsername(): String?
+validateEmail(): String?
+validatePassword(): String?
+}
+class AppError 
+type: ErrorType
+message: String?
+
+AppError ..> ErrorType
+AppError ..|> Exception
+class MediaModel 
+url: String
+type: MediaType
+
+MediaModel ..> MediaType
+class MediaPickerSheet {
+show(): String?
+}
+class MediaPicker {
+-picker: ImagePicker
+pickAndStoreMedia(): String?
+}
+MediaPicker ..> ImagePicker

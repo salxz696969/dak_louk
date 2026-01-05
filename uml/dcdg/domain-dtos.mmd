@@ -1,0 +1,86 @@
+%% DAK LOUK DOMAIN – DTOs
+classDiagram
+class CreateCartDTO
+CreateCartDTO : +productId int
+CreateCartDTO : +quantity int
+
+class UpdateCartDTO
+UpdateCartDTO : +quantity int?
+
+class CreateOrderDTO
+CreateOrderDTO : +merchantId int
+CreateOrderDTO : +address String?
+CreateOrderDTO : +phone String?
+CreateOrderDTO : +notes String?
+CreateOrderDTO : +orderItems List~OrderProductDTO~
+
+class UpdateOrderDTO
+UpdateOrderDTO : +status String?
+
+class OrderProductDTO
+OrderProductDTO : +productId int
+OrderProductDTO : +quantity int
+
+class CreateChatDTO
+CreateChatDTO : +chatRoomId int
+CreateChatDTO : +text String
+
+class UpdateChatDTO
+UpdateChatDTO : +text String?
+
+class CreateChatRoomDTO
+CreateChatRoomDTO : +merchantId int
+
+class CreateLiveStreamChatDTO
+CreateLiveStreamChatDTO : +liveStreamId int
+CreateLiveStreamChatDTO : +text String
+
+class CreateProductDTO
+CreateProductDTO : +name String
+CreateProductDTO : +description String?
+CreateProductDTO : +price double
+CreateProductDTO : +quantity int
+CreateProductDTO : +imageUrl String?
+
+class UpdateProductDTO
+UpdateProductDTO : +name String?
+UpdateProductDTO : +description String?
+UpdateProductDTO : +price double?
+UpdateProductDTO : +quantity int?
+UpdateProductDTO : +imageUrl String?
+
+class CreatePostDTO
+CreatePostDTO : +caption String?
+CreatePostDTO : +productIds List~int~?
+CreatePostDTO : +promoMedias List~MediaModel~?
+
+class UpdatePostDTO
+UpdatePostDTO : +caption String?
+UpdatePostDTO : +productIds List~int~?
+UpdatePostDTO : +promoMedias List~MediaModel~?
+
+class CreateLiveStreamDTO
+CreateLiveStreamDTO : +title String
+CreateLiveStreamDTO : +streamUrl String
+CreateLiveStreamDTO : +thumbnailUrl String?
+CreateLiveStreamDTO : +productIds List~int~?
+
+class UpdateLiveStreamDTO
+UpdateLiveStreamDTO : +title String?
+UpdateLiveStreamDTO : +streamUrl String?
+UpdateLiveStreamDTO : +thumbnailUrl String?
+UpdateLiveStreamDTO : +productIds List~int~?
+
+class LogInDTO
+LogInDTO : +email String
+LogInDTO : +password String
+
+class SignUpDTO
+SignUpDTO : +username String
+SignUpDTO : +email String
+SignUpDTO : +password String
+SignUpDTO : +phone String
+SignUpDTO : +address String
+SignUpDTO : +profileImageUrl String
+SignUpDTO : +bio String
+
