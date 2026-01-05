@@ -292,110 +292,92 @@ Future<void> initDb(Database db) async {
     ''');
 }
 
-const profileImage = 'assets/profiles/profile1.png';
+const profileImages = [
+  'assets/profiles/rafat.png',
+  'assets/profiles/raksa.png',
+  'assets/profiles/sal.png',
+  'assets/profiles/tong.png',
+  'assets/profiles/vatana.png',
+];
 
 const productImages = [
-  'assets/images/coffee1.png',
-  'assets/images/coffee2.png',
-  'assets/images/coffee3.png',
-  'assets/images/coffee4.png',
-  'assets/images/coffee5.png',
-];
+  'assets/images/apartment.jpg',
+  'assets/images/bike.jpg',
+  'assets/images/broom.jpg',
+  'assets/images/car.jpg',
+  'assets/images/dog_food.jpg',
+  'assets/images/dog_toy.jpg',
+  'assets/images/home.avif',
+  'assets/images/ipad.jpg',
+  'assets/images/motobike.webp',
+  'assets/images/pants.jpg',
+  'assets/images/pen.png',
+  'assets/images/phone.jpg',
+  'assets/images/plane_toy.jpg',
+  'assets/images/plane.jpg',
+  'assets/images/room.jpg',
+  'assets/images/shirt.jpg',
+  'assets/images/teddy.jpg',
+  'assets/images/vacuum.jpg',
+]; 
 
 const productVideos = [
   'assets/live_videos/sample1.mp4',
   'assets/live_videos/sample2.mp4',
 ];
 
-const promoImages = [
-  'assets/images/coffee1.png',
-  'assets/images/coffee2.png',
-  'assets/images/coffee3.png',
-  'assets/images/coffee4.png',
-];
+// Category-specific product mappings
+final categoryProductMap = {
+  'vehicles': ['car.jpg', 'bike.jpg', 'motobike.webp'],
+  'property': ['apartment.jpg', 'home.avif', 'room.jpg', 'plane.jpg'],
+  'electronics': ['ipad.jpg', 'phone.jpg', 'vacuum.jpg'],
+  'home': ['broom.jpg', 'vacuum.jpg'],
+  'fashion': ['pants.jpg', 'shirt.jpg'],
+  'kids': ['plane_toy.jpg', 'teddy.jpg', 'pen.png'],
+  'pets': ['dog_food.jpg', 'dog_toy.jpg'],
+  'others': ['pen.png'],
+};
 
-const promoVideos = [
-  'assets/live_videos/sample1.mp4',
-  'assets/live_videos/sample2.mp4',
-];
+final categoryProductNames = {
+  'vehicles': ['Toyota Camry 2020', 'Honda CBR 600', 'Mountain Bike Pro', 'Yamaha Exciter 155'],
+  'property': ['2BR Apartment Downtown', '3BR Family House', 'Studio Room City Center', 'Private Jet Charter'],
+  'electronics': ['iPad Pro 11"', 'iPhone 14 Pro', 'Robot Vacuum Cleaner', 'Wireless Earbuds'],
+  'home': ['Cleaning Broom Set', 'Coffee Maker Deluxe', 'Smart Vacuum Robot'],
+  'fashion': ['Denim Jeans', 'Cotton T-Shirt', 'Formal Pants', 'Casual Shirt'],
+  'kids': ['Toy Airplane', 'Teddy Bear Large', 'Colorful Pen Set', 'Learning Tablet'],
+  'pets': ['Premium Dog Food 10kg', 'Chew Toy for Dogs', 'Pet Grooming Kit'],
+  'others': ['Office Pen Set', 'Stationery Bundle', 'Misc Items'],
+};
 
-const categories = [
+final categories = [
   'vehicles',
   'property',
   'electronics',
   'home',
   'fashion',
-  'jobs',
-  'services',
-  'entertainment',
   'kids',
   'pets',
-  'business',
   'others',
 ];
 
 final firstNames = [
-  'Alex',
-  'Jordan',
-  'Taylor',
-  'Morgan',
-  'Casey',
-  'Riley',
-  'Cameron',
-  'Jamie',
-  'Skyler',
-  'Avery',
-  'Quinn',
-  'Parker',
-  'Dakota',
-  'Reese',
-  'Emerson',
+  'Alex', 'Jordan', 'Taylor', 'Morgan', 'Casey',
+  'Riley', 'Cameron', 'Jamie', 'Skyler', 'Avery',
+  'Quinn', 'Parker', 'Dakota', 'Reese', 'Emerson',
 ];
 
 final lastNames = [
-  'Smith',
-  'Johnson',
-  'Brown',
-  'Williams',
-  'Jones',
-  'Miller',
-  'Davis',
-  'Garcia',
-  'Rodriguez',
-  'Martinez',
-  'Lee',
-  'Walker',
-  'Hall',
-  'Allen',
-  'Young',
+  'Smith', 'Johnson', 'Brown', 'Williams', 'Jones',
+  'Miller', 'Davis', 'Garcia', 'Rodriguez', 'Martinez',
+  'Lee', 'Walker', 'Hall', 'Allen', 'Young',
 ];
 
 String randomName(Random rand, int userId) {
   final first = firstNames[rand.nextInt(firstNames.length)];
   final last = lastNames[rand.nextInt(lastNames.length)];
-  return '$first $last $userId'; // Add userId to ensure uniqueness
+  return '$first $last';
 }
 
-// Product names
-final productNames = [
-  "Premium Coffee Beans",
-  "Wireless Bluetooth Headphones",
-  "Organic Cotton T-Shirt",
-  "Stainless Steel Water Bottle",
-  "Smartphone Case",
-  "Laptop Stand",
-  "Yoga Mat",
-  "Kitchen Knife Set",
-  "LED Desk Lamp",
-  "Backpack",
-  "Running Shoes",
-  "Skincare Set",
-  "Board Game",
-  "Plant Pot",
-  "Candle Set",
-];
-
-// Post captions
 final postCaptions = [
   "Fresh stock just arrived! ☕ Don't miss out",
   "Back in stock - grab yours while available",
@@ -425,476 +407,466 @@ final addresses = [
   '350 Birch Pl, Miami, FL 33101, USA',
   '72 Cherry Ct, Boston, MA 02118, USA',
   '890 Aspen Cir, Columbus, OH 43215, USA',
-  '230 Magnolia Ave, Nashville, TN 37206, USA',
-  '400 Spruce Ter, Minneapolis, MN 55407, USA',
-  '385 Hickory Way, Raleigh, NC 27605, USA',
-  '2000 Sycamore St, Phoenix, AZ 85018, USA',
-  '1013 Palm Dr, Los Angeles, CA 90026, USA',
-  '9 Jasmine Blvd, Atlanta, GA 30308, USA',
-  '876 Poplar Park, Kansas City, MO 64108, USA',
-  '155 Redwood Ln, Salt Lake City, UT 84101, USA',
-  '545 Alder Blvd, Madison, WI 53703, USA',
-  '27 Dogwood Pl, Richmond, VA 23220, USA',
 ];
 
 final notes = [
   'Leave the package at front door.',
   'Ring the doorbell twice, please.',
   'Call before delivery.',
-  'Friendly golden retriever in the yard.',
   'Gate code is 2458.',
   'Apartment 3B, buzzer #042.',
   'Please deliver after 5pm.',
   'N/A',
   'Please handle with care, fragile items.',
-  'Gate is usually open, come around back.',
   'Deliveries to side entrance.',
   'Someone home after 4pm.',
-  'Park on the street, driveway is narrow.',
-  'Package locker is in the lobby.',
-  'Mail slot is on the right side of the house.',
-  'No signature required.',
-  'Knock loudly, bell not working.',
-  'House is at the end of a long driveway.',
-  'Please text me if running late.',
-  'Use the service elevator for large items.',
 ];
 
 final phoneNumbers = [
-  '217-555-3748',
-  '718-555-2339',
-  '512-555-9810',
-  '415-555-2256',
-  '303-555-8920',
-  '206-555-1123',
-  '503-555-4098',
-  '305-555-7210',
-  '617-555-3344',
+  '217-555-3748', '718-555-2339', '512-555-9810',
+  '415-555-2256', '303-555-8920', '206-555-1123',
+  '503-555-4098', '305-555-7210', '617-555-3344',
   '614-555-9099',
-  '615-555-6031',
-  '612-555-7878',
-  '919-555-1442',
-  '602-555-5550',
-  '323-555-7654',
-  '404-555-3322',
-  '816-555-2288',
-  '801-555-1017',
-  '608-555-4126',
-  '804-555-9890',
 ];
 
-final bio = [
-  'Passionate entrepreneur, coffee enthusiast, and lifelong learner...',
-  'As a merchant, I believe in the power of community...',
-  'With a background in business management and a passion for e-commerce...',
+final bios = [
+  'Passionate entrepreneur and coffee enthusiast. Been selling online for 5+ years!',
+  'Quality products at fair prices. Customer satisfaction is my priority.',
+  'Small business owner. Thanks for supporting local sellers! 🙏',
+  'Trusted seller since 2019. Fast replies and reliable service.',
 ];
 
-final productDescriptions = [
-  "This is one of those items that just works...",
-  "I personally tested this before adding it to my shop...",
-  "Honestly, I was surprised by how good this is for the price...",
-  "This has become one of my bestsellers for good reason...",
-];
+final productDescriptions = {
+  'vehicles': 'Well-maintained and in excellent condition. All documents available.',
+  'property': 'Prime location with great amenities. Viewing available by appointment.',
+  'electronics': 'Brand new with warranty. Original packaging included.',
+  'home': 'High quality and durable. Perfect for everyday use.',
+  'fashion': 'Comfortable fit, premium material. Various sizes available.',
+  'kids': 'Safe and fun for children. Educational and entertaining.',
+  'pets': 'Vet recommended and pet-approved. High quality ingredients.',
+  'others': 'Excellent quality and great value for money.',
+};
 
 final chatMessages = [
-  "Hi there! Is this still available?",
-  "Hey, how much are you asking for this?",
-  "Can you deliver it today by any chance?",
-  "I'm really interested in buying this!",
+  "Hi! Is this still available?",
+  "Can you send more photos?",
+  "What's your best price?",
+  "Can you deliver today?",
+  "I'm interested in buying this!",
+  "Do you accept payment on delivery?",
+  "Is the warranty still valid?",
+  "Can we meet up tomorrow?",
 ];
 
 final liveChatMessages = [
-  "How much for this one? 💰",
-  "Is this available right now?",
-  "Can you show it closer please?",
-  "This looks really good! 👍",
+  "How much for this? 💰",
+  "Still available?",
+  "Show it closer please 👀",
+  "This looks great! 👍",
+  "I want to buy!",
+  "What's the price? 💵",
+  "Can you show the back?",
+  "Add to cart! 🛒",
 ];
 
 final reviewMessages = [
-  "Really smooth transaction! The seller was super helpful.",
-  "Item arrived exactly as described in the post.",
-  "Fast replies and very easy to deal with.",
-  "Had a great experience overall.",
+  "Great seller! Item exactly as described.",
+  "Fast delivery and good communication.",
+  "Very professional and helpful.",
+  "Product quality exceeded expectations!",
+  "Smooth transaction, highly recommend.",
+  "Good service, will buy again.",
+  "Item arrived safely and on time.",
+  "Honest seller, no issues at all.",
 ];
 
 Future<void> insertMockData(Database db) async {
   await db.execute('PRAGMA foreign_keys = ON');
-
   final now = DateTime.now().toIso8601String();
   final rand = Random();
 
-  // 1️⃣ USERS (50 merchants, 50 regular users)
-  for (int i = 1; i <= 100; i++) {
+  print('📊 Starting data seeding...');
+
+  // 1️⃣ USERS (50 regular users only)
+  print('👥 Creating users...');
+  for (int i = 1; i <= 50; i++) {
     await db.insert(Tables.users.tableName, {
       Tables.users.cols.username: randomName(rand, i),
-      Tables.users.cols.email: 'user$i@gmail.com',
+      Tables.users.cols.email: 'user$i@example.com',
       Tables.users.cols.passwordHash: Hasher.sha256Hash('password$i'),
       Tables.users.cols.phone: phoneNumbers[rand.nextInt(phoneNumbers.length)],
       Tables.users.cols.address: addresses[rand.nextInt(addresses.length)],
       Tables.users.cols.notes: notes[rand.nextInt(notes.length)],
-      Tables.users.cols.profileImageUrl: profileImage,
-      Tables.users.cols.bio: bio[rand.nextInt(bio.length)],
+      Tables.users.cols.profileImageUrl: profileImages[rand.nextInt(profileImages.length)],
+      Tables.users.cols.bio: null, // Regular users don't need bios
       Tables.users.cols.createdAt: now,
       Tables.users.cols.updatedAt: now,
     });
   }
 
-  // 2️⃣ MERCHANTS (50 merchants)
-  for (int i = 1; i <= 50; i++) {
+  // 2️⃣ MERCHANTS (20 merchants with unique profiles)
+  print('🏪 Creating merchants...');
+  for (int i = 1; i <= 20; i++) {
     await db.insert(Tables.merchants.tableName, {
-      Tables.merchants.cols.userId: i,
+      Tables.merchants.cols.userId: i, // First 20 users are merchants
       Tables.merchants.cols.username: randomName(rand, i),
-      Tables.merchants.cols.email: 'merchant$i@gmail.com',
-      Tables.merchants.cols.bio: bio[rand.nextInt(bio.length)],
-      Tables.merchants.cols.passwordHash: Hasher.sha256Hash(
-        'merchantpassword$i',
-      ),
-      Tables.merchants.cols.rating:
-          (rand.nextDouble() * 2) + 3.0, // 3.0-5.0 rating
-      Tables.merchants.cols.profileImage: profileImage,
+      Tables.merchants.cols.email: 'merchant$i@example.com',
+      Tables.merchants.cols.bio: bios[rand.nextInt(bios.length)],
+      Tables.merchants.cols.passwordHash: Hasher.sha256Hash('merchant$i'),
+      Tables.merchants.cols.rating: (rand.nextDouble() * 1.5) + 3.5, // 3.5-5.0
+      Tables.merchants.cols.profileImage: profileImages[rand.nextInt(profileImages.length)],
       Tables.merchants.cols.createdAt: now,
       Tables.merchants.cols.updatedAt: now,
     });
   }
-  // 2️⃣ PRODUCT_CATEGORIES
+
+  // 3️⃣ PRODUCT_CATEGORIES
+  print('📦 Creating categories...');
   for (int i = 0; i < categories.length; i++) {
     await db.insert(Tables.productCategories.tableName, {
       Tables.productCategories.cols.name: categories[i],
     });
   }
 
-  // 3️⃣ PRODUCTS (created by merchants)
-  for (int i = 1; i <= 200; i++) {
-    final merchantId = rand.nextInt(50) + 1; // Random merchant (1-50)
-    await db.insert(Tables.products.tableName, {
-      Tables.products.cols.merchantId: merchantId,
-      Tables.products.cols.name:
-          productNames[rand.nextInt(productNames.length)],
-      Tables.products.cols.description:
-          productDescriptions[rand.nextInt(productDescriptions.length)],
-      Tables.products.cols.price: (rand.nextDouble() * 200) + 10, // $10-$210
-      Tables.products.cols.quantity: rand.nextInt(50) + 1,
-      Tables.products.cols.createdAt: now,
-      Tables.products.cols.updatedAt: now,
-    });
-  }
+  // 4️⃣ PRODUCTS (5-15 products per merchant, category-specific)
+  print('🛍️ Creating products...');
+  int productId = 1;
+  for (int merchantId = 1; merchantId <= 20; merchantId++) {
+    final numProducts = rand.nextInt(11) + 5; // 5-15 products per merchant
+    
+    for (int j = 0; j < numProducts; j++) {
+      final category = categories[rand.nextInt(categories.length)];
+      final categoryIndex = categories.indexOf(category) + 1;
+      final productNameList = categoryProductNames[category]!;
+      
+      await db.insert(Tables.products.tableName, {
+        Tables.products.cols.merchantId: merchantId,
+        Tables.products.cols.name: productNameList[rand.nextInt(productNameList.length)],
+        Tables.products.cols.description: productDescriptions[category],
+        Tables.products.cols.price: _getCategoryPrice(category, rand),
+        Tables.products.cols.quantity: rand.nextInt(30) + 5, // 5-35 items
+        Tables.products.cols.createdAt: now,
+        Tables.products.cols.updatedAt: now,
+      });
 
-  // 4️⃣ PRODUCT_CATEGORY_MAPS (assign categories to products)
-  for (int productId = 1; productId <= 200; productId++) {
-    // Each product gets 1-3 categories
-    final numCategories = rand.nextInt(3) + 1;
-    final assignedCategories = <int>{};
-
-    for (int j = 0; j < numCategories; j++) {
-      int categoryId;
-      do {
-        categoryId = rand.nextInt(categories.length) + 1;
-      } while (assignedCategories.contains(categoryId));
-
-      assignedCategories.add(categoryId);
-
+      // Assign appropriate category
       await db.insert(Tables.productCategoryMaps.tableName, {
         Tables.productCategoryMaps.cols.productId: productId,
-        Tables.productCategoryMaps.cols.categoryId: categoryId,
+        Tables.productCategoryMaps.cols.categoryId: categoryIndex,
       });
+
+      // Add 2-4 relevant images per product
+      final imageList = categoryProductMap[category]!;
+      final numImages = rand.nextInt(3) + 2; // 2-4 images
+      for (int k = 0; k < numImages; k++) {
+        await db.insert(Tables.productMedias.tableName, {
+          Tables.productMedias.cols.productId: productId,
+          Tables.productMedias.cols.url: 'assets/images/${imageList[rand.nextInt(imageList.length)]}',
+          Tables.productMedias.cols.mediaType: 'image',
+          Tables.productMedias.cols.createdAt: now,
+          Tables.productMedias.cols.updatedAt: now,
+        });
+      }
+
+      productId++;
     }
   }
 
-  // 5️⃣ PRODUCT_MEDIAS (images only for products)
-  for (int productId = 1; productId <= 200; productId++) {
-    // Each product gets 2-5 media files (all images)
-    final numMedia = rand.nextInt(4) + 2;
+  final totalProducts = productId - 1;
+  print('✅ Created $totalProducts products');
 
-    for (int j = 0; j < numMedia; j++) {
-      await db.insert(Tables.productMedias.tableName, {
-        Tables.productMedias.cols.productId: productId,
-        Tables.productMedias.cols.url:
-            productImages[rand.nextInt(productImages.length)],
-        Tables.productMedias.cols.mediaType: 'image',
-        Tables.productMedias.cols.createdAt: now,
-        Tables.productMedias.cols.updatedAt: now,
+  // 5️⃣ POSTS (2-8 posts per merchant)
+  print('📝 Creating posts...');
+  int postId = 1;
+  for (int merchantId = 1; merchantId <= 20; merchantId++) {
+    final numPosts = rand.nextInt(7) + 2; // 2-8 posts
+    
+    for (int j = 0; j < numPosts; j++) {
+      await db.insert(Tables.posts.tableName, {
+        Tables.posts.cols.merchantId: merchantId,
+        Tables.posts.cols.caption: postCaptions[rand.nextInt(postCaptions.length)],
+        Tables.posts.cols.createdAt: now,
+        Tables.posts.cols.updatedAt: now,
       });
+
+      // Get merchant's products
+      final merchantProducts = await db.query(
+        Tables.products.tableName,
+        where: '${Tables.products.cols.merchantId} = ?',
+        whereArgs: [merchantId],
+      );
+
+      if (merchantProducts.isNotEmpty) {
+        // Feature 1-3 products per post
+        final numFeatured = rand.nextInt(3) + 1;
+        final shuffled = List.from(merchantProducts)..shuffle(rand);
+        
+        for (int k = 0; k < numFeatured && k < shuffled.length; k++) {
+          final productData = shuffled[k];
+          await db.insert(Tables.postProducts.tableName, {
+            Tables.postProducts.cols.postId: postId,
+            Tables.postProducts.cols.productId: productData[Tables.products.cols.id],
+          });
+        }
+
+        // Add 1-3 promo images
+        final numPromoMedia = rand.nextInt(3) + 1;
+        for (int k = 0; k < numPromoMedia; k++) {
+          await db.insert(Tables.promoMedias.tableName, {
+            Tables.promoMedias.cols.postId: postId,
+            Tables.promoMedias.cols.url: productImages[rand.nextInt(productImages.length)],
+            Tables.promoMedias.cols.mediaType: 'image',
+            Tables.promoMedias.cols.createdAt: now,
+            Tables.promoMedias.cols.updatedAt: now,
+          });
+        }
+      }
+
+      postId++;
     }
   }
 
-  // 6️⃣ POSTS (promotional posts by merchants)
-  for (int i = 1; i <= 150; i++) {
-    final merchantId = rand.nextInt(50) + 1; // Random merchant
+  final totalPosts = postId - 1;
+  print('✅ Created $totalPosts posts');
 
-    await db.insert(Tables.posts.tableName, {
-      Tables.posts.cols.merchantId: merchantId,
-      Tables.posts.cols.caption:
-          postCaptions[rand.nextInt(postCaptions.length)],
-      Tables.posts.cols.createdAt: now,
-      Tables.posts.cols.updatedAt: now,
-    });
-  }
-
-  // 7️⃣ POST_PRODUCTS (products featured in posts)
-  for (int postId = 1; postId <= 150; postId++) {
-    // Each post features 1-4 products
-    final numProducts = rand.nextInt(4) + 1;
-    final featuredProducts = <int>{};
-
-    for (int j = 0; j < numProducts; j++) {
-      int productId;
-      do {
-        productId = rand.nextInt(200) + 1;
-      } while (featuredProducts.contains(productId));
-
-      featuredProducts.add(productId);
-
-      await db.insert(Tables.postProducts.tableName, {
-        Tables.postProducts.cols.postId: postId,
-        Tables.postProducts.cols.productId: productId,
-      });
+  // 6️⃣ POST_LIKES (realistic engagement)
+  print('❤️ Creating post likes...');
+  for (int pId = 1; pId <= totalPosts; pId++) {
+    final numLikes = rand.nextInt(30); // 0-30 likes per post
+    final likedBy = <int>{};
+    
+    for (int j = 0; j < numLikes; j++) {
+      final userId = rand.nextInt(50) + 1;
+      if (likedBy.add(userId)) {
+        try {
+          await db.insert(Tables.postLikes.tableName, {
+            Tables.postLikes.cols.userId: userId,
+            Tables.postLikes.cols.postId: pId,
+            Tables.postLikes.cols.createdAt: now,
+            Tables.postLikes.cols.updatedAt: now,
+          });
+        } catch (e) {
+          // Skip duplicates
+        }
+      }
     }
   }
 
-  // 8️⃣ PROMO_MEDIAS (images only for promotional media in posts)
-  for (int postId = 1; postId <= 150; postId++) {
-    // Each post gets 1-3 promotional media (all images)
-    final numMedia = rand.nextInt(3) + 1;
-
-    for (int j = 0; j < numMedia; j++) {
-      await db.insert(Tables.promoMedias.tableName, {
-        Tables.promoMedias.cols.postId: postId,
-        Tables.promoMedias.cols.url:
-            promoImages[rand.nextInt(promoImages.length)],
-        Tables.promoMedias.cols.mediaType: 'image',
-        Tables.promoMedias.cols.createdAt: now,
-        Tables.promoMedias.cols.updatedAt: now,
-      });
+  // 7️⃣ POST_SAVES (less common than likes)
+  print('🔖 Creating post saves...');
+  for (int pId = 1; pId <= totalPosts; pId++) {
+    final numSaves = rand.nextInt(10); // 0-10 saves per post
+    final savedBy = <int>{};
+    
+    for (int j = 0; j < numSaves; j++) {
+      final userId = rand.nextInt(50) + 1;
+      if (savedBy.add(userId)) {
+        try {
+          await db.insert(Tables.postSaves.tableName, {
+            Tables.postSaves.cols.userId: userId,
+            Tables.postSaves.cols.postId: pId,
+            Tables.postSaves.cols.createdAt: now,
+            Tables.postSaves.cols.updatedAt: now,
+          });
+        } catch (e) {
+          // Skip duplicates
+        }
+      }
     }
   }
 
-  // 9️⃣ POST_LIKES (users liking posts)
-  for (int i = 1; i <= 500; i++) {
-    final userId = rand.nextInt(50) + 51; // Regular users (51-100)
-    final postId = rand.nextInt(150) + 1;
-
-    // Try to insert, ignore if duplicate
-    try {
-      await db.insert(Tables.postLikes.tableName, {
-        Tables.postLikes.cols.userId: userId,
-        Tables.postLikes.cols.postId: postId,
-        Tables.postLikes.cols.createdAt: now,
-        Tables.postLikes.cols.updatedAt: now,
+  // 8️⃣ LIVE_STREAMS (1-3 per merchant)
+  print('📹 Creating live streams...');
+  for (int merchantId = 1; merchantId <= 20; merchantId++) {
+    final numStreams = rand.nextInt(3) + 1;
+    
+    for (int j = 0; j < numStreams; j++) {
+      final streamId = await db.insert(Tables.liveStreams.tableName, {
+        Tables.liveStreams.cols.merchantId: merchantId,
+        Tables.liveStreams.cols.title: 'Live Selling - ${randomName(rand, merchantId)}',
+        Tables.liveStreams.cols.streamUrl: productVideos[rand.nextInt(productVideos.length)],
+        Tables.liveStreams.cols.thumbnailUrl: productImages[rand.nextInt(productImages.length)],
+        Tables.liveStreams.cols.viewCount: rand.nextInt(500) + 50,
+        Tables.liveStreams.cols.createdAt: now,
+        Tables.liveStreams.cols.updatedAt: now,
       });
-    } catch (e) {
-      // Ignore duplicate constraint errors
+
+      // Get merchant's products for stream
+      final merchantProducts = await db.query(
+        Tables.products.tableName,
+        where: '${Tables.products.cols.merchantId} = ?',
+        whereArgs: [merchantId],
+      );
+
+      if (merchantProducts.isNotEmpty) {
+        final numStreamProducts = rand.nextInt(5) + 2; // 2-6 products
+        final shuffled = List.from(merchantProducts)..shuffle(rand);
+        
+        for (int k = 0; k < numStreamProducts && k < shuffled.length; k++) {
+          await db.insert(Tables.liveStreamProducts.tableName, {
+            Tables.liveStreamProducts.cols.liveStreamId: streamId,
+            Tables.liveStreamProducts.cols.productId: shuffled[k][Tables.products.cols.id],
+          });
+        }
+
+        // Add 10-50 chat messages
+        final numChats = rand.nextInt(41) + 10;
+        for (int k = 0; k < numChats; k++) {
+          final userId = rand.nextInt(50) + 1;
+          await db.insert(Tables.liveStreamChats.tableName, {
+            Tables.liveStreamChats.cols.liveStreamId: streamId,
+            Tables.liveStreamChats.cols.userId: userId,
+            Tables.liveStreamChats.cols.text: liveChatMessages[rand.nextInt(liveChatMessages.length)],
+            Tables.liveStreamChats.cols.createdAt: now,
+            Tables.liveStreamChats.cols.updatedAt: now,
+          });
+        }
+      }
     }
   }
 
-  // 🔟 POST_SAVES (users saving posts)
-  for (int i = 1; i <= 200; i++) {
-    final userId = rand.nextInt(50) + 51; // Regular users
-    final postId = rand.nextInt(150) + 1;
-
-    try {
-      await db.insert(Tables.postSaves.tableName, {
-        Tables.postSaves.cols.userId: userId,
-        Tables.postSaves.cols.postId: postId,
-        Tables.postSaves.cols.createdAt: now,
-        Tables.postSaves.cols.updatedAt: now,
-      });
-    } catch (e) {
-      // Ignore duplicates
-    }
-  }
-
-  // 1️⃣1️⃣ LIVE_STREAMS (merchant live streams -- retain videos here)
-  for (int i = 1; i <= 50; i++) {
-    final merchantId = rand.nextInt(50) + 1;
-
-    await db.insert(Tables.liveStreams.tableName, {
-      Tables.liveStreams.cols.merchantId: merchantId,
-      Tables.liveStreams.cols.title: 'Live selling session ${i}',
-      Tables.liveStreams.cols.streamUrl:
-          productVideos[rand.nextInt(productVideos.length)],
-      Tables.liveStreams.cols.thumbnailUrl:
-          productImages[rand.nextInt(productImages.length)],
-      Tables.liveStreams.cols.viewCount: rand.nextInt(1000),
-      Tables.liveStreams.cols.createdAt: now,
-      Tables.liveStreams.cols.updatedAt: now,
-    });
-  }
-
-  // 1️⃣2️⃣ LIVE_STREAM_PRODUCTS (products in live streams)
-  for (int streamId = 1; streamId <= 50; streamId++) {
-    final numProducts = rand.nextInt(5) + 1; // 1-5 products per stream
-    final streamProducts = <int>{};
-
-    for (int j = 0; j < numProducts; j++) {
-      int productId;
-      do {
-        productId = rand.nextInt(200) + 1;
-      } while (streamProducts.contains(productId));
-
-      streamProducts.add(productId);
-
-      await db.insert(Tables.liveStreamProducts.tableName, {
-        Tables.liveStreamProducts.cols.liveStreamId: streamId,
-        Tables.liveStreamProducts.cols.productId: productId,
-      });
-    }
-  }
-
-  // 1️⃣3️⃣ LIVE_STREAM_CHATS (chat messages in streams)
-  for (int streamId = 1; streamId <= 50; streamId++) {
-    final numChats = rand.nextInt(50) + 10; // 10-60 chats per stream
-
-    for (int j = 0; j < numChats; j++) {
-      final userId = rand.nextInt(100) + 1; // Any user can chat
-
-      await db.insert(Tables.liveStreamChats.tableName, {
-        Tables.liveStreamChats.cols.liveStreamId: streamId,
-        Tables.liveStreamChats.cols.userId: userId,
-        Tables.liveStreamChats.cols.text:
-            liveChatMessages[rand.nextInt(liveChatMessages.length)],
-        Tables.liveStreamChats.cols.createdAt: now,
-        Tables.liveStreamChats.cols.updatedAt: now,
-      });
-    }
-  }
-
-  // 1️⃣4️⃣ CHAT_ROOMS (private conversations)
-  for (int i = 1; i <= 100; i++) {
-    // final userId = rand.nextInt(50) + 51; // Regular user
-    final merchantId = rand.nextInt(50) + 1; // Merchant
-
-    try {
-      await db.insert(Tables.chatRooms.tableName, {
-        Tables.chatRooms.cols.userId: 1, // for easy testing
+  // 9️⃣ CHAT_ROOMS (conversations between users and merchants)
+  print('💬 Creating chat rooms...');
+  final createdRooms = <String>{};
+  for (int i = 1; i <= 60; i++) {
+    final userId = rand.nextInt(50) + 1;
+    final merchantId = rand.nextInt(20) + 1;
+    final key = '$userId-$merchantId';
+    
+    if (createdRooms.add(key)) {
+      final roomId = await db.insert(Tables.chatRooms.tableName, {
+        Tables.chatRooms.cols.userId: userId,
         Tables.chatRooms.cols.merchantId: merchantId,
         Tables.chatRooms.cols.createdAt: now,
         Tables.chatRooms.cols.updatedAt: now,
       });
-    } catch (e) {
-      // Ignore duplicates
+
+      // Add 3-15 messages per room
+      final numMessages = rand.nextInt(13) + 3;
+      for (int j = 0; j < numMessages; j++) {
+        final isUserSender = rand.nextBool();
+        await db.insert(Tables.chats.tableName, {
+          Tables.chats.cols.chatRoomId: roomId,
+          Tables.chats.cols.senderId: isUserSender ? userId : merchantId,
+          Tables.chats.cols.text: chatMessages[rand.nextInt(chatMessages.length)],
+          Tables.chats.cols.createdAt: now,
+          Tables.chats.cols.updatedAt: now,
+        });
+      }
     }
   }
 
-  // 1️⃣5️⃣ CHATS (messages in chat rooms)
-  final chatRooms = await db.query(Tables.chatRooms.tableName);
-  for (final room in chatRooms) {
-    final roomId = room[Tables.chatRooms.cols.id] as int;
-    final userId = room[Tables.chatRooms.cols.userId] as int;
-    final merchantId = room[Tables.chatRooms.cols.merchantId] as int;
-    final numMessages = rand.nextInt(10) + 1;
-
-    for (int j = 0; j < numMessages; j++) {
-      final senderId = rand.nextBool() ? userId : merchantId;
-
-      await db.insert(Tables.chats.tableName, {
-        Tables.chats.cols.chatRoomId: roomId,
-        Tables.chats.cols.senderId: senderId,
-        Tables.chats.cols.text: chatMessages[rand.nextInt(chatMessages.length)],
-        Tables.chats.cols.createdAt: now,
-        Tables.chats.cols.updatedAt: now,
-      });
-    }
-  }
-
-  // ! for dev purposes: remove seeded carts and orders so that these things come naturally
-
-  // 1️⃣6️⃣ CARTS (user shopping carts)
-  for (int userId = 51; userId <= 100; userId++) {
-    // Regular users only
-    final numItems = rand.nextInt(5) + 1; // 1-5 items per cart
-    final cartProducts = <int>{};
-
-    for (int j = 0; j < numItems; j++) {
-      int productId;
-      do {
-        productId = rand.nextInt(200) + 1;
-      } while (cartProducts.contains(productId));
-
-      cartProducts.add(productId);
-
-      await db.insert(Tables.carts.tableName, {
-        Tables.carts.cols.userId: userId,
-        Tables.carts.cols.productId: productId,
-        Tables.carts.cols.quantity: rand.nextInt(3) + 1,
-        Tables.carts.cols.createdAt: now,
-        Tables.carts.cols.updatedAt: now,
-      });
-    }
-  }
-
-  // 1️⃣7️⃣ ORDERS (purchase orders)
-  for (int i = 1; i <= 80; i++) {
-    final userId = rand.nextInt(50) + 51; // Regular user
-    final merchantId = 1; // Merchant
-    final statuses = [
-      'waiting',
-      'accepted',
-      'delivering',
-      'completed',
-      'cancelled',
-    ];
-
-    await db.insert(Tables.orders.tableName, {
+  // 🔟 ORDERS (realistic purchase history)
+  print('🛒 Creating orders...');
+  for (int i = 1; i <= 40; i++) {
+    final userId = rand.nextInt(50) + 1;
+    final merchantId = rand.nextInt(20) + 1;
+    
+    final statusWeights = ['completed', 'completed', 'completed', 'delivering', 'accepted', 'waiting', 'cancelled'];
+    final status = statusWeights[rand.nextInt(statusWeights.length)];
+    
+    final orderId = await db.insert(Tables.orders.tableName, {
       Tables.orders.cols.userId: userId,
       Tables.orders.cols.merchantId: merchantId,
-      Tables.orders.cols.status: statuses[rand.nextInt(statuses.length)],
+      Tables.orders.cols.status: status,
       Tables.orders.cols.createdAt: now,
       Tables.orders.cols.updatedAt: now,
     });
-  }
 
-  // 1️⃣8️⃣ ORDER_PRODUCTS (products in orders)
-  for (int orderId = 1; orderId <= 80; orderId++) {
-    final numProducts = rand.nextInt(3) + 1; // 1-3 products per order
+    // Add 1-4 products per order
+    final merchantProducts = await db.query(
+      Tables.products.tableName,
+      where: '${Tables.products.cols.merchantId} = ?',
+      whereArgs: [merchantId],
+    );
 
-    for (int j = 0; j < numProducts; j++) {
-      final productId = rand.nextInt(200) + 1;
-
-      await db.insert(Tables.orderProducts.tableName, {
-        Tables.orderProducts.cols.orderId: orderId,
-        Tables.orderProducts.cols.productId: productId,
-        Tables.orderProducts.cols.quantity: rand.nextInt(2) + 1,
-      });
-    }
-  }
-
-  // 1️⃣9️⃣ REVIEWS (user reviews for merchants)
-  for (int i = 1; i <= 100; i++) {
-    final userId = rand.nextInt(50) + 51; // Regular user
-    final merchantId = rand.nextInt(50) + 1; // Merchant
-
-    try {
-      await db.insert(Tables.reviews.tableName, {
-        Tables.reviews.cols.userId: userId,
-        Tables.reviews.cols.merchantId: merchantId,
-        Tables.reviews.cols.text:
-            reviewMessages[rand.nextInt(reviewMessages.length)],
-        Tables.reviews.cols.rating: (rand.nextDouble() * 2) + 3.0, // 3.0-5.0
-        Tables.reviews.cols.createdAt: now,
-        Tables.reviews.cols.updatedAt: now,
-      });
-    } catch (e) {
-      // Ignore duplicates
-    }
-  }
-
-  // 2️⃣0️⃣ FOLLOWERS (user following system)
-  for (int i = 1; i <= 200; i++) {
-    final followerId = rand.nextInt(100) + 1; // Any user
-    final followedId = rand.nextInt(100) + 1; // Any user
-
-    if (followerId != followedId) {
-      // Can't follow yourself
-      try {
-        await db.insert(Tables.followers.tableName, {
-          Tables.followers.cols.followerId: followerId,
-          Tables.followers.cols.followedId: followedId,
-          Tables.followers.cols.createdAt: now,
-          Tables.followers.cols.updatedAt: now,
+    if (merchantProducts.isNotEmpty) {
+      final numProducts = rand.nextInt(4) + 1;
+      final shuffled = List.from(merchantProducts)..shuffle(rand);
+      
+      for (int j = 0; j < numProducts && j < shuffled.length; j++) {
+        await db.insert(Tables.orderProducts.tableName, {
+          Tables.orderProducts.cols.orderId: orderId,
+          Tables.orderProducts.cols.productId: shuffled[j][Tables.products.cols.id],
+          Tables.orderProducts.cols.quantity: rand.nextInt(3) + 1,
         });
-      } catch (e) {
-        // Ignore duplicates
       }
     }
+  }
+
+  // 1️⃣1️⃣ REVIEWS (only for completed orders)
+  print('⭐ Creating reviews...');
+  final completedOrders = await db.query(
+    Tables.orders.tableName,
+    where: '${Tables.orders.cols.status} = ?',
+    whereArgs: ['completed'],
+  );
+
+  for (final order in completedOrders) {
+    if (rand.nextDouble() < 0.7) { // 70% of completed orders get reviewed
+      final userId = order[Tables.orders.cols.userId] as int;
+      final merchantId = order[Tables.orders.cols.merchantId] as int;
+      
+      try {
+        await db.insert(Tables.reviews.tableName, {
+          Tables.reviews.cols.userId: userId,
+          Tables.reviews.cols.merchantId: merchantId,
+          Tables.reviews.cols.text: reviewMessages[rand.nextInt(reviewMessages.length)],
+          Tables.reviews.cols.rating: (rand.nextDouble() * 1.5) + 3.5, // 3.5-5.0
+          Tables.reviews.cols.createdAt: now,
+          Tables.reviews.cols.updatedAt: now,
+        });
+      } catch (e) {
+        // Skip if user already reviewed this merchant
+      }
+    }
+  }
+
+  // 1️⃣2️⃣ FOLLOWERS (users following merchants)
+  print('👥 Creating follower relationships...');
+  for (int userId = 1; userId <= 50; userId++) {
+    final numFollowing = rand.nextInt(10); // Follow 0-10 merchants
+    final following = <int>{};
+    
+    for (int j = 0; j < numFollowing; j++) {
+      final merchantId = rand.nextInt(20) + 1;
+      if (following.add(merchantId)) {
+        try {
+          await db.insert(Tables.followers.tableName, {
+            Tables.followers.cols.followerId: userId,
+            Tables.followers.cols.followedId: merchantId,
+            Tables.followers.cols.createdAt: now,
+            Tables.followers.cols.updatedAt: now,
+          });
+        } catch (e) {
+          // Skip duplicates
+        }
+      }
+    }
+  }
+
+  print('✅ Mock data seeding completed successfully!');
+}
+
+double _getCategoryPrice(String category, Random rand) {
+  switch (category) {
+    case 'vehicles':
+      return (rand.nextDouble() * 20000) + 5000; // $5k-$25k
+    case 'property':
+      return (rand.nextDouble() * 500000) + 100000; // $100k-$600k
+    case 'electronics':
+      return (rand.nextDouble() * 800) + 200; // $200-$1000
+    case 'home':
+      return (rand.nextDouble() * 150) + 20; // $20-$170
+    case 'fashion':
+      return (rand.nextDouble() * 80) + 15; // $15-$95
+    case 'kids':
+      return (rand.nextDouble() * 60) + 10; // $10-$70
+    case 'pets':
+      return (rand.nextDouble() * 50) + 15; // $15-$65
+    case 'others':
+      return (rand.nextDouble() * 40) + 5; // $5-$45
+    default:
+      return (rand.nextDouble() * 100) + 10;
   }
 }

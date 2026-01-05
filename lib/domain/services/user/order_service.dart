@@ -116,7 +116,7 @@ class OrderService {
             order,
             username: 'placeholder name',
             userProfileImage:
-                user?.profileImageUrl ?? 'assets/images/coffee1.png',
+                user?.profileImageUrl ?? 'assets/images/plane.jpg',
             merchantName: merchant?.username ?? '',
             merchantProfileImage: merchant?.profileImage ?? '',
             products: orderProductsVM,
