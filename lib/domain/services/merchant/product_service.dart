@@ -1,4 +1,5 @@
 import 'package:dak_louk/core/auth/app_session.dart';
+import 'package:dak_louk/core/enums/media_type_enum.dart';
 import 'package:dak_louk/core/utils/error.dart';
 import 'package:dak_louk/data/repositories/product_repo.dart';
 import 'package:dak_louk/data/repositories/product_media_repo.dart';
@@ -168,6 +169,18 @@ class ProductService {
       );
       final id = await _productRepository.insert(productModel);
       if (id > 0) {
+        if (dto.imageUrl != null) {
+          await _productMediaRepository.insert(
+            ProductMediaModel(
+              id: 0,
+              productId: id,
+              url: dto.imageUrl!,
+              mediaType: 'image',
+              createdAt: DateTime.now(),
+              updatedAt: DateTime.now(),
+            ),
+          );
+        }
         final newProduct = await _productRepository.getById(id);
         if (newProduct != null) {
           _cache.del('$_baseCacheKey:getAllProductsForCurrentMerchant');
@@ -236,11 +249,25 @@ class ProductService {
         updatedAt: DateTime.now(),
       );
       await _productRepository.update(productModel);
+      if (dto.imageUrl != null) {
+        await _productMediaRepository.update(
+          ProductMediaModel(
+            id: id,
+            productId: id,
+            url: dto.imageUrl!,
+            mediaType: MediaType.image.name,
+            createdAt: product.createdAt,
+            updatedAt: DateTime.now(),
+          ),
+        );
+      }
       final newProduct = await _productRepository.getById(id);
       if (newProduct != null) {
-        _cache.del('$_baseCacheKey:getAllProductsForCurrentMerchant');
+        _cache.delByPattern(
+          '$_baseCacheKey:getAllProductsForCurrentMerchant:*',
+        );
         _cache.del('$_baseCacheKey:getProductById:$id');
-        _cache.del('$_baseCacheKey:getAllProducts');
+        _cache.delByPattern('$_baseCacheKey:getAllProducts:*');
         _cache.delByPattern(userSideCacheKeyPattern);
         return ProductVM.fromRaw(newProduct);
       }
@@ -275,9 +302,9 @@ class ProductService {
       }
       await _productRepository.delete(productId);
 
-      _cache.del('$_baseCacheKey:getAllProductsForCurrentMerchant');
+      _cache.delByPattern('$_baseCacheKey:getAllProductsForCurrentMerchant:*');
       _cache.del('$_baseCacheKey:getProductById:$productId');
-      _cache.del('$_baseCacheKey:getAllProducts');
+      _cache.delByPattern('$_baseCacheKey:getAllProducts:*');
       _cache.delByPattern(userSideCacheKeyPattern);
       throw AppError(type: ErrorType.NOT_FOUND, message: 'Product not found');
     } catch (e) {

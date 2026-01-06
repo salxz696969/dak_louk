@@ -458,6 +458,7 @@ class PostService {
           updatedAt: DateTime.now(),
         ),
       );
+
       if (dto.promoMedias != null) {
         for (var media in dto.promoMedias!) {
           await _promoMediaRepository.insert(
@@ -485,7 +486,11 @@ class PostService {
           final postVMs = await _buildPostVMs([newPost]);
           if (postVMs.isNotEmpty) {
             // Invalidate cache for all posts for current merchant
-            _cache.del('$_baseCacheKey:getAllPostsForCurrentMerchant');
+            _cache.delByPattern(
+              '$_baseCacheKey:getAllPostsForCurrentMerchant:*',
+            );
+            _cache.del('$_baseCacheKey:getPostById:$id');
+            _cache.delByPattern('$_baseCacheKey:getAllPosts:*');
             _cache.delByPattern(userSideCacheKeyPattern);
             return postVMs.first;
           }
@@ -594,8 +599,9 @@ class PostService {
       if (updatedPost != null) {
         final postVMs = await _buildPostVMs([updatedPost]);
         if (postVMs.isNotEmpty) {
-          _cache.del('$_baseCacheKey:getAllPostsForCurrentMerchant');
+          _cache.delByPattern('$_baseCacheKey:getAllPostsForCurrentMerchant:*');
           _cache.del('$_baseCacheKey:getPostById:$id');
+          _cache.delByPattern('$_baseCacheKey:getAllPosts:*');
           _cache.delByPattern(userSideCacheKeyPattern);
           return postVMs.first;
         }
@@ -640,8 +646,9 @@ class PostService {
 
       await _postRepository.delete(postId);
 
-      _cache.del('$_baseCacheKey:getAllPostsForCurrentMerchant');
+      _cache.delByPattern('$_baseCacheKey:getAllPostsForCurrentMerchant:*');
       _cache.del('$_baseCacheKey:getPostById:$postId');
+      _cache.delByPattern('$_baseCacheKey:getAllPosts:*');
       _cache.delByPattern(userSideCacheKeyPattern);
     } catch (e) {
       if (e is AppError) {
