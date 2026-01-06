@@ -57,8 +57,8 @@ class _MerchantPostsScreenState extends State<MerchantPostsScreen> {
     }
   }
 
-  void _showPostForm(BuildContext context, {PostVM? post}) {
-    showModalBottomSheet(
+  Future<void> _showPostForm(BuildContext context, {PostVM? post}) async {
+    final result = await showModalBottomSheet<dynamic>(
       enableDrag: true,
       isDismissible: true,
       showDragHandle: true,
@@ -71,11 +71,43 @@ class _MerchantPostsScreenState extends State<MerchantPostsScreen> {
         padding: EdgeInsets.only(
           bottom: MediaQuery.of(context).viewInsets.bottom,
         ),
-        child: post == null
-            ? PostForm(onSaved: (_) => setState(() {}))
-            : PostEditForm(post: post, onSaved: (_) => setState(() {})),
+        child: post == null ? const PostForm() : PostEditForm(post: post),
       ),
     );
+
+    if (result == null || !mounted) return;
+
+    setState(() {});
+
+    try {
+      if (post == null) {
+        // Create
+        final dto = result as CreatePostDTO;
+        final savedPost = await _postService.createPost(dto);
+        if (savedPost != null && mounted) {
+          setState(() {});
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Post created successfully')),
+          );
+        }
+      } else {
+        // Update
+        final dto = result as UpdatePostDTO;
+        final savedPost = await _postService.updatePost(post.id, dto);
+        if (savedPost != null && mounted) {
+          setState(() {});
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Post updated successfully')),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+      }
+    }
   }
 
   @override

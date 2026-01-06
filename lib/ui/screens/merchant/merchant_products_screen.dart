@@ -72,8 +72,11 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
     );
   }
 
-  void _showProductForm(BuildContext context, {ProductVM? product}) {
-    showModalBottomSheet(
+  Future<void> _showProductForm(
+    BuildContext context, {
+    ProductVM? product,
+  }) async {
+    final result = await showModalBottomSheet<dynamic>(
       enableDrag: true,
       isDismissible: true,
       showDragHandle: true,
@@ -87,28 +90,50 @@ class _MerchantProductsScreenState extends State<MerchantProductsScreen> {
           bottom: MediaQuery.of(context).viewInsets.bottom,
         ),
         child: product == null
-            ? ProductsCreateForm(
-                onSaved: (savedProduct) {
-                  setState(() {
-                    _products.insert(0, savedProduct);
-                  });
-                },
-              )
-            : ProductsUpdateForm(
-                product: product,
-                onSaved: (savedProduct) {
-                  setState(() {
-                    final index = _products.indexWhere(
-                      (p) => p.id == savedProduct.id,
-                    );
-                    if (index != -1) {
-                      _products[index] = savedProduct;
-                    }
-                  });
-                },
-              ),
+            ? const ProductsCreateForm()
+            : ProductsUpdateForm(product: product),
       ),
     );
+
+    if (result == null || !mounted) return;
+
+    try {
+      if (product == null) {
+        final dto = result as CreateProductDTO;
+        final savedProduct = await _productService.createProduct(dto);
+        if (savedProduct != null && mounted) {
+          setState(() {
+            _products.insert(0, savedProduct);
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Product created successfully')),
+          );
+        }
+      } else {
+        final dto = result as UpdateProductDTO;
+        final savedProduct = await _productService.updateProduct(
+          product.id,
+          dto,
+        );
+        if (savedProduct != null && mounted) {
+          setState(() {
+            final index = _products.indexWhere((p) => p.id == savedProduct.id);
+            if (index != -1) {
+              _products[index] = savedProduct;
+            }
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Product updated successfully')),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+      }
+    }
   }
 
   Future<void> _deleteProduct(int productId, int index) async {

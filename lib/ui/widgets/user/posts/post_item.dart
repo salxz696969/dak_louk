@@ -1,7 +1,6 @@
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/domain/services/user/post_like_service.dart';
 import 'package:dak_louk/domain/services/user/post_save_service.dart';
-import 'package:dak_louk/ui/widgets/merchant/posts/post_create_form.dart';
 import 'package:dak_louk/ui/widgets/user/posts/product_item.dart';
 import 'package:dak_louk/ui/screens/user/merchant_profile_screen.dart';
 import 'package:dak_louk/ui/screens/user/post_detail_screen.dart';
@@ -81,54 +80,6 @@ class _PostItemState extends State<PostItem> {
     }
   }
 
-  void _showPostForm() {
-    showModalBottomSheet(
-      enableDrag: true,
-      isDismissible: true,
-      showDragHandle: true,
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-        ),
-        child: PostForm(
-          post: widget.post,
-          onSaved: (updatedPost) {
-            widget.onPostUpdated?.call(updatedPost);
-          },
-        ),
-      ),
-    );
-  }
-
-  Future<void> _deletePost() async {
-    final confirm = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete Post'),
-        content: const Text('Are you sure you want to delete this post?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Delete', style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
-    );
-
-    if (confirm == true) {
-      widget.onPostDeleted?.call();
-    }
-  }
-
   void _navigateToDetail() {
     Navigator.push(
       context,
@@ -140,8 +91,6 @@ class _PostItemState extends State<PostItem> {
 
   @override
   Widget build(BuildContext context) {
-    // Only the merchant header's InkWell should NOT open the post detail
-    // Rest of the item should navigate to post detail
     return GestureDetector(
       onTap: _navigateToDetail,
       behavior: HitTestBehavior.opaque,
@@ -213,20 +162,6 @@ class _PostItemState extends State<PostItem> {
                       ),
                     ],
                   ),
-                ),
-                PopupMenuButton<String>(
-                  icon: const Icon(Icons.more_horiz),
-                  itemBuilder: (context) => const [
-                    PopupMenuItem(value: 'edit', child: Text('Edit')),
-                    PopupMenuItem(value: 'delete', child: Text('Delete')),
-                  ],
-                  onSelected: (value) {
-                    if (value == 'edit') {
-                      _showPostForm();
-                    } else if (value == 'delete') {
-                      _deletePost();
-                    }
-                  },
                 ),
               ],
             ),

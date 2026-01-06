@@ -3,7 +3,6 @@ import 'package:dak_louk/core/media/media_picker_sheet.dart';
 import 'package:dak_louk/core/media/media_model.dart';
 import 'package:flutter/material.dart';
 import 'package:dak_louk/domain/models/models.dart';
-import 'package:dak_louk/domain/services/merchant/post_service.dart';
 import 'package:dak_louk/domain/services/merchant/product_service.dart';
 import 'package:dak_louk/ui/widgets/merchant/shared/add_media_section.dart';
 import 'package:dak_louk/ui/widgets/merchant/shared/add_products_section.dart';
@@ -11,9 +10,8 @@ import 'package:dak_louk/ui/widgets/merchant/shared/product_selector_sheet.dart'
 
 class PostEditForm extends StatefulWidget {
   final PostVM post;
-  final void Function(PostVM savedPost)? onSaved;
 
-  const PostEditForm({super.key, required this.post, this.onSaved});
+  const PostEditForm({super.key, required this.post});
 
   @override
   State<PostEditForm> createState() => _PostEditFormState();
@@ -25,8 +23,6 @@ class _PostEditFormState extends State<PostEditForm> {
   final List<MediaModel> _promoMedias = [];
   List<AddProductsModel> _selectedProducts = [];
 
-  bool _saving = false;
-  final _service = PostService();
   final _productService = ProductService();
 
   @override
@@ -108,32 +104,16 @@ class _PostEditFormState extends State<PostEditForm> {
     });
   }
 
-  Future<void> _submit() async {
+  void _submit() {
     if (!_formKey.currentState!.validate()) return;
 
-    setState(() => _saving = true);
+    final dto = UpdatePostDTO(
+      caption: _captionCtrl.text.trim().isEmpty
+          ? null
+          : _captionCtrl.text.trim(),
+    );
 
-    try {
-      final result = await _service.updatePost(
-        widget.post.id,
-        UpdatePostDTO(
-          caption: _captionCtrl.text.trim().isEmpty
-              ? null
-              : _captionCtrl.text.trim(),
-        ),
-      );
-
-      widget.onSaved?.call(result!);
-      if (mounted) Navigator.pop(context);
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
-      }
-    } finally {
-      if (mounted) setState(() => _saving = false);
-    }
+    Navigator.pop(context, dto);
   }
 
   @override
@@ -206,23 +186,17 @@ class _PostEditFormState extends State<PostEditForm> {
                 width: double.infinity,
                 height: 48,
                 child: InkWell(
-                  onTap: _saving ? null : _submit,
-                  child: _saving
-                      ? const CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            Colors.white,
-                          ),
-                        )
-                      : const Center(
-                          child: Text(
-                            'Update Post',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ),
+                  onTap: _submit,
+                  child: const Center(
+                    child: Text(
+                      'Update Post',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ],
