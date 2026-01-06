@@ -3,17 +3,13 @@ import 'package:dak_louk/core/media/media_picker_sheet.dart';
 import 'package:dak_louk/core/media/media_model.dart';
 import 'package:flutter/material.dart';
 import 'package:dak_louk/domain/models/models.dart';
-import 'package:dak_louk/domain/services/merchant/post_service.dart';
 import 'package:dak_louk/domain/services/merchant/product_service.dart';
 import 'package:dak_louk/ui/widgets/merchant/shared/add_media_section.dart';
 import 'package:dak_louk/ui/widgets/merchant/shared/add_products_section.dart';
 import 'package:dak_louk/ui/widgets/merchant/shared/product_selector_sheet.dart';
 
 class PostForm extends StatefulWidget {
-  final PostVM? post;
-  final void Function(PostVM savedPost)? onSaved;
-
-  const PostForm({super.key, this.post, this.onSaved});
+  const PostForm({super.key});
 
   @override
   State<PostForm> createState() => _PostFormState();
@@ -25,39 +21,7 @@ class _PostFormState extends State<PostForm> {
   final List<MediaModel> _promoMedias = [];
   List<AddProductsModel> _selectedProducts = [];
 
-  bool _saving = false;
-  final _service = PostService();
   final _productService = ProductService();
-
-  @override
-  void initState() {
-    super.initState();
-    if (widget.post != null) {
-      _captionCtrl.text = widget.post!.caption ?? '';
-      if (widget.post!.promoMedias != null) {
-        _promoMedias.addAll(
-          widget.post!.promoMedias!.map(
-            (m) => MediaModel(
-              url: m.url,
-              type: m.mediaType == 'video' ? MediaType.video : MediaType.image,
-            ),
-          ),
-        );
-      } else {
-        _promoMedias.addAll([]);
-      }
-      _selectedProducts.addAll(
-        widget.post!.products.map(
-          (product) => AddProductsModel(
-            id: product.id,
-            name: product.name,
-            price: product.price,
-            medias: product.medias,
-          ),
-        ),
-      );
-    }
-  }
 
   @override
   void dispose() {
@@ -101,56 +65,22 @@ class _PostFormState extends State<PostForm> {
     });
   }
 
-  Future<void> _submit() async {
+  void _submit() {
     if (!_formKey.currentState!.validate()) return;
 
-    setState(() => _saving = true);
+    final dto = CreatePostDTO(
+      caption: _captionCtrl.text.trim().isEmpty
+          ? null
+          : _captionCtrl.text.trim(),
+      productIds: _selectedProducts.map((product) => product.id).toList(),
+      promoMedias: _promoMedias,
+    );
 
-    try {
-      PostVM? result;
-
-      if (widget.post == null) {
-        // Create new post
-        result = await _service.createPost(
-          CreatePostDTO(
-            caption: _captionCtrl.text.trim().isEmpty
-                ? null
-                : _captionCtrl.text.trim(),
-            productIds: _selectedProducts.map((product) => product.id).toList(),
-            promoMedias: _promoMedias,
-          ),
-        );
-      } else {
-        // Update existing post
-        result = await _service.updatePost(
-          widget.post!.id,
-          UpdatePostDTO(
-            caption: _captionCtrl.text.trim().isEmpty
-                ? null
-                : _captionCtrl.text.trim(),
-            productIds: _selectedProducts.map((product) => product.id).toList(),
-            promoMedias: _promoMedias,
-          ),
-        );
-      }
-
-      widget.onSaved?.call(result!);
-      if (mounted) Navigator.pop(context);
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
-      }
-    } finally {
-      if (mounted) setState(() => _saving = false);
-    }
+    Navigator.pop(context, dto);
   }
 
   @override
   Widget build(BuildContext context) {
-    final isEditing = widget.post != null;
-
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Form(
@@ -162,7 +92,7 @@ class _PostFormState extends State<PostForm> {
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  isEditing ? 'Edit Post' : 'Create Post',
+                  'Create Post',
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -213,23 +143,17 @@ class _PostFormState extends State<PostForm> {
                 width: double.infinity,
                 height: 48,
                 child: InkWell(
-                  onTap: _saving ? null : _submit,
-                  child: _saving
-                      ? const CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            Colors.white,
-                          ),
-                        )
-                      : Center(
-                          child: Text(
-                            isEditing ? 'Update Post' : 'Create Post',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ),
+                  onTap: _submit,
+                  child: const Center(
+                    child: Text(
+                      'Create Post',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ],

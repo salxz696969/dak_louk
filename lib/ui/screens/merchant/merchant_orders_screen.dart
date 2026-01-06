@@ -15,7 +15,6 @@ class _MerchantOrdersScreenState extends State<MerchantOrdersScreen> {
 
   Future<void> _updateOrderStatus(int orderId, String newStatus) async {
     try {
-      // Show loading indicator
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -27,13 +26,10 @@ class _MerchantOrdersScreenState extends State<MerchantOrdersScreen> {
         UpdateOrderDTO(status: newStatus),
       );
 
-      // Close loading indicator
       if (mounted) Navigator.pop(context);
 
-      // Refresh the screen
       setState(() {});
 
-      // Show success message
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -43,18 +39,12 @@ class _MerchantOrdersScreenState extends State<MerchantOrdersScreen> {
         );
       }
     } catch (e) {
-      // Close loading indicator
-      if (mounted) Navigator.pop(context);
-
-      // Show error message
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to update status: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to update status: $e')));
       }
+      if (mounted) Navigator.pop(context);
     }
   }
 

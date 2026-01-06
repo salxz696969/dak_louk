@@ -3,13 +3,10 @@ import 'dart:io';
 import 'package:dak_louk/core/enums/media_type_enum.dart';
 import 'package:dak_louk/core/media/media_picker_sheet.dart';
 import 'package:dak_louk/domain/models/models.dart';
-import 'package:dak_louk/domain/services/merchant/product_service.dart';
 import 'package:flutter/material.dart';
 
 class ProductsCreateForm extends StatefulWidget {
-  final void Function(ProductVM savedProduct)? onSaved;
-
-  const ProductsCreateForm({super.key, this.onSaved});
+  const ProductsCreateForm({super.key});
 
   @override
   State<ProductsCreateForm> createState() => _ProductsCreateFormState();
@@ -22,8 +19,6 @@ class _ProductsCreateFormState extends State<ProductsCreateForm> {
   final _priceCtrl = TextEditingController();
   final _qtyCtrl = TextEditingController();
 
-  bool _saving = false;
-  final _service = ProductService();
   String? imageUrl;
 
   @override
@@ -46,35 +41,18 @@ class _ProductsCreateFormState extends State<ProductsCreateForm> {
     }
   }
 
-  Future<void> _submit() async {
+  void _submit() {
     if (!_formKey.currentState!.validate()) return;
 
-    setState(() => _saving = true);
+    final dto = CreateProductDTO(
+      name: _nameCtrl.text.trim(),
+      description: _descCtrl.text.trim().isEmpty ? null : _descCtrl.text.trim(),
+      price: double.parse(_priceCtrl.text),
+      quantity: int.parse(_qtyCtrl.text),
+      imageUrl: imageUrl,
+    );
 
-    try {
-      final result = await _service.createProduct(
-        CreateProductDTO(
-          name: _nameCtrl.text.trim(),
-          description: _descCtrl.text.trim().isEmpty
-              ? null
-              : _descCtrl.text.trim(),
-          price: double.parse(_priceCtrl.text),
-          quantity: int.parse(_qtyCtrl.text),
-          imageUrl: imageUrl,
-        ),
-      );
-
-      widget.onSaved?.call(result!);
-      if (mounted) Navigator.pop(context);
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
-      }
-    } finally {
-      if (mounted) setState(() => _saving = false);
-    }
+    Navigator.pop(context, dto);
   }
 
   @override
@@ -191,19 +169,17 @@ class _ProductsCreateFormState extends State<ProductsCreateForm> {
               width: double.infinity,
               height: 48,
               child: InkWell(
-                onTap: _saving ? null : _submit,
-                child: _saving
-                    ? const CircularProgressIndicator()
-                    : const Center(
-                        child: Text(
-                          'Create',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ),
+                onTap: _submit,
+                child: const Center(
+                  child: Text(
+                    'Create',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
               ),
             ),
           ],
@@ -212,4 +188,3 @@ class _ProductsCreateFormState extends State<ProductsCreateForm> {
     );
   }
 }
-

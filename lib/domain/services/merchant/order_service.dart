@@ -2,12 +2,12 @@ import 'package:dak_louk/data/repositories/order_product_repo.dart';
 import 'package:dak_louk/data/repositories/order_repo.dart';
 import 'package:dak_louk/data/repositories/product_media_repo.dart';
 import 'package:dak_louk/data/repositories/product_repo.dart';
+import 'package:dak_louk/data/repositories/user_repo.dart';
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/core/utils/orm.dart';
 import 'package:dak_louk/data/tables/tables.dart';
 import 'package:dak_louk/core/auth/app_session.dart';
 import 'package:dak_louk/core/utils/error.dart';
-import 'package:dak_louk/domain/services/user/user_service.dart';
 import 'package:dak_louk/data/cache/cache.dart';
 
 class OrderService {
@@ -18,6 +18,7 @@ class OrderService {
   final ProductRepository _productRepository = ProductRepository();
   final ProductMediaRepository _productMediaRepository =
       ProductMediaRepository();
+  final UserRepository _userRepository = UserRepository();
   final Cache _cache = Cache();
   late final String _baseCacheKey;
   late final String userSideCacheKeyPattern;
@@ -41,34 +42,30 @@ class OrderService {
   Future<List<OrderMerchantVM>> getAllOrders() async {
     try {
       final cacheKey = '$_baseCacheKey:getAllOrders';
+
       if (_cache.exists(cacheKey)) {
         final cached = _cache.get(cacheKey);
-        return _cache.expectMany(cached).cast<OrderMerchantVM>().toList();
+        final result = _cache
+            .expectMany(cached)
+            .cast<OrderMerchantVM>()
+            .toList();
+        return result;
       }
 
-      final statement = Clauses.where
-          .eq(Tables.orders.cols.merchantId, currentMerchantId)
-          .and([
-            Clauses.where.neq(Tables.orders.cols.status, 'completed'),
-            Clauses.where.neq(Tables.orders.cols.status, 'cancelled'),
-          ]);
+      final statement = Clauses.where.eq(
+        Tables.orders.cols.merchantId,
+        currentMerchantId,
+      );
 
       final orders = await _orderRepository.queryThisTable(
         where: statement.clause,
         args: statement.args,
-        orderBy: Clauses.orderBy
-            .caseWhen(Tables.orders.cols.status, {
-              'waiting': 1,
-              'delivering': 2,
-            }, elseValue: 3)
-            .thenBy(Clauses.orderBy.desc(Tables.orders.cols.createdAt).clause)
-            .clause,
       );
 
       final List<OrderMerchantVM> enrichedOrders = [];
       for (final order in orders) {
         try {
-          final user = await UserService().getUserById(order.userId);
+          final user = await _userRepository.getById(order.userId);
           final orderProductModels = await _orderProductRepository
               .queryThisTable(
                 where: Clauses.where

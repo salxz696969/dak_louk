@@ -77,7 +77,9 @@ class _AuthScreenState extends State<AuthScreen> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           decoration: BoxDecoration(
-                            color: isLogIn ? Theme.of(context).colorScheme.secondary : Colors.transparent,
+                            color: isLogIn
+                                ? Theme.of(context).colorScheme.secondary
+                                : Colors.transparent,
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
@@ -97,7 +99,9 @@ class _AuthScreenState extends State<AuthScreen> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           decoration: BoxDecoration(
-                            color: !isLogIn ? Theme.of(context).colorScheme.secondary : Colors.transparent,
+                            color: !isLogIn
+                                ? Theme.of(context).colorScheme.secondary
+                                : Colors.transparent,
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
