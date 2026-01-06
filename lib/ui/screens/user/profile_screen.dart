@@ -58,7 +58,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           return Center(child: Text('Error: ${userSnapshot.error}'));
         }
         final user = userSnapshot.data!;
-        return Column(
+        return ListView(
           children: [
             const SizedBox(height: 30),
             ProfileInfo(

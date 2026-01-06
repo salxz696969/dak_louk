@@ -26,7 +26,7 @@ class ChatRoomService {
     }
   }
 
-  // ! not used in ui, but should be when theres no seeded data, should happen when we click the message icon oin a post or 
+  // ! not used in ui, but should be when theres no seeded data, should happen when we click the message icon oin a post or
   // ! merchant profile, if the getChatsByChatroom id or by merchant id create the chatroom
   // Migrated from ChatRoomDao.insertChatRoom
   Future<int> createChatRoom(CreateChatRoomDTO dto) async {
@@ -120,15 +120,14 @@ class ChatRoomService {
   }
 
   // Migrated from ChatRoomDao.getAllChatRoomsByUserId
-  Future<List<ChatRoomVM?>> getAllChatRooms() async {
+  Future<List<ChatRoomVM>> getAllChatRooms() async {
     try {
       final cacheKey = '$_baseCacheKey:getAllChatRooms';
       if (_cache.exists(cacheKey)) {
         final cached = _cache.get(cacheKey);
-        return _cache.expectMany(cached).cast<ChatRoomVM?>().toList();
+        return _cache.expectMany(cached).cast<ChatRoomVM>().toList();
       }
 
-      print('getAllChatRooms: querying chat rooms for user $currentUserId');
       final statement = Clauses.where.eq(
         Tables.chatRooms.cols.userId,
         currentUserId,
@@ -138,11 +137,9 @@ class ChatRoomService {
         args: statement.args,
         limit: 50,
       );
-      print('getAllChatRooms: found ${chatRooms.length} chat rooms');
       final chatRoomsVM = <ChatRoomVM>[];
       if (chatRooms.isNotEmpty) {
         for (final chatRoom in chatRooms) {
-          print('getAllChatRooms: processing chatRoom.id=${chatRoom.id}');
           final merchant = await _merchantRepository.getById(
             chatRoom.merchantId,
           );
@@ -157,13 +154,10 @@ class ChatRoomService {
               limit: 1,
               orderBy: Clauses.orderBy.desc(Tables.chats.cols.createdAt).clause,
             );
-            print('getAllChatRooms: found ${chatRoomChats.length} chats in chatRoom.id=${chatRoom.id}');
             if (chatRoomChats.isNotEmpty) {
               final latestChat = chatRoomChats.first;
               final timeAgo = DateTime.parse(latestChat.createdAt);
               final latestText = latestChat.text;
-              print('getAllChatRooms: adding ChatRoomVM for chatRoom.id=${chatRoom.id} '
-                  'merchant=${merchant.username}, latestText="$latestText", timeAgo=${timeAgo}');
               chatRoomsVM.add(
                 ChatRoomVM.fromRaw(
                   chatRoom,
@@ -174,16 +168,12 @@ class ChatRoomService {
                 ),
               );
             }
-          } else {
-            print('getAllChatRooms: merchant not found for merchantId=${chatRoom.merchantId}');
           }
         }
       }
-      print('getAllChatRooms: returning ${chatRoomsVM.length} ChatRoomVMs');
       _cache.set(cacheKey, Many(chatRoomsVM));
       return chatRoomsVM;
     } catch (e) {
-      print('getAllChatRooms: error - $e');
       if (e is AppError) {
         rethrow;
       }
