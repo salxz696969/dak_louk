@@ -37,10 +37,7 @@ class AuthService {
       return Role.user;
     }
     if (merchant != null) {
-      // Merchant login, fill both sections
       await AppSession.instance.setMerchantSession(
-        userId: merchant.id,
-        username: merchant.username,
         role: Role.merchant,
         merchantId: merchant.id,
         merchantUsername: merchant.username,

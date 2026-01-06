@@ -26,7 +26,7 @@ class AppSession {
 
   Role? _role;
 
-  bool get isLoggedIn => _userId != null;
+  bool get isLoggedIn => _userId != null || _merchantId != null;
 
   int? get userId => _userId;
   String? get username => _username;
@@ -91,8 +91,6 @@ class AppSession {
   }
 
   Future<void> setMerchantSession({
-    required int userId,
-    required String username,
     required Role role,
     required int merchantId,
     required String merchantUsername,
@@ -100,8 +98,8 @@ class AppSession {
   }) async {
     final prefs = await SharedPreferences.getInstance();
 
-    _userId = userId;
-    _username = username;
+    _userId = null;
+    _username = null;
     _role = role;
     _merchantId = merchantId;
     _merchantUsername = merchantUsername;
@@ -110,8 +108,6 @@ class AppSession {
     _phone = null;
     _address = null;
 
-    await prefs.setInt(_keyUserId, _userId!);
-    await prefs.setString(_keyUsername, _username!);
     await prefs.setString(_keyRole, _role!.name);
 
     await prefs.setInt(_keyMerchantId, _merchantId!);

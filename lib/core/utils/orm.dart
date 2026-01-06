@@ -94,22 +94,6 @@ class _OrderBy {
   _OrderBy desc(String column) {
     return _OrderBy('$column DESC');
   }
-
-  _OrderBy caseWhen(String column, Map<String, int> cases, {int? elseValue}) {
-    String caseClause = 'CASE $column ';
-    cases.forEach((value, priority) {
-      caseClause += "WHEN '$value' THEN $priority ";
-    });
-    if (elseValue != null) {
-      caseClause += 'ELSE $elseValue ';
-    }
-    caseClause += 'END ASC';
-    return _OrderBy(caseClause);
-  }
-
-  _OrderBy thenBy(String orderByClause) {
-    return _OrderBy('$clause, $orderByClause');
-  }
 }
 
 class _Like {
