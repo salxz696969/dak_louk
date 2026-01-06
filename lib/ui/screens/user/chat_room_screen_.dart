@@ -9,17 +9,17 @@ class ChatRoomScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ChatRoomService _chatRoomService = ChatRoomService();
-    return FutureBuilder<List<ChatRoomVM?>>(
+    return FutureBuilder<List<ChatRoomVM>>(
       future: _chatRoomService.getAllChatRooms(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
-          return Center(child: Text('Error: \\${snapshot.error}'));
+          return Center(child: Text('Error: ${snapshot.error}'));
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
           return const Center(child: Text('No chat rooms found.'));
         }
-        final chatRooms = snapshot.data! as List<ChatRoomVM>;
+        final chatRooms = snapshot.data!;
         return ListView.builder(
           itemCount: chatRooms.length,
           itemBuilder: (context, index) {
