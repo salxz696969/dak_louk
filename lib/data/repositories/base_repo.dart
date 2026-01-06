@@ -144,7 +144,6 @@ abstract class BaseRepository<T extends Cacheable>
   @override
   Future<int> update(T model) async {
     try {
-      if (T is CartModel) {}
       final db = await database;
       final cacheKey = _getBaseCacheKey();
       final map = toMap(model);
