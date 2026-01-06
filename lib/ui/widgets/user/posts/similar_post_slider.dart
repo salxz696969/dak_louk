@@ -87,18 +87,21 @@ class _SimilarItemCardState extends State<_SimilarItemCard> {
               ),
               child: Stack(
                 children: [
-                  MediaCarousel(
-                    medias: widget.post.promoMedias!
-                        .map(
-                          (m) => MediaModel(
-                            url: m.url,
-                            type: m.mediaType == 'video'
-                                ? MediaType.video
-                                : MediaType.image,
-                          ),
-                        )
-                        .toList(),
-                  ),
+                  if (widget.post.promoMedias != null)
+                    MediaCarousel(
+                      medias:
+                          widget.post.promoMedias
+                              ?.map(
+                                (m) => MediaModel(
+                                  url: m.url,
+                                  type: m.mediaType == 'video'
+                                      ? MediaType.video
+                                      : MediaType.image,
+                                ),
+                              )
+                              .toList() ??
+                          [],
+                    ),
                 ],
               ),
             ),
@@ -106,7 +109,13 @@ class _SimilarItemCardState extends State<_SimilarItemCard> {
               padding: const EdgeInsets.all(12.0),
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.primary,
-                borderRadius: const BorderRadius.only(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(
+                    widget.post.promoMedias != null ? 16 : 0,
+                  ),
+                  topRight: Radius.circular(
+                    widget.post.promoMedias != null ? 16 : 0,
+                  ),
                   bottomLeft: Radius.circular(16),
                   bottomRight: Radius.circular(16),
                 ),

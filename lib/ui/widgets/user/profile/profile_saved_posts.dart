@@ -1,5 +1,6 @@
 import 'package:dak_louk/domain/models/models.dart';
 import 'package:dak_louk/ui/widgets/user/profile/profile_liked_posts.dart';
+import 'package:dak_louk/ui/widgets/user/profile/profile_post_item.dart';
 import 'package:flutter/material.dart';
 
 class SavedPosts extends StatelessWidget {
@@ -24,7 +25,7 @@ class SavedPosts extends StatelessWidget {
       itemCount: savedPosts.length,
       itemBuilder: (context, index) {
         final post = savedPosts[index];
-        return PhotoContainer(post: post);
+        return ProfilePostItem(post: post);
       },
     );
   }
