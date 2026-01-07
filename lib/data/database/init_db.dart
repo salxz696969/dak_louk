@@ -322,8 +322,11 @@ const productImages = [
 ]; 
 
 const productVideos = [
-  'assets/live_videos/sample1.mp4',
-  'assets/live_videos/sample2.mp4',
+  'assets/live_videos/sample3.mp4',
+  'assets/live_videos/sample4.mp4',
+  'assets/live_videos/sample5.mp4',
+  'assets/live_videos/sample6.mp4',
+  'assets/live_videos/sample7.mp4',
 ];
 
 // Category-specific product mappings
